@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.pablocompany.proyectono1_compi1.ui.screens.HomeScreen
+import com.pablocompany.proyectono1_compi1.ui.screens.main.HomeScreen
 
 
 @Composable
@@ -23,8 +23,8 @@ fun AppNavigation() {
         }
 
         //Ruta que permite ir al editor
-        composable("editor") {
-            //EditorScreen(navController, viewModel)
+        composable("main") {
+            MainScaffold()
         }
     }
 }

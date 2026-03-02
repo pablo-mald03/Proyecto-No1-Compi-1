@@ -1,4 +1,4 @@
-package com.pablocompany.proyectono1_compi1.ui.screens
+package com.pablocompany.proyectono1_compi1.ui.screens.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -80,7 +80,7 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
-                    onClick = { navController.navigate("editor") },
+                    onClick = { navController.navigate("main") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(58.dp),
@@ -91,7 +91,8 @@ fun HomeScreen(navController: NavController) {
                 ) {
                     Text(
                         text = "Iniciar",
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
