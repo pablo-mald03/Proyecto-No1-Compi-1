@@ -54,6 +54,7 @@ dependencies {
     implementation("com.itextpdf:itextpdf:5.5.13.3")
 
     implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation(libs.androidx.material3)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
