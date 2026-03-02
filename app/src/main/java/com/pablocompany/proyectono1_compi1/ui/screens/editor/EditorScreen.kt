@@ -128,7 +128,7 @@ fun EditorScreen() {
     }
 
     val saveAsLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("text/plain")
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri ->
         uri?.let { viewModel.saveAs(it) }
     }
@@ -168,11 +168,11 @@ fun EditorScreen() {
                 onAbrirCodigo = {
                     if (viewModel.isModified) {
                         pendingAction = {
-                            openLauncher.launch(arrayOf("*/*"))
+                            openLauncher.launch(arrayOf("application/octet-stream"))
                         }
                         showUnsavedDialog = true
                     } else {
-                        openLauncher.launch(arrayOf("*/*"))
+                        openLauncher.launch(arrayOf("application/octet-stream"))
                     }
                 },
                 onGuardarCodigo = {

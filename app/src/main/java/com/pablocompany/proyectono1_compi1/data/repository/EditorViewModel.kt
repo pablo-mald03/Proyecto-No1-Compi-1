@@ -41,10 +41,25 @@ class EditorViewModel(
         }
     }
 
-    fun saveAs(uri: Uri) {
-        repository.writeFile(uri, code)
-        currentFileUri = uri
-        fileName = repository.getFileName(uri)
+    fun saveAs(uri: Uri?) {
+        if (uri == null) return
+
+        val finalUri = if (uri.toString().endsWith(".form")) {
+            uri
+        } else {
+            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault())
+                .format(java.util.Date())
+            val defaultName = "archivo_$timestamp.form"
+
+            val contentValues = android.content.ContentValues().apply {
+                put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, defaultName)
+            }
+            uri
+        }
+
+        repository.writeFile(finalUri, code)
+        currentFileUri = finalUri
+        fileName = repository.getFileName(finalUri)
         isModified = false
     }
 
