@@ -1,5 +1,8 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,6 +39,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -54,11 +59,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModel
+import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModelFactory
+import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,6 +95,21 @@ fun EditorScreen() {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
 
+    val context = LocalContext.current
+
+    val repository = remember { FormFileRepository(context) }
+    val viewModel: EditorViewModel = viewModel(
+        factory = EditorViewModelFactory(repository)
+    )
+
+    val code by viewModel::code
+    val fileNameObserved by viewModel::fileName
+    val isModified by viewModel::isModified
+
+    val fileName = fileNameObserved ?: "Sin título"
+    val title = if (isModified) "$fileName *" else fileName
+
+
     LaunchedEffect(sheetState.currentValue) {
         if (sheetState.currentValue != SheetValue.Expanded) {
             keyboardController?.hide()
@@ -91,10 +117,86 @@ fun EditorScreen() {
         }
     }
 
+    val openLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            if (it.toString().endsWith(".form")) {
+                viewModel.loadFile(it)
+            }
+        }
+    }
+
+    val saveAsLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri ->
+        uri?.let { viewModel.saveAs(it) }
+    }
+
+    var showUnsavedDialog by remember { mutableStateOf(false) }
+    var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    if (showUnsavedDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsavedDialog = false },
+            title = { Text("Cambios sin guardar") },
+            text = { Text("Tienes cambios sin guardar. ¿Deseas continuar?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showUnsavedDialog = false
+                        pendingAction?.invoke()
+                    }
+                ) {
+                    Text("Continuar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showUnsavedDialog = false }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { DrawerContent() }
+        drawerContent = {
+            DrawerContent(
+                onAbrirCodigo = {
+                    if (viewModel.isModified) {
+                        pendingAction = {
+                            openLauncher.launch(arrayOf("*/*"))
+                        }
+                        showUnsavedDialog = true
+                    } else {
+                        openLauncher.launch(arrayOf("*/*"))
+                    }
+                },
+                onGuardarCodigo = {
+                    if (viewModel.currentFileUri != null) {
+                        viewModel.saveFile()
+                    } else {
+                        saveAsLauncher.launch("archivo.form")
+                    }
+                },
+                onCerrarCodigo = {
+                    if (viewModel.isModified) {
+                        pendingAction = {
+                            viewModel.closeFile()
+                        }
+                        showUnsavedDialog = true
+                    } else {
+                        viewModel.closeFile()
+                    }
+                },
+                currentFileUri = viewModel.currentFileUri,
+                isModified = viewModel.isModified,
+                fileName = fileName
+            )
+        }
     ) {
 
         Box(
@@ -114,8 +216,9 @@ fun EditorScreen() {
                             ),
                             title = {
                                 Text(
-                                    "Editor",
-                                    style = MaterialTheme.typography.titleLarge
+                                    title,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Bold
                                 )
                             },
                             navigationIcon = {
@@ -146,7 +249,8 @@ fun EditorScreen() {
                     Text(
                         "Previsualización del Formulario",
                         color = Color.White,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
                     )
 
                     Spacer(Modifier.height(24.dp))
@@ -190,7 +294,23 @@ fun EditorScreen() {
                 sheetContainerColor = Color(0xFF1E1E1E),
                 containerColor = Color.Transparent,
                 sheetContent = {
-                    ConsoleSection()
+                    ConsoleSection(
+                        code = code,
+                        onCodeChange = { viewModel.updateCode(it) },
+                        onGuardarClick = {
+                            if (viewModel.currentFileUri != null) {
+                                viewModel.saveFile()
+                            } else {
+                                saveAsLauncher.launch("archivo.form")
+                            }
+                        },
+                        onEjecutarClick = {
+                            println("Ejecutar análisis")
+                        },
+                        onAgregarClick = {
+                            println("Agregar elemento")
+                        }
+                    )
                 },
                 modifier = Modifier.matchParentSize()
             ) {}
@@ -199,7 +319,14 @@ fun EditorScreen() {
 }
 
 @Composable
-fun DrawerContent() {
+fun DrawerContent(
+    onAbrirCodigo: () -> Unit,
+    onGuardarCodigo: () -> Unit,
+    onCerrarCodigo: () -> Unit,
+    currentFileUri: Uri?,
+    isModified: Boolean,
+    fileName: String,
+) {
 
     Column(
         modifier = Modifier
@@ -214,24 +341,40 @@ fun DrawerContent() {
             color = Color.White
         )
 
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = fileName,
+            color = if (currentFileUri != null) Color.Green else Color.Yellow,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        if (isModified) {
+            Text(
+                "Cambios sin guardar",
+                color = Color.Red,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+
         Spacer(Modifier.height(24.dp))
 
-        DrawerButton("Abrir código")
-        DrawerButton("Guardar código")
-        DrawerButton("Abrir formulario")
-        DrawerButton("Guardar formulario")
+        DrawerButton("Abrir código", onAbrirCodigo)
+        DrawerButton("Guardar código", onGuardarCodigo)
 
-        Spacer(Modifier.weight(1f))
-
-        DrawerButton("Finalizar")
+        if (currentFileUri != null) {
+            DrawerButton("Cerrar código", onCerrarCodigo)
+        }
     }
 }
 
 @Composable
-fun DrawerButton(text: String) {
-
+fun DrawerButton(
+    text: String,
+    onClick: () -> Unit
+) {
     Button(
-        onClick = { },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF2C2C2C)
         ),
@@ -249,9 +392,13 @@ fun DrawerButton(text: String) {
 }
 
 @Composable
-fun ConsoleSection() {
-
-    var code by rememberSaveable { mutableStateOf("") }
+fun ConsoleSection(
+    code: String,
+    onCodeChange: (String) -> Unit,
+    onGuardarClick: () -> Unit,
+    onEjecutarClick: () -> Unit,
+    onAgregarClick: () -> Unit
+) {
 
     val density = LocalDensity.current
     val imeBottom = WindowInsets.ime.getBottom(density)
@@ -268,7 +415,7 @@ fun ConsoleSection() {
         ) {
 
             Text(
-                "Consola",
+                text = "Consola",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White
             )
@@ -277,7 +424,7 @@ fun ConsoleSection() {
 
             TextField(
                 value = code,
-                onValueChange = { code = it },
+                onValueChange = onCodeChange,
                 maxLines = Int.MAX_VALUE,
                 modifier = Modifier
                     .height(250.dp)
@@ -295,7 +442,10 @@ fun ConsoleSection() {
                     fontFamily = FontFamily.Monospace
                 ),
                 placeholder = {
-                    Text("Escribe tu código aquí...", color = Color.Gray)
+                    Text(
+                        "Escribe tu código aquí...",
+                        color = Color.Gray
+                    )
                 }
             )
 
@@ -309,9 +459,9 @@ fun ConsoleSection() {
                     ),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ConsoleButton("Agregar")
-                ConsoleButton("Reemplazar")
-                ConsoleButton("Finalizar")
+                ConsoleButton("Agregar", onClick = onAgregarClick)
+                ConsoleButton("Ejecutar", onClick = onEjecutarClick)
+                ConsoleButton("Guardar", onClick = onGuardarClick)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -320,17 +470,20 @@ fun ConsoleSection() {
 }
 
 @Composable
-fun ConsoleButton(text: String) {
+fun ConsoleButton(
+    text: String,
+    onClick: () -> Unit
+) {
 
     Button(
-        onClick = { },
+        onClick = onClick,
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF5F0F40)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(
-            text,
+            text = text,
             color = Color.White
         )
     }
