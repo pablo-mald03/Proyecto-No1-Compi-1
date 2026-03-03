@@ -121,9 +121,7 @@ fun EditorScreen() {
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let {
-            if (it.toString().endsWith(".form")) {
-                viewModel.loadFile(it)
-            }
+            viewModel.loadFile(it)
         }
     }
 
