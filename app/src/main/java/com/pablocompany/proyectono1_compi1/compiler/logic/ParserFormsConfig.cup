@@ -1,0 +1,94 @@
+/****************** packages and imports **************/
+package com.pablocompany.proyectono1_compi1.compiler.logic;
+
+/*Created by Pablo*/
+import java_cup.runtime.*;
+import java.util.*;
+
+/*Imports de mis clases*/
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+
+/*------------------------------------------------------
+                        CUP
+--------------------------------------------------------*/
+parser code {:
+
+       LexerForms lex;
+       private List<ErrorAnalisis> syntaxErrorList;
+
+       // conexion de parser y lexer
+       public Parser(LexerForms lex){
+           super(lex);
+           this.lex = lex;
+           syntaxErrorList = new ArrayList<>();
+       }
+
+       // Getters
+       public LexerForms getLexer(){
+           return this.lex;
+       }
+
+       public List<ErrorAnalisis> getSyntaxErrorList(){
+           return this.syntaxErrorList;
+       }
+
+        //Metodo que permite retornar los errores sintacticos
+        public void syntax_error(Symbol cur_token) {
+           /* List<Integer> ids = expected_token_ids();
+            String encontrado = (cur_token.value != null) ? cur_token.value.toString() : sym.terminalNames[cur_token.sym];
+
+            StringBuilder sugerencias = new StringBuilder();
+            if (!ids.isEmpty()) {
+                sugerencias.append(". Se esperaba: ");
+                for (int i = 0; i < ids.size(); i++) {
+                    sugerencias.append(traducirToken(sym.terminalNames[ids.get(i)]));
+                    if (i < ids.size() - 1) sugerencias.append(", ");
+                }
+            }
+
+            syntaxErrorList.add(new ErrorAnalisis(
+                encontrado,
+                cur_token.left,
+                cur_token.right,
+                "Sintáctico",
+                encontrado + "'" + sugerencias.toString()
+            ));*/
+        }
+
+
+:}
+
+/*----------------------------------------------------------
+                         reglas
+-----------------------------------------------------------*/
+
+/* Terminales: tokens que el parser nos retorna */
+terminal    ERROR, WHITESPACE, NEWLINE;
+
+
+/*======Apartado de tipado de tokens que vienen del lexer======*/
+terminal String ID;
+terminal Double DECIMAL;
+terminal Integer ENTERO;
+
+
+/*======Apartado de tipado de tokens que vienen del lexer======*/
+
+/* No terminales, reglas que nosotros vamos a definir sintacticamente */
+non terminal formulario;
+
+/* Símbolo inicial */
+start with formulario;
+
+formulario          ::=
+                    ;
+
+
+
+
+
+
+
+
+
+

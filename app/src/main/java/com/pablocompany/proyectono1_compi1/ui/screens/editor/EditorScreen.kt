@@ -83,9 +83,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -240,18 +243,24 @@ fun EditorScreen() {
                 sheetContent = {
                     ConsoleSection(
                         codeField = viewModel.codeField,
+                        highlightedCode = viewModel.highlightedCode,
                         onCodeChange = { viewModel.updateCodeField(it) },
-                        onGuardarClick = {
+                        onFinalizarClick = {
                             if (viewModel.currentFileUri != null) {
                                 viewModel.saveFile()
                             } else {
                                 saveAsLauncher.launch("archivo.form")
                             }
+                            //Pendiente logica para llamar al traductor
                         },
-                        onEjecutarClick = {
+                        onReemplazarClick = {
                             hayErrores = true
+
+                            //Pendiente conectar al lexer
                         },
-                        onAgregarClick = {},
+                        onAgregarClick = {//Pendiente definir bloques de codigo
+
+                        },
                         onColorClick = {
                             showColorPicker = true
                         }
@@ -694,11 +703,12 @@ fun DrawerButton(
 @Composable
 fun ConsoleSection(
     codeField: TextFieldValue,
+    highlightedCode: AnnotatedString,
     onCodeChange: (TextFieldValue) -> Unit,
-    onGuardarClick: () -> Unit,
-    onEjecutarClick: () -> Unit,
+    onFinalizarClick: () -> Unit,
+    onReemplazarClick: () -> Unit,
     onAgregarClick: () -> Unit,
-    onColorClick: () -> Unit
+    onColorClick: () -> Unit,
 ) {
 
     val density = LocalDensity.current
@@ -752,6 +762,13 @@ fun ConsoleSection(
                 value = codeField,
                 onValueChange = onCodeChange,
                 maxLines = Int.MAX_VALUE,
+                visualTransformation = {
+                    val safeHighlighted = if (codeField.text.isEmpty()) AnnotatedString("") else highlightedCode
+                    TransformedText(
+                        safeHighlighted,
+                        OffsetMapping.Identity
+                    )
+                },
                 modifier = Modifier
                     .height(250.dp)
                     .fillMaxWidth(),
@@ -786,8 +803,8 @@ fun ConsoleSection(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 ConsoleButton("Agregar", onClick = onAgregarClick)
-                ConsoleButton("Reemplazar", onClick = onEjecutarClick)
-                ConsoleButton("Finalizar", onClick = onGuardarClick)
+                ConsoleButton("Reemplazar", onClick = onReemplazarClick)
+                ConsoleButton("Finalizar", onClick = onFinalizarClick)
             }
 
             Spacer(Modifier.height(24.dp))
