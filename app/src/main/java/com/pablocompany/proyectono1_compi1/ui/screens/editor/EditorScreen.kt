@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -68,7 +69,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,9 +81,12 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.github.skydoves.colorpicker.compose.ColorEnvelope
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModelFactory
 import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
@@ -97,10 +100,11 @@ fun EditorScreen() {
     val leftDrawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    /* ---------- NUEVO: Drawer derecho control manual ---------- */
     var showErrorDrawer by remember { mutableStateOf(false) }
 
-    /* ---------- NUEVO: Banner flotante ---------- */
+    var showColorPicker by remember { mutableStateOf(false) }
+
+    /* ---------- Banner flotante ---------- */
     var hayErrores by remember { mutableStateOf(false) }
 
     LaunchedEffect(hayErrores) {
@@ -134,7 +138,6 @@ fun EditorScreen() {
         factory = EditorViewModelFactory(repository)
     )
 
-    val code by viewModel::code
     val fileNameObserved by viewModel::fileName
     val isModified by viewModel::isModified
 
@@ -220,7 +223,6 @@ fun EditorScreen() {
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            /* ---------------- CONTENIDO PRINCIPAL + BOTTOM SHEET ---------------- */
 
             BottomSheetScaffold(
                 scaffoldState = scaffoldState,
@@ -229,8 +231,8 @@ fun EditorScreen() {
                 containerColor = Color.Transparent,
                 sheetContent = {
                     ConsoleSection(
-                        code = code,
-                        onCodeChange = { viewModel.updateCode(it) },
+                        codeField = viewModel.codeField,
+                        onCodeChange = { viewModel.updateCodeField(it) },
                         onGuardarClick = {
                             if (viewModel.currentFileUri != null) {
                                 viewModel.saveFile()
@@ -241,7 +243,10 @@ fun EditorScreen() {
                         onEjecutarClick = {
                             hayErrores = true
                         },
-                        onAgregarClick = {}
+                        onAgregarClick = {},
+                        onColorClick = {
+                            showColorPicker = true
+                        }
                     )
                 }
             ) {
@@ -324,7 +329,7 @@ fun EditorScreen() {
                 }
             }
 
-            /* ---------------- Boton flotante ---------------- */
+            /* ---------------- Boton flotante de errores---------------- */
 
             FloatingActionButton(
                 onClick = { showErrorDrawer = !showErrorDrawer },
@@ -365,7 +370,6 @@ fun EditorScreen() {
                 ) {
                     Column {
 
-                        /* Header con X */
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -433,6 +437,15 @@ fun EditorScreen() {
                 )
             }
 
+            /* ---------------- SELECTOR DE COLORES ---------------- */
+            if (showColorPicker) {
+                ColorPickerDialog(
+                    onDismiss = { showColorPicker = false },
+                    onColorSelected = { formattedColor ->
+                        viewModel.insertTextAtCursor(formattedColor)
+                    }
+                )
+            }
         }
     }
 }
@@ -590,6 +603,7 @@ fun Celda(texto: String) {
     }
 }
 
+//Metodo que permite ejecutar las acciones de opciones
 @Composable
 fun DrawerContent(
     onAbrirCodigo: () -> Unit,
@@ -640,6 +654,7 @@ fun DrawerContent(
     }
 }
 
+//Metodo que permite dibujar los botones para la configuracion
 @Composable
 fun DrawerButton(
     text: String,
@@ -663,13 +678,15 @@ fun DrawerButton(
     }
 }
 
+//Metodo que permite despliegar la consola la seccion plegable de la consola
 @Composable
 fun ConsoleSection(
-    code: String,
-    onCodeChange: (String) -> Unit,
+    codeField: TextFieldValue,
+    onCodeChange: (TextFieldValue) -> Unit,
     onGuardarClick: () -> Unit,
     onEjecutarClick: () -> Unit,
-    onAgregarClick: () -> Unit
+    onAgregarClick: () -> Unit,
+    onColorClick: () -> Unit
 ) {
 
     val density = LocalDensity.current
@@ -694,8 +711,17 @@ fun ConsoleSection(
 
             Spacer(Modifier.height(8.dp))
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                ConsoleButton("Color", onClick = onColorClick)
+            }
+
+            Spacer(Modifier.height(8.dp))
+
             TextField(
-                value = code,
+                value = codeField,
                 onValueChange = onCodeChange,
                 maxLines = Int.MAX_VALUE,
                 modifier = Modifier
@@ -739,6 +765,82 @@ fun ConsoleSection(
             Spacer(Modifier.height(24.dp))
         }
     }
+}
+
+//Consola para poder realizar el picker de colores
+@Composable
+fun ColorPickerDialog(
+    onDismiss: () -> Unit,
+    onColorSelected: (String) -> Unit
+) {
+    var selectedColor by remember { mutableStateOf(Color.Red) }
+    var selectedFormat by remember { mutableStateOf("HEX") }
+
+    val controller = rememberColorPickerController()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+
+                val result = when (selectedFormat) {
+                    "HEX" -> selectedColor.toHex()
+                    "RGB" -> selectedColor.toRgb()
+                    else -> selectedColor.toHex()
+                }
+
+                onColorSelected(result)
+                onDismiss()
+            }) {
+                Text("Insertar")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar")
+            }
+        },
+        text = {
+            Column {
+
+                HsvColorPicker(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp),
+                    controller = controller,
+                    onColorChanged = { envelope: ColorEnvelope ->
+                        selectedColor = envelope.color
+                    }
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Button(onClick = { selectedFormat = "HEX" }) {
+                        Text("HEX")
+                    }
+                    Button(onClick = { selectedFormat = "RGB" }) {
+                        Text("RGB")
+                    }
+                }
+            }
+        }
+    )
+}
+fun Color.toHex(): String {
+    return String.format(
+        "#%02X%02X%02X",
+        (red * 255).toInt(),
+        (green * 255).toInt(),
+        (blue * 255).toInt()
+    )
+}
+
+fun Color.toRgb(): String {
+    return "rgb(${(red * 255).toInt()}, ${(green * 255).toInt()}, ${(blue * 255).toInt()})"
 }
 
 @Composable

@@ -18,9 +18,12 @@ class FormFileRepository(
 
     fun writeFile(uri: Uri, content: String) {
         context.contentResolver
-            .openOutputStream(uri)
+            .openOutputStream(uri, "wt")
             ?.bufferedWriter()
-            ?.use { it.write(content) }
+            ?.use { writer ->
+                writer.write(content)
+                writer.flush()
+            }
     }
 
     fun getFileName(uri: Uri): String {

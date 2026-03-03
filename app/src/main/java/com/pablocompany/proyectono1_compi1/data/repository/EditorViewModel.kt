@@ -4,14 +4,19 @@ import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 
 class EditorViewModel(
     private val repository: FormFileRepository
 ) : ViewModel() {
 
-    var code by mutableStateOf("")
+    var codeField by mutableStateOf(TextFieldValue(""))
         private set
+
+    val code: String
+        get() = codeField.text
 
     var fileName by mutableStateOf<String?>(null)
         private set
@@ -22,14 +27,37 @@ class EditorViewModel(
     var currentFileUri: Uri? = null
         private set
 
-    fun updateCode(newCode: String) {
-        code = newCode
+    fun updateCodeField(value: TextFieldValue) {
+        codeField = value
+        isModified = true
+    }
+
+    fun insertTextAtCursor(text: String) {
+        val current = codeField
+
+        val newText = buildString {
+            append(current.text.substring(0, current.selection.start))
+            append(text)
+            append(current.text.substring(current.selection.end))
+        }
+
+        codeField = TextFieldValue(
+            text = newText,
+            selection = TextRange(current.selection.start + text.length)
+        )
+
         isModified = true
     }
 
     fun loadFile(uri: Uri) {
         currentFileUri = uri
-        code = repository.readFile(uri)
+        val content = repository.readFile(uri)
+
+        codeField = TextFieldValue(
+            text = content,
+            selection = TextRange(content.length)
+        )
+
         fileName = repository.getFileName(uri)
         isModified = false
     }
@@ -44,29 +72,16 @@ class EditorViewModel(
     fun saveAs(uri: Uri?) {
         if (uri == null) return
 
-        val finalUri = if (uri.toString().endsWith(".form")) {
-            uri
-        } else {
-            val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault())
-                .format(java.util.Date())
-            val defaultName = "archivo_$timestamp.form"
-
-            val contentValues = android.content.ContentValues().apply {
-                put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, defaultName)
-            }
-            uri
-        }
-
-        repository.writeFile(finalUri, code)
-        currentFileUri = finalUri
-        fileName = repository.getFileName(finalUri)
+        repository.writeFile(uri, code)
+        currentFileUri = uri
+        fileName = repository.getFileName(uri)
         isModified = false
     }
 
     fun closeFile() {
         currentFileUri = null
         fileName = null
-        code = ""
+        codeField = TextFieldValue("")
         isModified = false
     }
 }
