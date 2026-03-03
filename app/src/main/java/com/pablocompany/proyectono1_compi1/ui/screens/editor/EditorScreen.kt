@@ -27,11 +27,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ColorLens
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
@@ -75,6 +78,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -84,6 +88,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.graphics.component1
+import androidx.core.graphics.component2
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -93,6 +100,7 @@ import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+//------METODO PRINCIPAL QUE PERMITE MOSTRAR LA PANTALLA DEL EDITOR DE TEXTO-------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen() {
@@ -114,7 +122,7 @@ fun EditorScreen() {
         }
     }
 
-    /* ----------------------------------------------------------- */
+    /* --------------------------APARTADO DE VALIDACION DE VARIABLES Y DEMAS COSAS-------------------------------- */
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
@@ -449,6 +457,7 @@ fun EditorScreen() {
         }
     }
 }
+//Permite mostrar el contenido del drawer de los resportes. Es decir que muestra los errores y sus tablas
 @Composable
 fun ErrorDrawerContent() {
 
@@ -529,6 +538,7 @@ fun ErrorDrawerContent() {
     }
 }
 
+//Permite mostrar el banner flotante de errores (el mensaje flotante)
 @Composable
 fun ErrorBanner(
     mensaje: String,
@@ -561,6 +571,7 @@ fun ErrorBanner(
     }
 }
 
+//Metodo que permite formar los headers de las tablas (composable) es decir que es compartible
 @Composable
 fun CeldaHeader(texto: String) {
     Box(
@@ -582,6 +593,7 @@ fun CeldaHeader(texto: String) {
     }
 }
 
+//Metodo que permite formar las celdas de las tablas por fila
 @Composable
 fun Celda(texto: String) {
     Box(
@@ -713,9 +725,25 @@ fun ConsoleSection(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.Center
             ) {
-                ConsoleButton("Color", onClick = onColorClick)
+                Button(
+                    onClick = onColorClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF590613)
+                    ),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ColorLens,
+                        contentDescription = "Color",
+                        tint = Color.White
+                    )
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Text("Insertar Color", color = Color.White)
+                }
             }
 
             Spacer(Modifier.height(8.dp))
@@ -758,8 +786,8 @@ fun ConsoleSection(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 ConsoleButton("Agregar", onClick = onAgregarClick)
-                ConsoleButton("Ejecutar", onClick = onEjecutarClick)
-                ConsoleButton("Guardar", onClick = onGuardarClick)
+                ConsoleButton("Reemplazar", onClick = onEjecutarClick)
+                ConsoleButton("Finalizar", onClick = onGuardarClick)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -776,33 +804,96 @@ fun ColorPickerDialog(
     var selectedColor by remember { mutableStateOf(Color.Red) }
     var selectedFormat by remember { mutableStateOf("HEX") }
 
+    var selectedPresetName by remember { mutableStateOf<String?>(null) }
+
     val controller = rememberColorPickerController()
 
     AlertDialog(
+        containerColor = Color(0xFF020226),
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = {
 
-                val result = when (selectedFormat) {
+                val result = selectedPresetName ?: when (selectedFormat) {
                     "HEX" -> selectedColor.toHex()
                     "RGB" -> selectedColor.toRgb()
+                    "HSL" -> selectedColor.toHsl()
                     else -> selectedColor.toHex()
                 }
 
                 onColorSelected(result)
                 onDismiss()
             }) {
-                Text("Insertar")
+                Text("Insertar", color = Color(0xFF33CC12))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text("Cancelar", color = Color(0xFFFFFFFF))
             }
         },
         text = {
             Column {
 
+                //Presets de la aplicacion propia
+                val presets = listOf(
+                    "RED" to Color(0xFFFF0000),
+                    "GREEN" to Color(0xFF00FF00),
+                    "BLUE" to Color(0xFF0000FF),
+                    "PURPLE" to Color(0xFF9C27B0),
+                    "SKY" to Color(0xFF03A9F4),
+                    "YELLOW" to Color(0xFFFFEB3B),
+                    "BLACK" to Color(0xFF000000),
+                    "WHITE" to Color(0xFFFFFFFF)
+                )
+
+                Text(
+                    text = "Presets",
+                    color = Color.White,
+                    fontFamily = FontFamily.Monospace
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(presets) { (name, colorValue) ->
+
+                        Box(
+                            modifier = Modifier
+                                .background(colorValue, RoundedCornerShape(50))
+                                .border(
+                                    width = if (selectedColor == colorValue) 2.dp else 1.dp,
+                                    color = if (selectedColor == colorValue)
+                                        Color(0xFFBB86FC)
+                                    else
+                                        Color.DarkGray,
+                                    shape = RoundedCornerShape(50)
+                                )
+                                .clickable {
+                                    selectedColor = colorValue
+                                    selectedPresetName = name
+                                    controller.selectByColor(colorValue, fromUser = true)
+                                }
+                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = name,
+                                color = if (colorValue.luminance() > 0.5f)
+                                    Color.Black
+                                else
+                                    Color.White,
+                                fontFamily = FontFamily.Monospace,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                //Picker de colores
                 HsvColorPicker(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -810,26 +901,113 @@ fun ColorPickerDialog(
                     controller = controller,
                     onColorChanged = { envelope: ColorEnvelope ->
                         selectedColor = envelope.color
+                        selectedPresetName = null
                     }
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                // ===== Botones de formato =====
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    listOf("HEX", "RGB", "HSL").forEach { format ->
+                        Button(
+                            onClick = { selectedFormat = format },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor =
+                                    if (selectedFormat == format)
+                                        Color(0xFF6A1B9A)
+                                    else
+                                        Color(0xFF2A2A2A)
+                            ),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(format, color = Color.White)
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                val previewText = when (selectedFormat) {
+                    "HEX" -> selectedColor.toHex()
+                    "RGB" -> selectedColor.toRgb()
+                    "HSL" -> selectedColor.toHsl()
+                    else -> selectedColor.toHex()
+                }
+
+                // ===== Preview visual del color =====
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .background(selectedColor, RoundedCornerShape(12.dp))
                 )
 
                 Spacer(Modifier.height(16.dp))
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier.fillMaxWidth()
+                // ===== Preview estilo del codigo =====
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF121212), RoundedCornerShape(12.dp))
+                        .border(1.dp, Color(0xFF333333), RoundedCornerShape(12.dp))
+                        .padding(16.dp)
                 ) {
-                    Button(onClick = { selectedFormat = "HEX" }) {
-                        Text("HEX")
-                    }
-                    Button(onClick = { selectedFormat = "RGB" }) {
-                        Text("RGB")
+                    Column {
+
+                        Text(
+                            text = "Vista previa del formato: ",
+                            color = Color(0xFF6A9955),
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 12.sp
+                        )
+
+                        Spacer(Modifier.height(6.dp))
+
+                        Text(
+                            text = previewText,
+                            color = Color.White,
+                            fontFamily = FontFamily.Monospace,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
             }
         }
     )
 }
+
+//Retorna formato HSL de colores
+fun Color.toHsl(): String {
+    val r = red
+    val g = green
+    val b = blue
+
+    val max = maxOf(r, g, b)
+    val min = minOf(r, g, b)
+    val delta = max - min
+
+    var h = 0f
+    val l = (max + min) / 2f
+    val s = if (delta == 0f) 0f else delta / (1f - kotlin.math.abs(2f * l - 1f))
+
+    if (delta != 0f) {
+        h = when (max) {
+            r -> ((g - b) / delta) % 6f
+            g -> ((b - r) / delta) + 2f
+            else -> ((r - g) / delta) + 4f
+        }
+        h *= 60f
+        if (h < 0) h += 360f
+    }
+
+    return "<${h.toInt()}, ${(s * 100).toInt()}, ${(l * 100).toInt()}>"
+}
+
+//Retorna colores hexadecimales
 fun Color.toHex(): String {
     return String.format(
         "#%02X%02X%02X",
@@ -839,8 +1017,9 @@ fun Color.toHex(): String {
     )
 }
 
+//Retorna colores rgb
 fun Color.toRgb(): String {
-    return "rgb(${(red * 255).toInt()}, ${(green * 255).toInt()}, ${(blue * 255).toInt()})"
+    return "(${(red * 255).toInt()}, ${(green * 255).toInt()}, ${(blue * 255).toInt()})"
 }
 
 @Composable

@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.material3)
 
     implementation("com.github.skydoves:colorpicker-compose:1.0.7")
+    implementation(libs.androidx.compose.foundation)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
