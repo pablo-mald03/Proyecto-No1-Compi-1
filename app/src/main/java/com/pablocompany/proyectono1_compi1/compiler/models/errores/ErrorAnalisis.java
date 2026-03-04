@@ -8,7 +8,6 @@ public class ErrorAnalisis {
     private String descripcion;
     private int linea;
     private int columna;
-
     private String cadena;
 
 
@@ -28,6 +27,10 @@ public class ErrorAnalisis {
 
     public int getLinea() {
         return linea;
+    }
+
+    public String getCadena() {
+        return cadena;
     }
 
     public String getDescripcion() {

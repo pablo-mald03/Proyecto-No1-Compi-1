@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -97,6 +98,7 @@ import androidx.core.graphics.component2
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModelFactory
 import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
@@ -213,7 +215,7 @@ fun EditorScreen() {
                     if (viewModel.currentFileUri != null) {
                         viewModel.saveFile()
                     } else {
-                        saveAsLauncher.launch("archivo.form")
+                        saveAsLauncher.launch("ArchivoEntrada")
                     }
                 },
                 onCerrarCodigo = {
@@ -246,17 +248,30 @@ fun EditorScreen() {
                         highlightedCode = viewModel.highlightedCode,
                         onCodeChange = { viewModel.updateCodeField(it) },
                         onFinalizarClick = {
-                            if (viewModel.currentFileUri != null) {
-                                viewModel.saveFile()
+                            val hayErroresFormales = viewModel.ejecutarAnalisisFormal()
+
+                            if (hayErroresFormales) {
+                                hayErrores = true
+                                showErrorDrawer = true
                             } else {
-                                saveAsLauncher.launch("archivo.form")
+                                hayErrores = false
+                                showErrorDrawer = false
+                                // Flujo normal tras compilado PENDIENTE (CORRER Y REDIRECCIONAR)
+
                             }
-                            //Pendiente logica para llamar al traductor
                         },
                         onReemplazarClick = {
-                            hayErrores = true
+                            val hayErroresFormales = viewModel.ejecutarAnalisisFormal()
 
-                            //Pendiente conectar al lexer
+                            if (hayErroresFormales) {
+                                hayErrores = true
+                                showErrorDrawer = true
+                            } else {
+                                hayErrores = false
+                                showErrorDrawer = false
+                                // Flujo normal tras compilado PENDIENTE (MODIFICAR UI)
+
+                            }
                         },
                         onAgregarClick = {//Pendiente definir bloques de codigo
 
@@ -350,7 +365,11 @@ fun EditorScreen() {
 
             FloatingActionButton(
                 onClick = { showErrorDrawer = !showErrorDrawer },
-                containerColor = if (hayErrores) Color(0xFFB00020) else Color(0xFF04643C),
+                containerColor =
+                    if (viewModel.listaErrores.isNotEmpty())
+                        Color(0xFFB00020)
+                    else
+                        Color(0xFF04643C),
                 contentColor = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -430,7 +449,7 @@ fun EditorScreen() {
                             color = Color.Gray.copy(alpha = 0.3f)
                         )
 
-                        ErrorDrawerContent()
+                        ErrorDrawerContent(errores = viewModel.listaErrores)
                     }
                 }
             }
@@ -468,7 +487,9 @@ fun EditorScreen() {
 }
 //Permite mostrar el contenido del drawer de los resportes. Es decir que muestra los errores y sus tablas
 @Composable
-fun ErrorDrawerContent() {
+fun ErrorDrawerContent(
+    errores: List<ErrorAnalisis>
+) {
 
     val horizontalScroll = rememberScrollState()
 
@@ -524,7 +545,8 @@ fun ErrorDrawerContent() {
                     }
                 }
 
-                items(2) { index ->
+                //val errores = viewModel
+                itemsIndexed(errores) { index, error ->
 
                     val backgroundColor =
                         if (index % 2 == 0) Color(0xFF104457)
@@ -535,11 +557,11 @@ fun ErrorDrawerContent() {
                             .horizontalScroll(horizontalScroll)
                             .background(backgroundColor)
                     ) {
-                        Celda("id")
-                        Celda("12")
-                        Celda("5")
-                        Celda("Lexico")
-                        Celda("Identificador no reconocido en la expresión")
+                        Celda(error.cadena ?: "")
+                        Celda(error.linea.toString())
+                        Celda(error.columna.toString())
+                        Celda(error.tipo ?: "")
+                        Celda(error.descripcion ?: "")
                     }
                 }
             }
