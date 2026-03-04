@@ -1,6 +1,8 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
 import android.net.Uri
+import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -203,6 +205,49 @@ fun EditorScreen(
         )
     }
 
+    val openFormLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+
+        uri?.let { selectedUri ->
+
+            var nombreArchivo = ""
+
+            val cursor = context.contentResolver.query(
+                selectedUri,
+                null,
+                null,
+                null,
+                null
+            )
+
+            cursor?.use {
+                val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (it.moveToFirst() && nameIndex >= 0) {
+                    nombreArchivo = it.getString(nameIndex)
+                }
+            }
+
+            if (!nombreArchivo.lowercase().endsWith(".pkm")) {
+                Toast.makeText(
+                    context,
+                    "Seleccione un archivo extension .pkm",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@let
+            }
+
+            val contenido = context.contentResolver
+                .openInputStream(selectedUri)
+                ?.bufferedReader()
+                ?.use { reader -> reader.readText() }
+                ?: ""
+
+            sharedFormViewModel.setCodigo(contenido)
+            navController.navigate("form")
+        }
+    }
+
     ModalNavigationDrawer(
         drawerContent = {
             DrawerContent(
@@ -229,6 +274,21 @@ fun EditorScreen(
                         showUnsavedDialog = true
                     } else {
                         viewModel.closeFile()
+                    }
+                },
+                onAbrirFormulario = {
+                    openFormLauncher.launch(arrayOf("application/octet-stream"))
+                },
+                onGuardarFormulario = {
+                    val compilado = viewModel.compilarFormulario()
+
+                    if (!compilado) {
+                        hayErrores = true
+                        showErrorDrawer = true
+                    } else {
+                        val codigoFinal = viewModel.codigoGenerado ?: ""
+                        sharedFormViewModel.setCodigo(codigoFinal)
+                        navController.navigate("form")
                     }
                 },
                 currentFileUri = viewModel.currentFileUri,
@@ -660,6 +720,8 @@ fun DrawerContent(
     onAbrirCodigo: () -> Unit,
     onGuardarCodigo: () -> Unit,
     onCerrarCodigo: () -> Unit,
+    onAbrirFormulario: () -> Unit,
+    onGuardarFormulario: () -> Unit,
     currentFileUri: Uri?,
     isModified: Boolean,
     fileName: String,
@@ -694,6 +756,7 @@ fun DrawerContent(
             )
         }
 
+        //Para codigo nativo
         Spacer(Modifier.height(24.dp))
 
         DrawerButton("Abrir código", onAbrirCodigo)
@@ -702,6 +765,19 @@ fun DrawerContent(
         if (currentFileUri != null) {
             DrawerButton("Cerrar código", onCerrarCodigo)
         }
+
+        Spacer(Modifier.height(16.dp))
+
+        HorizontalDivider(
+            thickness = 1.dp,
+            color = Color.Gray.copy(alpha = 0.3f)
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        //Para para formularios
+        DrawerButton("Abrir formulario", onAbrirFormulario)
+        DrawerButton("Guardar formulario", onGuardarFormulario)
     }
 }
 
