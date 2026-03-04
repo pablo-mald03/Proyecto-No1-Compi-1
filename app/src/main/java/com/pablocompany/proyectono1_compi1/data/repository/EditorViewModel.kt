@@ -39,6 +39,10 @@ class EditorViewModel(
     // SOLO para highlight visual (tiempo real)
     private var erroresVisuales: List<ErrorAnalisis> = emptyList()
 
+    // Código generado por backend listo para siguiente fase
+    var codigoGenerado by mutableStateOf<String?>(null)
+        private set
+
     //Metodo que permite reescribir el codigo
     private fun recalcularHighlight() {
 
@@ -168,25 +172,61 @@ class EditorViewModel(
 
     /*====Apartado de analisis formal de codigo al ejecutar====*/
 
-    fun ejecutarAnalisisFormal(): Boolean {
+    //Metodo encargado de generar la compilacion del codigo o pre-compilacion
+    private fun analizarCompleto(texto: String): Pair<List<ErrorAnalisis>, String?> {
 
-        val texto = codeField.text
-
-        if (texto.isEmpty()) {
-            listaErrores = emptyList()
-            return false
+        if (texto.isBlank()) {
+            return Pair(emptyList(), null)
         }
 
         val resultadoLexico = analizarLexico(texto)
 
-        // Pendiente parser
+        // PENDIENTE POR DEFINIR LO QUE SEA EL BACKEND REAL
         // val resultadoParser = analizarSintactico(texto)
+        // val erroresTotales = resultadoLexico.errores + resultadoParser.errores
 
-        listaErrores = resultadoLexico.errores
-        // pendiente concatenar las listas haciendo  resultadoLexico.errores +  resultadoParser.errores
+        //QUEMADO MIENTRAS
+        val erroresTotales = resultadoLexico.errores
 
-        return listaErrores.isNotEmpty()
+        if (erroresTotales.isNotEmpty()) {
+            return Pair(erroresTotales, null)
+        }
+
+        // Aquí en el futuro irá EL CODIGO GENERADO POR BACKEND (QUEMADO MIENTRAS)
+        //val codigoGenerado = resultadoParser
+        val codigoGenerado = texto
+
+        return Pair(emptyList(), codigoGenerado)
     }
+
+
+    //METODO QUE GENERA EL PRE-COMPILADO PARA ACTUALIZAR LA PREVISUALIZACION
+    fun ejecutarAnalisisFormal(): Boolean {
+
+        val (errores, _) = analizarCompleto(codeField.text)
+
+        listaErrores = errores
+
+        return errores.isNotEmpty()
+    }
+
+    //Metodo encargado de compilar el codigo y hacer TODA LA LOGICA BACKEND QUE CONLLEVA
+    fun compilarFormulario(): Boolean {
+
+        val (errores, codigo) = analizarCompleto(codeField.text)
+
+        listaErrores = errores
+
+        if (errores.isNotEmpty()) {
+            codigoGenerado = null
+            return false
+        }
+
+        codigoGenerado = codigo
+        isModified = false
+        return true
+    }
+
 
     /*====Apartado de analisis formal de codigo al ejecutar====*/
 

@@ -96,19 +96,24 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.component1
 import androidx.core.graphics.component2
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModelFactory
 import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
+import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 //------METODO PRINCIPAL QUE PERMITE MOSTRAR LA PANTALLA DEL EDITOR DE TEXTO-------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorScreen() {
+fun EditorScreen(
+    navController: NavController,
+    sharedFormViewModel: SharedFormViewModel
+) {
 
     val leftDrawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -248,16 +253,19 @@ fun EditorScreen() {
                         highlightedCode = viewModel.highlightedCode,
                         onCodeChange = { viewModel.updateCodeField(it) },
                         onFinalizarClick = {
-                            val hayErroresFormales = viewModel.ejecutarAnalisisFormal()
+                            //Instruccion de compilacion absoluta
+                            val compilado = viewModel.compilarFormulario()
 
-                            if (hayErroresFormales) {
+                            if (!compilado) {
                                 hayErrores = true
                                 showErrorDrawer = true
                             } else {
                                 hayErrores = false
                                 showErrorDrawer = false
-                                // Flujo normal tras compilado PENDIENTE (CORRER Y REDIRECCIONAR)
 
+                                val codigoFinal = viewModel.codigoGenerado
+                                sharedFormViewModel.setCodigo(codigoFinal ?: "")
+                                navController.navigate("form")
                             }
                         },
                         onReemplazarClick = {

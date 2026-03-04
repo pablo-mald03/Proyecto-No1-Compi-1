@@ -20,16 +20,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.EditorScreen
+import com.pablocompany.proyectono1_compi1.ui.screens.editor.FormScreen
 
 @Composable
 fun MainScaffold() {
 
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val sharedFormViewModel: SharedFormViewModel = viewModel()
 
     Box(
         modifier = Modifier
@@ -119,13 +123,17 @@ fun MainScaffold() {
                 modifier = Modifier.padding(padding)
             ) {
 
-                composable("editor") { EditorScreen() }
+                //Metodo que sirve para invocar la pantalla del editor
+                composable("editor") { EditorScreen(
+                    navController = navController,
+                    sharedFormViewModel = sharedFormViewModel
+                ) }
 
+                //Metodo que permite invocar la pantalla del formulario
                 composable("form") {
-                    // TEMPORAL
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Form Screen", color = Color.White)
-                    }
+                    FormScreen(
+                        sharedFormViewModel = sharedFormViewModel
+                    )
                 }
 
                 composable("server") {
