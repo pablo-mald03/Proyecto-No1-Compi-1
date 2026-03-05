@@ -1,6 +1,8 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
+import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -93,6 +95,23 @@ fun FormScreen(
 
     /* ---------------- Guardado de formularios ---------------- */
 
+    //Funcion de guardado
+    fun getFileName(context: Context, uri: Uri): String {
+        var name = "Sin nombre"
+
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+
+        cursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+
+            if (it.moveToFirst() && nameIndex != -1) {
+                name = it.getString(nameIndex)
+            }
+        }
+
+        return name
+    }
+
     val saveAsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri ->
@@ -106,9 +125,30 @@ fun FormScreen(
                     writer.write(sharedFormViewModel.codigoCompilado ?: "")
                 }
 
-            sharedFormViewModel.loadFromFile(it, sharedFormViewModel.codigoCompilado ?: "")
+            val name = getFileName(context, it)
+
+            sharedFormViewModel.loadFromFile(it, sharedFormViewModel.codigoCompilado ?: "",name)
         }
     }
+
+    //Laucher que permite abrir un archivo
+    val openFormLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+
+        uri?.let {
+
+            val input = context.contentResolver.openInputStream(it)
+            val contenido = input?.bufferedReader()?.use { reader ->
+                reader.readText()
+            } ?: ""
+
+            val name = getFileName(context, it)
+
+            sharedFormViewModel.loadFromFile(it, contenido, name)
+        }
+    }
+
 
     fun guardarFormulario() {
 
@@ -136,7 +176,7 @@ fun FormScreen(
 
             DrawerFormContent(
 
-                onAbrirFormulario = { },
+                onAbrirFormulario = { openFormLauncher.launch(arrayOf("application/octet-stream"))},
 
                 onGuardarFormulario = {
                     guardarFormulario()
@@ -144,12 +184,11 @@ fun FormScreen(
 
                 onCerrarFormulario = {
                     sharedFormViewModel.limpiar()
-                    navController.popBackStack()
                 },
 
                 currentFileUri = currentUri,
                 isModified = isModified,
-                fileName = "Sin título"
+                fileName = sharedFormViewModel.fileName ?: "Sin nombre"
             )
         }
     ) {

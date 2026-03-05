@@ -207,8 +207,26 @@ fun EditorScreen(
                     writer.write(codigo)
                 }
 
+            var nombreArchivo = ""
+
+            val cursor = context.contentResolver.query(
+                it,
+                null,
+                null,
+                null,
+                null
+            )
+
+            cursor?.use { c ->
+                val nameIndex = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (c.moveToFirst() && nameIndex >= 0) {
+                    nombreArchivo = c.getString(nameIndex)
+                }
+            }
+
+
             //Registrar archivo en el SharedViewModel
-            sharedFormViewModel.loadFromFile(it, codigo)
+            sharedFormViewModel.loadFromFile(it, codigo,nombreArchivo)
             sharedFormViewModel.marcarDesdeEditor()
             navController.navigate("form")
         }
@@ -344,7 +362,7 @@ fun EditorScreen(
                 ?.use { reader -> reader.readText() }
                 ?: ""
 
-            sharedFormViewModel.loadFromFile(selectedUri, contenido)
+            sharedFormViewModel.loadFromFile(selectedUri, contenido, nombreArchivo)
             navController.navigate("form")
         }
     }

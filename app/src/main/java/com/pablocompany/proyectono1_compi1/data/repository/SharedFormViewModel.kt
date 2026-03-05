@@ -8,6 +8,10 @@ import androidx.lifecycle.ViewModel
 
 class SharedFormViewModel : ViewModel() {
 
+
+    var fileName by mutableStateOf("Sin título")
+        private set
+
     var codigoCompilado by mutableStateOf<String?>(null)
         private set
 
@@ -27,9 +31,10 @@ class SharedFormViewModel : ViewModel() {
         generadoDesdeEditor = true
     }
 
-    fun loadFromFile(uri: Uri, contenido: String) {
+    fun loadFromFile(uri: Uri, contenido: String, name: String) {
         codigoCompilado = contenido
         currentFileUri = uri
+        fileName = name
         isModified = false
         generadoDesdeEditor = false
     }
@@ -54,6 +59,7 @@ class SharedFormViewModel : ViewModel() {
     fun limpiar() {
         codigoCompilado = null
         currentFileUri = null
+        fileName = "Sin título"
         isModified = false
         generadoDesdeEditor = false
     }
