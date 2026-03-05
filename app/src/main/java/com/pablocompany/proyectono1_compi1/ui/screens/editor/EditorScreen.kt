@@ -190,7 +190,50 @@ fun EditorScreen(
     var showSaveFormDialog by remember { mutableStateOf(false) }
     var codigoPendiente by remember { mutableStateOf<String?>(null) }
 
-    //Permite guardar
+    //====Permite guardar el archivo con el codigo compilado al darle a guardar
+
+    val saveFormLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/octet-stream")
+    ) { uri ->
+
+        uri?.let {
+
+            val codigo = codigoPendiente ?: return@rememberLauncherForActivityResult
+
+            context.contentResolver
+                .openOutputStream(it, "wt")
+                ?.bufferedWriter()
+                ?.use { writer ->
+                    writer.write(codigo)
+                }
+
+            //Registrar archivo en el SharedViewModel
+            sharedFormViewModel.loadFromFile(it, codigo)
+            sharedFormViewModel.marcarDesdeEditor()
+            navController.navigate("form")
+        }
+    }
+
+    //Permite sobreescribir el formulario
+    fun sobrescribirFormulario() {
+
+        val uri = sharedFormViewModel.currentFileUri ?: return
+        val codigo = codigoPendiente ?: return
+
+        context.contentResolver
+            .openOutputStream(uri, "wt")
+            ?.bufferedWriter()
+            ?.use { writer ->
+                writer.write(codigo)
+            }
+
+        sharedFormViewModel.updateCodigoEditor(codigo)
+        sharedFormViewModel.markSaved()
+    }
+
+    //====Permite guardar el archivo con el codigo compilado al darle a guardar
+
+    //Permite guardar el codigo compilado
     if (showSaveFormDialog) {
 
         AlertDialog(
@@ -209,12 +252,12 @@ fun EditorScreen(
                     onClick = {
 
                         showSaveFormDialog = false
-
-                        codigoPendiente?.let {
-
-                            sharedFormViewModel.loadTemporary(it)
-
+                        if (sharedFormViewModel.currentFileUri != null) {
+                            sobrescribirFormulario()
                             navController.navigate("form")
+
+                        } else {
+                            saveFormLauncher.launch("Formulario.pkm")
                         }
                     }
                 ) {
@@ -225,13 +268,10 @@ fun EditorScreen(
             dismissButton = {
                 TextButton(
                     onClick = {
-
                         showSaveFormDialog = false
-
                         codigoPendiente?.let {
 
                             sharedFormViewModel.loadTemporary(it)
-
                             navController.navigate("form")
                         }
                     }
@@ -320,6 +360,7 @@ fun EditorScreen(
                         showUnsavedDialog = true
                     } else {
                         openLauncher.launch(arrayOf("text/plain","application/octet-stream"))
+                        sharedFormViewModel.desmarcarDesdeEditor()
                     }
                 },
                 onGuardarCodigo = {
@@ -335,6 +376,7 @@ fun EditorScreen(
                         showUnsavedDialog = true
                     } else {
                         viewModel.closeFile()
+                        sharedFormViewModel.desmarcarDesdeEditor()
                     }
                 },
                 onAbrirFormulario = {
@@ -345,7 +387,8 @@ fun EditorScreen(
                     //Condicion que permite verificar antes de que se guarde el formulario (caso en el que se abro un formulario)
                     if (
                         sharedFormViewModel.codigoCompilado != null &&
-                        !sharedFormViewModel.generadoDesdeEditor
+                        !sharedFormViewModel.generadoDesdeEditor &&
+                        sharedFormViewModel.currentFileUri?.toString() != viewModel.currentFileUri?.toString()
                     ){
 
                         Toast.makeText(
@@ -366,17 +409,13 @@ fun EditorScreen(
                         hayErrores = true
                         showErrorDrawer = true
                     } else {
+                        hayErrores = false
+                        showErrorDrawer = false
+
                         val codigoFinal = viewModel.codigoGenerado ?: ""
-                        if (sharedFormViewModel.currentFileUri == null) {
 
-                            codigoPendiente = codigoFinal
-                            showSaveFormDialog = true
-
-                        } else {
-
-                            sharedFormViewModel.loadTemporary(codigoFinal)
-                            navController.navigate("form")
-                        }
+                        codigoPendiente = codigoFinal
+                        showSaveFormDialog = true
                     }
                 },
                 currentFileUri = viewModel.currentFileUri,
@@ -405,7 +444,8 @@ fun EditorScreen(
                             //Condicion que permite verificar antes de que se guarde el formulario (caso en el que se abro un formulario)
                             if (
                                 sharedFormViewModel.codigoCompilado != null &&
-                                !sharedFormViewModel.generadoDesdeEditor
+                                !sharedFormViewModel.generadoDesdeEditor &&
+                                sharedFormViewModel.currentFileUri?.toString() != viewModel.currentFileUri?.toString()
                             ){
 
                                 Toast.makeText(
@@ -430,17 +470,8 @@ fun EditorScreen(
 
                                 val codigoFinal = viewModel.codigoGenerado ?: ""
 
-                                if (sharedFormViewModel.currentFileUri == null) {
-
-                                    codigoPendiente = codigoFinal
-                                    showSaveFormDialog = true
-
-                                } else {
-
-                                    sharedFormViewModel.loadTemporary(codigoFinal)
-                                    navController.navigate("form")
-
-                                }
+                                codigoPendiente = codigoFinal
+                                showSaveFormDialog = true
                             }
                         },
                         onReemplazarClick = {

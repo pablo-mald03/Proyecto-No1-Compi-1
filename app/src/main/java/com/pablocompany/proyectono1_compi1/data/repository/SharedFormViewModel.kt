@@ -23,7 +23,6 @@ class SharedFormViewModel : ViewModel() {
 
     fun loadTemporary(codigoNuevo: String) {
         codigoCompilado = codigoNuevo
-        currentFileUri = null
         isModified = true
         generadoDesdeEditor = true
     }
@@ -35,7 +34,15 @@ class SharedFormViewModel : ViewModel() {
         generadoDesdeEditor = false
     }
 
-    fun updateCodigo(nuevo: String) {
+    //Exclusivo del editorScreen
+    fun updateCodigoEditor(nuevo: String) {
+        codigoCompilado = nuevo
+        isModified = true
+        generadoDesdeEditor = true
+    }
+
+    //Permite guardar desde el formulario
+    fun updateCodigoForm(nuevo: String) {
         codigoCompilado = nuevo
         isModified = true
     }
@@ -48,6 +55,15 @@ class SharedFormViewModel : ViewModel() {
         codigoCompilado = null
         currentFileUri = null
         isModified = false
+        generadoDesdeEditor = false
+    }
+
+    //Metodos utilizados para desmarcar cuando se cerro desde el editor o cuando se guardo desde el editor
+    fun marcarDesdeEditor() {
+        generadoDesdeEditor = true
+    }
+
+    fun desmarcarDesdeEditor() {
         generadoDesdeEditor = false
     }
 }
