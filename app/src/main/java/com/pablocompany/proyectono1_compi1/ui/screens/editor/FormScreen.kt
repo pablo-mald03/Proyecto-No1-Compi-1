@@ -1,33 +1,104 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormScreen(
+    navController: NavController,
     sharedFormViewModel: SharedFormViewModel
 ) {
+
+    val context = LocalContext.current
 
     val codigo = sharedFormViewModel.codigoCompilado
     val isModified = sharedFormViewModel.isModified
     val currentUri = sharedFormViewModel.currentFileUri
 
-    val context = LocalContext.current
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
+    var showErrorDrawer by remember { mutableStateOf(false) }
+
+    /* ---------------- BottomSheet consola ---------------- */
+
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.PartiallyExpanded,
+        skipHiddenState = true
+    )
+
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = sheetState
+    )
+
+    val isExpanded by remember {
+        derivedStateOf { sheetState.currentValue == SheetValue.Expanded }
+    }
+
+    val scrollState = rememberScrollState()
+    val consoleScroll = rememberScrollState()
+
+    /* ---------------- Guardado de formularios ---------------- */
 
     val saveAsLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/octet-stream")
     ) { uri ->
+
         uri?.let {
+
             context.contentResolver
                 .openOutputStream(it)
                 ?.bufferedWriter()
@@ -41,13 +112,13 @@ fun FormScreen(
 
     fun guardarFormulario() {
 
-        if (sharedFormViewModel.currentFileUri != null) {
+        if (currentUri != null) {
 
             context.contentResolver
-                .openOutputStream(sharedFormViewModel.currentFileUri!!, "wt")
+                .openOutputStream(currentUri, "wt")
                 ?.bufferedWriter()
                 ?.use { writer ->
-                    writer.write(sharedFormViewModel.codigoCompilado ?: "")
+                    writer.write(codigo ?: "")
                 }
 
             sharedFormViewModel.markSaved()
@@ -57,23 +128,279 @@ fun FormScreen(
         }
     }
 
+    /* ---------------- Drawer ---------------- */
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
 
-        if (codigo != null) {
-            Text(
-                text = "Código recibido:\n\n$codigo",
-                color = Color.White
-            )
-        } else {
-            Text(
-                text = "No hay código cargado",
-                color = Color.White
+            DrawerFormContent(
+
+                onAbrirFormulario = { },
+
+                onGuardarFormulario = {
+                    guardarFormulario()
+                },
+
+                onCerrarFormulario = {
+                    sharedFormViewModel.limpiar()
+                    navController.popBackStack()
+                },
+
+                currentFileUri = currentUri,
+                isModified = isModified,
+                fileName = "Sin título"
             )
         }
-    }
+    ) {
 
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            /* ---------------- Consola inferior ---------------- */
+
+            BottomSheetScaffold(
+                scaffoldState = scaffoldState,
+                sheetPeekHeight = 36.dp,
+                sheetContainerColor = Color(0xFF1E1E1E),
+                containerColor = Color.Transparent,
+
+                sheetContent = {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(scrollState)
+                            .padding(16.dp)
+                    ) {
+
+                        Text(
+                            "Codigo Compilado",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        Spacer(Modifier.height(12.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(250.dp)
+                                .background(Color(0xFF121212))
+                                .padding(12.dp)
+                                .verticalScroll(consoleScroll)
+                        ) {
+
+                            Text(
+                                text = codigo ?: "Sin código compilado",
+                                color = Color.White,
+                                fontFamily = FontFamily.Monospace,
+                                modifier = Modifier.fillMaxWidth(),
+                                softWrap = true
+                            )
+                        }
+
+                        Spacer(Modifier.height(24.dp))
+                    }
+                }
+            ) {
+
+                /* ---------------- Pantalla principal ---------------- */
+
+                Scaffold(
+                    containerColor = Color.Transparent,
+
+                    topBar = {
+
+                        AnimatedVisibility(visible = !isExpanded) {
+
+                            TopAppBar(
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = Color.Transparent,
+                                    titleContentColor = Color.White
+                                ),
+
+                                title = {
+                                    Text(
+                                        "Formulario",
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                },
+
+                                navigationIcon = {
+
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch { drawerState.open() }
+                                        }
+                                    ) {
+                                        Icon(Icons.Default.Menu, null,
+                                            tint = Color.White)
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                ) { padding ->
+
+                    /* ---------------- Área visual del formulario ---------------- */
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                    ) {
+
+                        Text(
+                            "Vista del formulario",
+                            color = Color.White,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(Modifier.height(24.dp))
+
+                        /* ----- PENDIENTE RECIBIR CODIGO DE BACKEDN (QUEMADO) ----- */
+
+                        repeat(5) { index ->
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Color(0xFF2C2C2C)
+                                )
+                            ) {
+
+                                Column(
+                                    Modifier.padding(16.dp)
+                                ) {
+
+                                    Text(
+                                        "Campo $index",
+                                        color = Color.White
+                                    )
+
+                                    Spacer(Modifier.height(8.dp))
+
+                                    OutlinedTextField(
+                                        value = "",
+                                        onValueChange = {},
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(Modifier.height(120.dp))
+                    }
+                }
+            }
+
+            AnimatedVisibility(
+                visible = showErrorDrawer,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 90.dp, end = 16.dp)
+            ) {
+
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFF2C2C2C)
+                    ),
+                    modifier = Modifier
+                        .width(350.dp)
+                        .height(200.dp)
+                ) {
+
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+
+                        Text(
+                            "Errores",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            "Aún no hay errores conectados al parser.",
+                            color = Color.LightGray
+                        )
+                    }
+                }
+            }
+
+            /* ---------------- ERRORES ---------------- */
+
+            FloatingActionButton(
+                onClick = { showErrorDrawer = !showErrorDrawer },
+
+                containerColor = Color(0xFF04643C),
+
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 35.dp, end = 16.dp)
+            ) {
+                Icon(Icons.Default.Warning, null)
+            }
+        }
+    }
+}
+
+@Composable
+fun DrawerFormContent(
+
+    onAbrirFormulario: () -> Unit,
+    onGuardarFormulario: () -> Unit,
+    onCerrarFormulario: () -> Unit,
+
+    currentFileUri: Uri?,
+    isModified: Boolean,
+    fileName: String,
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF1A1A1A).copy(alpha = 0.97f))
+            .padding(24.dp)
+    ) {
+
+        Text(
+            "Formulario",
+            style = MaterialTheme.typography.titleLarge,
+            color = Color.White
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = fileName,
+            color = if (currentFileUri != null) Color.Green else Color.Yellow
+        )
+
+        if (isModified) {
+            Text(
+                "Cambios sin guardar",
+                color = Color.Red
+            )
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        DrawerButton("Abrir formulario", onAbrirFormulario)
+
+        DrawerButton("Guardar formulario", onGuardarFormulario)
+
+        if (currentFileUri != null) {
+            DrawerButton("Cerrar formulario", onCerrarFormulario)
+        }
+    }
 }

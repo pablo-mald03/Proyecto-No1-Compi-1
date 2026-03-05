@@ -132,6 +132,7 @@ fun MainScaffold() {
                 //Metodo que permite invocar la pantalla del formulario
                 composable("form") {
                     FormScreen(
+                        navController = navController,
                         sharedFormViewModel = sharedFormViewModel
                     )
                 }
@@ -156,14 +157,3 @@ fun navItemColors() = NavigationBarItemDefaults.colors(
     indicatorColor = Color(0xFF5F0F40)
 )
 
-//CODIGO REEMPLAZABLE FUTURO
-/*
-        NavHost(
-            navController = navController,
-            startDestination = "editor",
-            modifier = Modifier.padding(padding)
-        ) {
-            composable("editor") { EditorScreen() }
-           /* composable("form") { FormScreen() }
-            composable("server") { ServerScreen() }*/
-        }*/
