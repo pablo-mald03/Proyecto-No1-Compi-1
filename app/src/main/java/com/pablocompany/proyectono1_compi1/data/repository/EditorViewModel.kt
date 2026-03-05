@@ -69,7 +69,8 @@ class EditorViewModel(
                 val color = when (token.tipo) {
                     sym.ID -> Color(0xFFFFFFFF)
                     sym.ENTERO -> Color(0xFF07E3DB)
-                    sym.DECIMAL -> Color(0xFFF5426C)
+                    sym.DECIMAL -> Color(0xFFF5B342)
+                    sym.ERROR -> Color(0xFFB90101)
                     else -> Color.White
                 }
 

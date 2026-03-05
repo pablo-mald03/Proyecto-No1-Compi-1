@@ -186,9 +186,70 @@ fun EditorScreen(
     var showUnsavedDialog by remember { mutableStateOf(false) }
     var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
+    //=======Variables para poder ver si hay cambios sin guardar=====
+    var showSaveFormDialog by remember { mutableStateOf(false) }
+    var codigoPendiente by remember { mutableStateOf<String?>(null) }
+
+    //Permite guardar
+    if (showSaveFormDialog) {
+
+        AlertDialog(
+            onDismissRequest = { showSaveFormDialog = false },
+            containerColor = Color(0xFF180321),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+            title = { Text("Guardar formulario") },
+
+            text = {
+                Text("¿Deseas guardar el formulario antes de abrir la vista?")
+            },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+
+                        showSaveFormDialog = false
+
+                        codigoPendiente?.let {
+
+                            sharedFormViewModel.loadTemporary(it)
+
+                            navController.navigate("form")
+                        }
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+
+            dismissButton = {
+                TextButton(
+                    onClick = {
+
+                        showSaveFormDialog = false
+
+                        codigoPendiente?.let {
+
+                            sharedFormViewModel.loadTemporary(it)
+
+                            navController.navigate("form")
+                        }
+                    }
+                ) {
+                    Text("No guardar")
+                }
+            }
+        )
+    }
+    //=======Variables para poder ver si hay cambios sin guardar=====
+
+
     if (showUnsavedDialog) {
         AlertDialog(
             onDismissRequest = { showUnsavedDialog = false },
+            containerColor = Color(0xFF180321),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
             title = { Text("Cambios sin guardar") },
             text = { Text("Tienes cambios sin guardar. ¿Deseas continuar?") },
             confirmButton = {
@@ -243,7 +304,7 @@ fun EditorScreen(
                 ?.use { reader -> reader.readText() }
                 ?: ""
 
-            sharedFormViewModel.setCodigo(contenido)
+            sharedFormViewModel.loadFromFile(selectedUri, contenido)
             navController.navigate("form")
         }
     }
@@ -254,11 +315,11 @@ fun EditorScreen(
                 onAbrirCodigo = {
                     if (viewModel.isModified) {
                         pendingAction = {
-                            openLauncher.launch(arrayOf("application/octet-stream"))
+                            openLauncher.launch(arrayOf("text/plain","application/octet-stream"))
                         }
                         showUnsavedDialog = true
                     } else {
-                        openLauncher.launch(arrayOf("application/octet-stream"))
+                        openLauncher.launch(arrayOf("text/plain","application/octet-stream"))
                     }
                 },
                 onGuardarCodigo = {
@@ -280,15 +341,42 @@ fun EditorScreen(
                     openFormLauncher.launch(arrayOf("application/octet-stream"))
                 },
                 onGuardarFormulario = {
+
+                    //Condicion que permite verificar antes de que se guarde el formulario (caso en el que se abro un formulario)
+                    if (
+                        sharedFormViewModel.codigoCompilado != null &&
+                        !sharedFormViewModel.generadoDesdeEditor
+                    ){
+
+                        Toast.makeText(
+                            context,
+                            "Hay un formulario abierto. Ciérrelo antes de reemplazarlo.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        return@DrawerContent
+                    }
+
                     val compilado = viewModel.compilarFormulario()
+
+                    //Pendiente compilar
+                    //pendiente preguntar si guardar y redireccionar
 
                     if (!compilado) {
                         hayErrores = true
                         showErrorDrawer = true
                     } else {
                         val codigoFinal = viewModel.codigoGenerado ?: ""
-                        sharedFormViewModel.setCodigo(codigoFinal)
-                        navController.navigate("form")
+                        if (sharedFormViewModel.currentFileUri == null) {
+
+                            codigoPendiente = codigoFinal
+                            showSaveFormDialog = true
+
+                        } else {
+
+                            sharedFormViewModel.loadTemporary(codigoFinal)
+                            navController.navigate("form")
+                        }
                     }
                 },
                 currentFileUri = viewModel.currentFileUri,
@@ -313,7 +401,24 @@ fun EditorScreen(
                         highlightedCode = viewModel.highlightedCode,
                         onCodeChange = { viewModel.updateCodeField(it) },
                         onFinalizarClick = {
+
+                            //Condicion que permite verificar antes de que se guarde el formulario (caso en el que se abro un formulario)
+                            if (
+                                sharedFormViewModel.codigoCompilado != null &&
+                                !sharedFormViewModel.generadoDesdeEditor
+                            ){
+
+                                Toast.makeText(
+                                    context,
+                                    "Hay un formulario abierto. Ciérrelo antes de reemplazarlo.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                return@ConsoleSection
+                            }
+
                             //Instruccion de compilacion absoluta
+                            //Pendiente preguntar si guardar y redireccionar y compilar
                             val compilado = viewModel.compilarFormulario()
 
                             if (!compilado) {
@@ -323,9 +428,19 @@ fun EditorScreen(
                                 hayErrores = false
                                 showErrorDrawer = false
 
-                                val codigoFinal = viewModel.codigoGenerado
-                                sharedFormViewModel.setCodigo(codigoFinal ?: "")
-                                navController.navigate("form")
+                                val codigoFinal = viewModel.codigoGenerado ?: ""
+
+                                if (sharedFormViewModel.currentFileUri == null) {
+
+                                    codigoPendiente = codigoFinal
+                                    showSaveFormDialog = true
+
+                                } else {
+
+                                    sharedFormViewModel.loadTemporary(codigoFinal)
+                                    navController.navigate("form")
+
+                                }
                             }
                         },
                         onReemplazarClick = {
