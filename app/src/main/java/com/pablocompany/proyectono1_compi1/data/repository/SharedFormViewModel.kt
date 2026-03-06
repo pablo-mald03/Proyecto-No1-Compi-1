@@ -5,9 +5,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
+import com.pablocompany.proyectono1_compi1.data.clases.ResultadoAnalisis
 
 class SharedFormViewModel : ViewModel() {
 
+    //Codigo ya procesado que se pasara a la consola de la UI
+    var codigoProcesado by mutableStateOf<String>("")
+        private set
+
+    // SOLO para análisis de errores (ANALISIS INSTANTANEO)
+    var listaErrores by mutableStateOf<List<ErrorAnalisis>>(emptyList())
 
     var fileName by mutableStateOf("Sin título")
         private set
@@ -71,5 +79,17 @@ class SharedFormViewModel : ViewModel() {
 
     fun desmarcarDesdeEditor() {
         generadoDesdeEditor = false
+    }
+
+    //Metodo que permite setear todo lo que trae el useCase
+    fun setResultadoAnalisis(resultado: ResultadoAnalisis) {
+        codigoProcesado = resultado.codigoGenerado
+        listaErrores = resultado.errores
+    }
+
+    //Permite limpiar todo para que no quede codigo basura
+    fun limpiarResultado() {
+        codigoProcesado = ""
+        listaErrores = emptyList()
     }
 }

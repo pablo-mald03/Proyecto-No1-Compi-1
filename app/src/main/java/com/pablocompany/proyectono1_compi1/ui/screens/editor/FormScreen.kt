@@ -6,18 +6,28 @@ import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.BottomSheetScaffold
@@ -26,6 +36,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +44,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -40,6 +52,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +61,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -55,6 +70,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
+import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,16 +81,53 @@ fun FormScreen(
     sharedFormViewModel: SharedFormViewModel
 ) {
 
+    //Variable que permite ir analizando el codigo de entrada
+    val analizarFormulario = remember { AnalizarFormularioUseCase() }
+
     val context = LocalContext.current
 
     val codigo = sharedFormViewModel.codigoCompilado
+
     val isModified = sharedFormViewModel.isModified
     val currentUri = sharedFormViewModel.currentFileUri
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    /* ---------------- Permite Mostrar el mensaje (Notificacion) de errores ---------------- */
+
     var showErrorDrawer by remember { mutableStateOf(false) }
+    var hayErrores by remember { mutableStateOf(false) }
+
+    LaunchedEffect(hayErrores) {
+        if (hayErrores) {
+            delay(3000)
+            hayErrores = false
+        }
+    }
+
+    //Obtener la lista de errores que se presentan en el analisis
+    val errores = sharedFormViewModel.listaErrores
+
+    /* ---------------- Permite analizar al cargar--------- */
+    LaunchedEffect(codigo) {
+
+        if (codigo.isNullOrBlank()) {
+
+            sharedFormViewModel.limpiarResultado()
+            return@LaunchedEffect
+        }
+
+        val resultado = analizarFormulario.ejecutar(codigo)
+
+        sharedFormViewModel.setResultadoAnalisis(resultado)
+
+        if (resultado.errores.isNotEmpty()) {
+            hayErrores = true
+        }
+    }
+
+    /* ---------------- Permite analizar al cargar--------- */
 
     /* ---------------- BottomSheet consola ---------------- */
 
@@ -122,7 +176,7 @@ fun FormScreen(
                 .openOutputStream(it)
                 ?.bufferedWriter()
                 ?.use { writer ->
-                    writer.write(sharedFormViewModel.codigoCompilado ?: "")
+                    writer.write(codigo)
                 }
 
             val name = getFileName(context, it)
@@ -176,7 +230,7 @@ fun FormScreen(
 
             DrawerFormContent(
 
-                onAbrirFormulario = { openFormLauncher.launch(arrayOf("application/octet-stream"))},
+                onAbrirFormulario = { openFormLauncher.launch(arrayOf("application/octet-stream","text/plain"))},
 
                 onGuardarFormulario = {
                     guardarFormulario()
@@ -214,11 +268,12 @@ fun FormScreen(
 
                         Text(
                             "Codigo Compilado",
+                            fontWeight = FontWeight.Bold,
                             color = Color.White,
                             style = MaterialTheme.typography.titleMedium
                         )
 
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(14.dp))
 
                         Box(
                             modifier = Modifier
@@ -230,7 +285,8 @@ fun FormScreen(
                         ) {
 
                             Text(
-                                text = codigo ?: "Sin código compilado",
+                                text = if (sharedFormViewModel.codigoProcesado.isNotEmpty()){ sharedFormViewModel.codigoProcesado }
+                                else{"Sin código compilado" },
                                 color = Color.White,
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.fillMaxWidth(),
@@ -301,7 +357,7 @@ fun FormScreen(
 
                         Spacer(Modifier.height(24.dp))
 
-                        /* ----- PENDIENTE RECIBIR CODIGO DE BACKEDN (QUEMADO) ----- */
+                        /* ----- PENDIENTE RECIBIR CODIGO DE BACKEND (QUEMADO) ----- */
 
                         repeat(5) { index ->
 
@@ -340,54 +396,115 @@ fun FormScreen(
                 }
             }
 
-            AnimatedVisibility(
-                visible = showErrorDrawer,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 90.dp, end = 16.dp)
-            ) {
-
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF2C2C2C)
-                    ),
-                    modifier = Modifier
-                        .width(350.dp)
-                        .height(200.dp)
-                ) {
-
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-
-                        Text(
-                            "Errores",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Text(
-                            "Aún no hay errores conectados al parser.",
-                            color = Color.LightGray
-                        )
-                    }
-                }
-            }
-
-            /* ---------------- ERRORES ---------------- */
+            /* ---------------- BOTON DE ERRORES ---------------- */
 
             FloatingActionButton(
                 onClick = { showErrorDrawer = !showErrorDrawer },
 
-                containerColor = Color(0xFF04643C),
+                containerColor =
+                    if (errores.isNotEmpty())
+                        Color(0xFFB00020)
+                    else
+                        Color(0xFF04643C),
+
+                contentColor = Color.White,
 
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(top = 35.dp, end = 16.dp)
             ) {
-                Icon(Icons.Default.Warning, null)
+                Icon(Icons.Default.Warning, contentDescription = "Ver errores")
+            }
+
+            //=====Vista del cuadro de errores======
+            AnimatedVisibility(visible = showErrorDrawer) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                        .clickable { showErrorDrawer = false }
+                )
+            }
+
+            //=====Vista del apartado de errores======
+            AnimatedVisibility(
+                visible = showErrorDrawer,
+                enter = slideInHorizontally(initialOffsetX = { it }),
+                exit = slideOutHorizontally(targetOffsetX = { it }),
+                modifier = Modifier.align(Alignment.CenterEnd)
+            ) {
+                Surface(
+                    tonalElevation = 12.dp,
+                    shadowElevation = 12.dp,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .widthIn(
+                            min = 320.dp,
+                            max = 600.dp
+                        )
+                ) {
+
+                    Column {
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            Color(0xFF0F0F0F),
+                                            Color(0xFF3A051A),
+                                            Color(0xFF021712),
+                                            Color(0xFF461904)
+                                        ),
+                                        start = Offset.Zero,
+                                        end = Offset(800f, 1200f)
+                                    )
+                                )
+                                .padding(12.dp),
+
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Text(
+                                "Errores",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+
+                            IconButton(
+                                onClick = { showErrorDrawer = false }
+                            ) {
+                                Icon(Icons.Default.Close, null, tint = Color.White)
+                            }
+                        }
+
+                        HorizontalDivider()
+
+                        ErrorDrawerContent(errores = errores)
+                    }
+                }
+            }
+
+            //=====Vista de notificacion flotante======
+            AnimatedVisibility(
+                visible = hayErrores,
+                enter = slideInVertically(initialOffsetY = { -it }),
+                exit = slideOutVertically(targetOffsetY = { -it }),
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 10.dp)
+            ) {
+                ErrorBanner(
+                    mensaje = "Se encontraron errores",
+                    onClose = { hayErrores = false },
+                    onClick = {
+                        hayErrores = false
+                        showErrorDrawer = true
+                    }
+                )
             }
         }
     }

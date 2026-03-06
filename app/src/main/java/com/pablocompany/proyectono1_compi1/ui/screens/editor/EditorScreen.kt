@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -127,6 +128,10 @@ fun EditorScreen(
     /* ---------- Banner flotante ---------- */
     var hayErrores by remember { mutableStateOf(false) }
 
+    //Control del teclado
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     LaunchedEffect(hayErrores) {
         if (hayErrores) {
             delay(3000)
@@ -149,8 +154,7 @@ fun EditorScreen(
         derivedStateOf { sheetState.currentValue == SheetValue.Expanded }
     }
 
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
+
     val context = LocalContext.current
 
     val repository = remember { FormFileRepository(context) }
@@ -424,8 +428,12 @@ fun EditorScreen(
                     //pendiente preguntar si guardar y redireccionar
 
                     if (!compilado) {
+
+                        //Cierra el teclado si hay errores
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+
                         hayErrores = true
-                        showErrorDrawer = true
                     } else {
                         hayErrores = false
                         showErrorDrawer = false
@@ -480,8 +488,12 @@ fun EditorScreen(
                             val compilado = viewModel.compilarFormulario()
 
                             if (!compilado) {
+
+                                //Cierra el teclado si hay errores
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+
                                 hayErrores = true
-                                showErrorDrawer = true
                             } else {
                                 hayErrores = false
                                 showErrorDrawer = false
@@ -497,7 +509,6 @@ fun EditorScreen(
 
                             if (hayErroresFormales) {
                                 hayErrores = true
-                                showErrorDrawer = true
                             } else {
                                 hayErrores = false
                                 showErrorDrawer = false
@@ -634,7 +645,10 @@ fun EditorScreen(
                     shadowElevation = 12.dp,
                     modifier = Modifier
                         .fillMaxHeight()
-                        .width(360.dp)
+                        .widthIn(
+                            min = 320.dp,
+                            max = 600.dp
+                        )
                 ) {
                     Column {
 
@@ -997,6 +1011,7 @@ fun ConsoleSection(
 
             Text(
                 text = "Consola",
+                fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White
             )
@@ -1033,7 +1048,12 @@ fun ConsoleSection(
                 onValueChange = onCodeChange,
                 maxLines = Int.MAX_VALUE,
                 visualTransformation = {
-                    val safeHighlighted = if (codeField.text.isEmpty()) AnnotatedString("") else highlightedCode
+                    val safeHighlighted =
+                        if (highlightedCode.text.length != codeField.text.length)
+                            AnnotatedString(codeField.text)
+                        else
+                            highlightedCode
+
                     TransformedText(
                         safeHighlighted,
                         OffsetMapping.Identity

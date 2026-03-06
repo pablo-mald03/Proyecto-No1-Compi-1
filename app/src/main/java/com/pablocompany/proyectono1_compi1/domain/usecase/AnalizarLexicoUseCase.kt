@@ -13,18 +13,31 @@ class AnalizarLexicoUseCase {
     operator fun invoke(codigo: String): ResultadoLexico {
 
         val lexer = LexerForms(StringReader(codigo))
+
         val listaTokens = mutableListOf<TokenUI>()
         val listaErrores = mutableListOf<ErrorAnalisis>()
 
         while (true) {
+
             val token = lexer.next_token() ?: break
 
             if (token.sym == sym.EOF) break
 
+            val lexema = token.value?.toString() ?: ""
+
+            listaTokens.add(
+                TokenUI(
+                    lexema,
+                    token.sym,
+                    token.left,
+                    token.right
+                )
+            )
+
             if (token.sym == sym.ERROR) {
                 listaErrores.add(
                     ErrorAnalisis(
-                        token.value?.toString() ?: "",
+                        lexema,
                         "Lexico",
                         "Simbolo no existe en el lenguaje",
                         token.left,
@@ -32,15 +45,6 @@ class AnalizarLexicoUseCase {
                     )
                 )
             }
-
-            listaTokens.add(
-                TokenUI(
-                    token.value?.toString() ?: "",
-                    token.sym,
-                    token.left,
-                    token.right
-                )
-            )
         }
 
         return ResultadoLexico(listaTokens, listaErrores)
