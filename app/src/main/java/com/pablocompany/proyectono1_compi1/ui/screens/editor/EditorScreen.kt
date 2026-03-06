@@ -310,7 +310,7 @@ fun EditorScreen(
     if (showUnsavedDialog) {
         AlertDialog(
             onDismissRequest = { showUnsavedDialog = false },
-            containerColor = Color(0xFF5DDEEF),
+            containerColor = Color(0xFF180321),
             titleContentColor = Color.White,
             textContentColor = Color(0xFFCCCCCC),
             title = { Text("Cambios sin guardar") },

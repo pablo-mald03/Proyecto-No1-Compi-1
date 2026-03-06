@@ -12,15 +12,23 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.pablocompany.proyectono1_compi1.compiler.logic.sym
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarLexicoUseCase
 import kotlin.collections.emptyList
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class EditorViewModel(
     private val repository: FormFileRepository
 ) : ViewModel() {
+
+    //Variable que optimiza el pintado de letras
+    private var highlightJob: Job? = null
+
 
     /*======Apartado de codigo que permite generar el coloreado dinamico de codigo=======*/
     //Lexer
@@ -42,6 +50,18 @@ class EditorViewModel(
     // Código generado por backend listo para siguiente fase
     var codigoGenerado by mutableStateOf<String?>(null)
         private set
+
+    //Metodo que optimiza el pintado dinamico del codigo
+    private fun recalcularHighlightDebounced() {
+
+        highlightJob?.cancel()
+
+        highlightJob = viewModelScope.launch {
+
+            delay(150)
+            recalcularHighlight()
+        }
+    }
 
     //Metodo que permite reescribir el codigo
     private fun recalcularHighlight() {
@@ -104,7 +124,7 @@ class EditorViewModel(
     fun updateCodeField(value: TextFieldValue) {
         codeField = value
         isModified = true
-        recalcularHighlight()
+        recalcularHighlightDebounced()
     }
 
     //Metodo que permite insertar texto en cualquier lugar del codigo en base al cursor
@@ -123,7 +143,7 @@ class EditorViewModel(
         )
 
         isModified = true
-        recalcularHighlight()
+        recalcularHighlightDebounced()
     }
 
     //Metodo que permite cargar un archivo de entrada
