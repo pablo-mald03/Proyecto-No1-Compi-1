@@ -96,6 +96,24 @@ fun MainScaffold() {
                     )
 
                     NavigationBarItem(
+                        selected = currentRoute == "answer",
+                        onClick = {
+                            navController.navigate("answer") {
+                                popUpTo(navController.graph.startDestinationId)
+                                launchSingleTop = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                Icons.Default.AdUnits,
+                                contentDescription = null
+                            )
+                        },
+                        label = { Text("Contestar") },
+                        colors = navItemColors()
+                    )
+
+                    NavigationBarItem(
                         selected = currentRoute == "server",
                         onClick = {
                             navController.navigate("server") {
@@ -137,6 +155,15 @@ fun MainScaffold() {
                     )
                 }
 
+                //Metodo que despliega la pantalla del servidor
+                composable("answer") {
+                    // TEMPORAL
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Screen para contestar formularios", color = Color.White)
+                    }
+                }
+
+                //Metodo que despliega la pantalla del servidor
                 composable("server") {
                     // TEMPORAL
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

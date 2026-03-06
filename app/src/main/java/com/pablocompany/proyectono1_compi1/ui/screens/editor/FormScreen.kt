@@ -29,9 +29,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,10 +50,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -68,10 +75,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
@@ -557,9 +566,18 @@ fun FormScreen(
     }
 }
 
+
+//Funcion que evita espacios (por cualquier cosa) (ESTA ER NO INFLUYE EN LO ABSOLUTO EN EL PARSER NI EL LEXER CABE ACLARAR)
+fun sanitizeFileName(name: String): String {
+    return name
+        .trim()
+        .replace("\\s+".toRegex(), "_")
+        .replace("[^A-Za-z0-9_]".toRegex(), "")
+}
+
+//Metodo que permite desplegar el contenido del menu de opciones
 @Composable
 fun DrawerFormContent(
-
     onAbrirFormulario: () -> Unit,
     onGuardarFormulario: () -> Unit,
     onCerrarFormulario: () -> Unit,
@@ -567,7 +585,15 @@ fun DrawerFormContent(
     currentFileUri: Uri?,
     isModified: Boolean,
     fileName: String,
-) {
+    ) {
+
+    var showConfirmUpload by remember { mutableStateOf(false) }
+    var showNameDialog by remember { mutableStateOf(false) }
+    var serverName by remember { mutableStateOf("") }
+
+    var showUploadResult by remember { mutableStateOf(false) }
+    var uploadSuccess by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -605,5 +631,272 @@ fun DrawerFormContent(
         if (currentFileUri != null) {
             DrawerButton("Cerrar formulario", onCerrarFormulario)
         }
+
+        /* ---------- SEPARADOR PARA LA OPCION DE SUBIR AL SERVIDOR ---------- */
+
+        Spacer(Modifier.height(36.dp))
+
+        HorizontalDivider(color = Color.DarkGray)
+
+        Spacer(Modifier.height(24.dp))
+
+        DrawerButtonServer(
+            text = "Subir formulario al servidor",
+            icon = Icons.Default.CloudUpload
+        ) {
+            showConfirmUpload = true
+        }
+    }
+
+    /* ---------------- CONFIRMACION ---------------- */
+
+    if (showConfirmUpload) {
+
+        AlertDialog(
+
+            onDismissRequest = { showConfirmUpload = false },
+            containerColor = Color(0xFF030821),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+
+            title = {
+                Text("Subir formulario")
+            },
+
+            text = {
+                Text("¿Deseas subir tu formulario al servidor?")
+            },
+
+            confirmButton = {
+
+                TextButton(
+                    onClick = {
+
+                        showConfirmUpload = false
+
+                        if (currentFileUri != null) {
+
+                            //Se evitan espacios (por seguridad de la api)
+                            val sanitizedFileName = sanitizeFileName(fileName)
+
+                            //AUN PENDIENTE PARA INTEGRAR EL REQUEST
+                            uploadSuccess = true
+
+                            showUploadResult = true
+
+                        } else {
+                            showNameDialog = true
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFCCB8F8)
+                    )
+
+                ) {
+                    Text("Subir")
+                }
+            },
+
+            dismissButton = {
+
+                TextButton(
+                    onClick = { showConfirmUpload = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFFC4773)
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    /* ---------------- DIALOGO NOMBRE PARA SUBIR AL SERVIDOR ---------------- */
+
+    if (showNameDialog) {
+
+        AlertDialog(
+
+            onDismissRequest = { showNameDialog = false },
+            containerColor = Color(0xFF030821),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+
+            title = {
+                Text("Nombre del formulario")
+            },
+
+            text = {
+
+                Column {
+
+                    Text("Ingresa el nombre con el que se guardara en el servidor")
+
+                    Spacer(Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = serverName,
+                        onValueChange = { serverName = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = {
+                            Text("Nombre del formulario", color = Color(0xFFD0BCFF))
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+
+                            focusedBorderColor = Color(0xFFD0BCFF),
+                            unfocusedBorderColor = Color.LightGray,
+
+                            cursorColor = Color(0xFFD0BCFF),
+
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                        ),
+                    )
+                }
+            },
+
+            confirmButton = {
+
+                TextButton(
+                    onClick = {
+
+                        val sanitizedName = sanitizeFileName(serverName)
+
+
+                        showNameDialog = false
+
+                        //AUN PENDIENTE PARA INTEGRAR EL REQUEST
+                        uploadSuccess = true
+                        showUploadResult = true
+
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFCCB8F8)
+                    )
+
+                ) {
+                    Text("Subir")
+                }
+            },
+
+            dismissButton = {
+
+                TextButton(
+                    onClick = { showNameDialog = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFFC4773)
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    /* ---------------- DIALOGO PARA CONFIRMAR SI FUE EXITOSO O NO ---------------- */
+    if (showUploadResult) {
+
+        LaunchedEffect(showUploadResult) {
+            kotlinx.coroutines.delay(3000)
+            showUploadResult = false
+        }
+
+        AlertDialog(
+
+            onDismissRequest = { showUploadResult = false },
+            containerColor = Color(0xFF030821),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        imageVector = if (uploadSuccess)
+                            Icons.Default.CheckCircle
+                        else
+                            Icons.Default.Error,
+                        contentDescription = null,
+                        tint = if (uploadSuccess) Color(0xFF4CAF50) else Color(0xFFE53935)
+                    )
+
+                    Spacer(Modifier.width(8.dp))
+
+                    Text(
+                        if (uploadSuccess)
+                            "Subida exitosa"
+                        else
+                            "Error al subir"
+                    )
+                }
+            },
+
+            text = {
+
+                Text(
+                    if (uploadSuccess)
+                        "Tu formulario se ha subido correctamente al servidor"
+                    else
+                        "Ocurrio un error al subir tu formulario"
+                )
+            },
+
+            confirmButton = {
+
+                TextButton(
+                    onClick = { showUploadResult = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFDA0964)
+                    )
+                ) {
+                    Text("Cerrar")
+                }
+            }
+        )
     }
 }
+
+//Boton especial para subir al servidor
+@Composable
+fun DrawerButtonServer(
+    text: String,
+    icon: ImageVector? = null,
+    onClick: () -> Unit
+) {
+
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+
+        shape = RoundedCornerShape(12.dp),
+
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF2C2C2C)
+        )
+    ) {
+
+        if (icon != null) {
+
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = Color.White
+            )
+
+            Spacer(Modifier.width(8.dp))
+        }
+
+        Text(
+            text,
+            color = Color.White
+        )
+    }
+}
+
