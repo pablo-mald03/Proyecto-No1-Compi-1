@@ -3,6 +3,7 @@ package com.pablocompany.proyectono1_compi1.ui.screens.editor
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -84,6 +85,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
+import com.pablocompany.proyectono1_compi1.domain.usecase.UploadFormUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -93,7 +95,6 @@ fun FormScreen(
     navController: NavController,
     sharedFormViewModel: SharedFormViewModel
 ) {
-
     //Variable que permite ir analizando el codigo de entrada
     val analizarFormulario = remember { AnalizarFormularioUseCase() }
 
@@ -194,7 +195,7 @@ fun FormScreen(
 
             val name = getFileName(context, it)
 
-            sharedFormViewModel.loadFromFile(it, sharedFormViewModel.codigoCompilado ?: "",name)
+            sharedFormViewModel.loadFromFile(it, sharedFormViewModel.codigoProcesado ?: "",name)
         }
     }
 
@@ -255,7 +256,8 @@ fun FormScreen(
 
                 currentFileUri = currentUri,
                 isModified = isModified,
-                fileName = sharedFormViewModel.fileName ?: "Sin nombre"
+                fileName = sharedFormViewModel.fileName ?: "Sin nombre",
+                sharedFormViewModel = sharedFormViewModel
             )
         }
     ) {
@@ -585,7 +587,12 @@ fun DrawerFormContent(
     currentFileUri: Uri?,
     isModified: Boolean,
     fileName: String,
+    sharedFormViewModel: SharedFormViewModel
     ) {
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val uploadUseCase = remember { UploadFormUseCase(context) }
 
     var showConfirmUpload by remember { mutableStateOf(false) }
     var showNameDialog by remember { mutableStateOf(false) }
@@ -594,6 +601,7 @@ fun DrawerFormContent(
     var showUploadResult by remember { mutableStateOf(false) }
     var uploadSuccess by remember { mutableStateOf(false) }
 
+    val formContent = sharedFormViewModel.codigoProcesado
 
     Column(
         modifier = Modifier
@@ -671,18 +679,45 @@ fun DrawerFormContent(
 
                 TextButton(
                     onClick = {
-
                         showConfirmUpload = false
+
+                        if (formContent.isBlank()) {
+
+                            Toast.makeText(
+                                    context,
+                                    "No hay código compilado para subir",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+
+                            return@TextButton
+                        }
+
+                        if (sharedFormViewModel.listaErrores.isNotEmpty()) {
+
+                            Toast.makeText(
+                                context,
+                                "El formulario contiene errores",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            return@TextButton
+                        }
+
 
                         if (currentFileUri != null) {
 
-                            //Se evitan espacios (por seguridad de la api)
                             val sanitizedFileName = sanitizeFileName(fileName)
 
-                            //AUN PENDIENTE PARA INTEGRAR EL REQUEST
-                            uploadSuccess = true
+                            scope.launch {
 
-                            showUploadResult = true
+                                val success = uploadUseCase.uploadForm(
+                                    fileUri = currentFileUri,
+                                    fileName = sanitizedFileName
+                                )
+
+                                uploadSuccess = success
+                                showUploadResult = true
+                            }
 
                         } else {
                             showNameDialog = true
@@ -765,12 +800,17 @@ fun DrawerFormContent(
 
                         val sanitizedName = sanitizeFileName(serverName)
 
+                        scope.launch {
 
-                        showNameDialog = false
+                            val success = uploadUseCase.uploadFormContent(
+                                content = formContent,
+                                fileName = sanitizedName
+                            )
 
-                        //AUN PENDIENTE PARA INTEGRAR EL REQUEST
-                        uploadSuccess = true
-                        showUploadResult = true
+                            uploadSuccess = success
+                            showUploadResult = true
+                            showNameDialog = false
+                        }
 
                     },
                     colors = ButtonDefaults.textButtonColors(

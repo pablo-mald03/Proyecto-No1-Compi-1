@@ -92,4 +92,9 @@ class SharedFormViewModel : ViewModel() {
         codigoProcesado = ""
         listaErrores = emptyList()
     }
+
+    //Metodo get para obtener el codigo procesado por el parser
+    fun getCodigoParaSubir(): String {
+        return codigoProcesado
+    }
 }
