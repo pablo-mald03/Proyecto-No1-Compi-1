@@ -231,5 +231,15 @@ class EditorViewModel(
 
     /*====Apartado de analisis formal de codigo al ejecutar====*/
 
+    //Metodo para limpiar codigo
+    fun limpiarCodigo() {
+
+        codeField = TextFieldValue("")
+        highlightedCode = AnnotatedString("")
+        listaErrores = emptyList()
+        codigoGenerado = null
+        isModified = true
+    }
+
 }
 

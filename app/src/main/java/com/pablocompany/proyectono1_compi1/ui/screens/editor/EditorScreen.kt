@@ -37,6 +37,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ColorLens
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
@@ -309,7 +310,7 @@ fun EditorScreen(
     if (showUnsavedDialog) {
         AlertDialog(
             onDismissRequest = { showUnsavedDialog = false },
-            containerColor = Color(0xFF180321),
+            containerColor = Color(0xFF5DDEEF),
             titleContentColor = Color.White,
             textContentColor = Color(0xFFCCCCCC),
             title = { Text("Cambios sin guardar") },
@@ -521,6 +522,9 @@ fun EditorScreen(
                         },
                         onColorClick = {
                             showColorPicker = true
+                        },
+                        onLimpiarClick = {
+                            viewModel.limpiarCodigo()
                         }
                     )
                 }
@@ -993,8 +997,11 @@ fun ConsoleSection(
     onReemplazarClick: () -> Unit,
     onAgregarClick: () -> Unit,
     onColorClick: () -> Unit,
+    onLimpiarClick: () -> Unit
 ) {
 
+    //Apartado de confirmacion de limpieza
+    var showClearDialog by remember { mutableStateOf(false) }
     val density = LocalDensity.current
     val imeBottom = WindowInsets.ime.getBottom(density)
     val isKeyboardVisible = imeBottom > 0
@@ -1038,6 +1045,27 @@ fun ConsoleSection(
                     Spacer(Modifier.width(6.dp))
 
                     Text("Insertar Color", color = Color.White)
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                Button(
+                    onClick = { showClearDialog = true },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF057373)
+                    ),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.CleaningServices,
+                        contentDescription = "Limpiar",
+                        tint = Color.White
+                    )
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Text("Limpiar", color = Color.White)
                 }
             }
 
@@ -1099,6 +1127,48 @@ fun ConsoleSection(
 
             Spacer(Modifier.height(24.dp))
         }
+    }
+
+    if (showClearDialog) {
+
+        AlertDialog(
+
+            onDismissRequest = { showClearDialog = false },
+            containerColor = Color(0xFF012F09),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+
+            title = {
+                Text("Limpiar consola")
+            },
+
+            text = {
+                Text("¿Seguro que deseas borrar todo el código?")
+            },
+
+            confirmButton = {
+
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                        onLimpiarClick()
+                    }
+                ) {
+                    Text("Sí")
+                }
+            },
+
+            dismissButton = {
+
+                TextButton(
+                    onClick = {
+                        showClearDialog = false
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 }
 

@@ -25,12 +25,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -295,6 +299,49 @@ fun FormScreen(
                         }
 
                         Spacer(Modifier.height(24.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+
+                            Button(
+
+                                onClick = {
+
+                                    val resultado = analizarFormulario.ejecutar(codigo ?: "")
+
+                                    sharedFormViewModel.setResultadoAnalisis(resultado)
+
+                                    if (resultado.errores.isNotEmpty()) {
+                                        hayErrores = true
+                                    }
+                                },
+
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF04643C)
+                                ),
+
+                                shape = RoundedCornerShape(14.dp)
+
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.Autorenew,
+                                    contentDescription = "Actualizar",
+                                    tint = Color.White
+                                )
+
+                                Spacer(Modifier.width(6.dp))
+
+                                Text(
+                                    "Actualizar",
+                                    color = Color.White
+                                )
+                            }
+                        }
+
+
                     }
                 }
             ) {
