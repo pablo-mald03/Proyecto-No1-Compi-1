@@ -1,28 +1,45 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -34,6 +51,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +60,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
+import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
+import kotlinx.coroutines.delay
 
 //Vista que sirve para contestar los formularios (Independientemente)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,241 +72,385 @@ fun AnswerScreen(
     answerViewModel: AnswerViewModel
 ) {
 
-    //Permite obtener el codigo procesado del formulario
     val codigoProcesadoForm = sharedFormViewModel.codigoProcesado
 
-    //Permite determinar si mostrar un dialog para cerrar el formulario
     var showCloseDialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    /* ===== ANALISIS ===== */
+
+    val analizarFormulario = remember { AnalizarFormularioUseCase() }
+
+    var showErrorDrawer by remember { mutableStateOf(false) }
+    var hayErrores by remember { mutableStateOf(false) }
+
+    val errores = answerViewModel.listaErrores
 
     LaunchedEffect(codigoProcesadoForm) {
         answerViewModel.setCodigoProcesado(codigoProcesadoForm)
     }
 
+    LaunchedEffect(hayErrores) {
+        if (hayErrores) {
+            delay(3000)
+            hayErrores = false
+        }
+    }
+
     val codigo by answerViewModel.codigoFormularioState
 
-    var showDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(codigo) {
 
-    Scaffold(
-        containerColor = Color.Transparent,
-
-        topBar = {
-
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = Color.White
-                ),
-
-                title = {
-                    Text(
-                        "Contestar Formulario",
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            )
+        if (codigo.isBlank()) {
+            answerViewModel.limpiarResultado()
+            return@LaunchedEffect
         }
 
-    ) { padding ->
+        val resultado = analizarFormulario.ejecutar(codigo)
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
+        answerViewModel.setResultadoAnalisis(resultado)
 
-            /* ---------- ESPACIO BONITO DE SEPARACION ---------- */
+        if (resultado.errores.isNotEmpty()) {
+            hayErrores = true
+        }
+    }
 
-            Spacer(Modifier.height(15.dp))
+    /* ===== UI PRINCIPAL PARA PODER VER EL FORM Y PODERLO CONTESTAR ===== */
 
-            HorizontalDivider(
-                color = Color(0xFF060434),
-                thickness = 5.dp
-            )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
 
-            Spacer(Modifier.height(24.dp))
+        Scaffold(
+            containerColor = Color.Transparent,
 
+            topBar = {
 
-            /* ---------- TEXTO QUE SE MUETRA SI NO HAY FORMULARIO SI NO HAY FORMULARIO ---------- */
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = Color.White
+                    ),
 
-            if (codigo.isBlank()) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1E1E1E)
-                        ),
-                        border = BorderStroke(1.dp, Color(0xFF3A3A3A)),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-
+                    title = {
                         Text(
-                            "No hay formulario seleccionado para contestar",
-                            modifier = Modifier.padding(24.dp),
-                            color = Color.White,
-                            textAlign = TextAlign.Center
+                            "Contestar Formulario",
+                            fontWeight = FontWeight.Bold
                         )
                     }
-                }
+                )
+            }
 
-            } else {
+        ) { padding ->
 
-                /* ---------- FORMULARIO QUEMADO ---------- */
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
 
-                repeat(5) { index ->
+                Spacer(Modifier.height(15.dp))
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                HorizontalDivider(
+                    color = Color(0xFF060434),
+                    thickness = 5.dp
+                )
 
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF2C2C2C)
-                        )
+                Spacer(Modifier.height(24.dp))
+
+                if (codigo.isBlank()) {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
 
-                        Column(
-                            Modifier.padding(16.dp)
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF1E1E1E)
+                            ),
+                            border = BorderStroke(1.dp, Color(0xFF3A3A3A)),
+                            shape = RoundedCornerShape(14.dp)
                         ) {
 
                             Text(
-                                "Pregunta ${index + 1}",
-                                color = Color.White
-                            )
-
-                            Spacer(Modifier.height(10.dp))
-
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = {},
-                                modifier = Modifier.fillMaxWidth()
+                                "No hay formulario seleccionado para contestar",
+                                modifier = Modifier.padding(24.dp),
+                                color = Color.White,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
-                }
 
-                Spacer(Modifier.height(30.dp))
+                } else {
 
-                /* ---------- BOTONES PARA CERRAR O CONTESTAR EL FORMULARIO---------- */
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(
-                        12.dp,
-                        Alignment.CenterHorizontally
-                    )
-                ) {
+                    /* FORMULARIO TEMPORAL */
 
-                    Button(
-                        onClick = { showDialog = true },
+                    repeat(5) { index ->
 
-                        modifier = Modifier.weight(1f),
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
 
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF04643C)
-                        ),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF2C2C2C)
+                            )
+                        ) {
 
-                        shape = RoundedCornerShape(14.dp)
+                            Column(
+                                Modifier.padding(16.dp)
+                            ) {
 
-                    ) {
+                                Text(
+                                    "Pregunta ${index + 1}",
+                                    color = Color.White
+                                )
 
-                        Text(
-                            "Enviar",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
+                                Spacer(Modifier.height(10.dp))
+
+                                OutlinedTextField(
+                                    value = "",
+                                    onValueChange = {},
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
                     }
 
+                    Spacer(Modifier.height(30.dp))
 
-                    Button(
-                        onClick = { showCloseDialog = true },
-
-                        modifier = Modifier.weight(1f),
-
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF09066E)
-                        ),
-
-                        shape = RoundedCornerShape(14.dp)
-
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            12.dp,
+                            Alignment.CenterHorizontally
+                        )
                     ) {
 
-                        Text(
-                            "Cerrar",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
+                        Button(
+                            onClick = { showDialog = true },
 
-                Spacer(Modifier.height(60.dp))
+                            modifier = Modifier.weight(1f),
+
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF04643C)
+                            ),
+
+                            shape = RoundedCornerShape(14.dp)
+
+                        ) {
+
+                            Text(
+                                "Enviar",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+
+                        Button(
+                            onClick = { showCloseDialog = true },
+
+                            modifier = Modifier.weight(1f),
+
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF09066E)
+                            ),
+
+                            shape = RoundedCornerShape(14.dp)
+
+                        ) {
+
+                            Text(
+                                "Cerrar",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(60.dp))
+                }
             }
         }
 
-        //Permite mostrar el dialogo de confirmacion para cerrar
-        if (showCloseDialog) {
+        /* ===== BOTON ERRORES FLOTANTE ===== */
 
-            AlertDialog(
+        FloatingActionButton(
+            onClick = { showErrorDrawer = !showErrorDrawer },
 
-                onDismissRequest = { showCloseDialog = false },
-                containerColor = Color(0xFF030821),
-                titleContentColor = Color.White,
-                textContentColor = Color(0xFFCCCCCC),
+            containerColor =
+                if (errores.isNotEmpty())
+                    Color(0xFFB00020)
+                else
+                    Color(0xFF04643C),
 
-                title = {
-                    Text(
-                        "Cerrar formulario",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
+            contentColor = Color.White,
 
-                text = {
-                    Text(
-                        "¿Seguro que deseas cerrar el formulario?\n\nSe perderán todas las respuestas.",
-                        color = Color(0xFFCCCCCC)
-                    )
-                },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 35.dp, end = 16.dp)
+        ) {
+            Icon(Icons.Default.Warning, contentDescription = "Ver errores")
+        }
 
-                confirmButton = {
+        /* ===== FONDO OSCURO QUE PERMITE ENCERRAR EL MENU DE ERRORES ===== */
 
-                    OutlinedButton(
-                        onClick = {
+        AnimatedVisibility(visible = showErrorDrawer) {
 
-                            answerViewModel.setCodigoProcesado("")
-                            showCloseDialog = false
-
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7A0C0C)
-                        )
-                    ) {
-                        Text("Cerrar")
-                    }
-                },
-
-                dismissButton = {
-
-                    OutlinedButton(
-                        onClick = { showCloseDialog = false },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = Color(0xFF34AB02)
-                        )
-                    ) {
-                        Text("Cancelar")
-                    }
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.5f))
+                    .clickable { showErrorDrawer = false }
             )
         }
 
+        /* ===== PANEL ERRORES QUE PERMITE VER ERRORES POR SI ACASO FUE MANIPULADO EL FORM ===== */
+
+        AnimatedVisibility(
+            visible = showErrorDrawer,
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it }),
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+
+            Surface(
+                tonalElevation = 12.dp,
+                shadowElevation = 12.dp,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(
+                        min = 320.dp,
+                        max = 600.dp
+                    )
+            ) {
+
+                Column {
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFF0F0F0F),
+                                        Color(0xFF3A051A),
+                                        Color(0xFF021712),
+                                        Color(0xFF461904)
+                                    ),
+                                    start = Offset.Zero,
+                                    end = Offset(800f, 1200f)
+                                )
+                            )
+                            .padding(12.dp),
+
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Text(
+                            "Errores",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+
+                        IconButton(
+                            onClick = { showErrorDrawer = false }
+                        ) {
+                            Icon(Icons.Default.Close, null, tint = Color.White)
+                        }
+                    }
+
+                    HorizontalDivider()
+
+                    ErrorDrawerContent(errores = errores)
+                }
+            }
+        }
+
+        /* ===== BANNER DE ERRORES ===== */
+
+        AnimatedVisibility(
+            visible = hayErrores,
+            enter = slideInVertically(initialOffsetY = { -it }),
+            exit = slideOutVertically(targetOffsetY = { -it }),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 10.dp)
+        ) {
+
+            ErrorBanner(
+                mensaje = "Se encontraron errores",
+                onClose = { hayErrores = false },
+                onClick = {
+                    hayErrores = false
+                    showErrorDrawer = true
+                }
+            )
+        }
     }
 
-    /* ---------- DIALOG DE CALIFICACION (PENDIENTE)---------- */
+    /* ===== DIALOG PARA CERRAR DEL FORMULARIO (SIEMPRE PREGUNTA SI CERRAR) ===== */
+
+    if (showCloseDialog) {
+
+        AlertDialog(
+
+            onDismissRequest = { showCloseDialog = false },
+            containerColor = Color(0xFF030821),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+
+            title = {
+                Text(
+                    "Cerrar formulario",
+                    fontWeight = FontWeight.Bold
+                )
+            },
+
+            text = {
+                Text(
+                    "¿Seguro que deseas cerrar el formulario?\n\nSe perderán todas las respuestas."
+                )
+            },
+
+            confirmButton = {
+
+                OutlinedButton(
+                    onClick = {
+
+                        answerViewModel.setCodigoProcesado("")
+                        showCloseDialog = false
+
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF7A0C0C)
+                    )
+                ) {
+                    Text("Cerrar")
+                }
+            },
+
+            dismissButton = {
+
+                OutlinedButton(
+                    onClick = { showCloseDialog = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFF34AB02)
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    /* ===== RESULTADO DEL FORMULARIO (PERMITE CALIFICAR LAS RESPUESTAS) ===== */
 
     if (showDialog) {
 
