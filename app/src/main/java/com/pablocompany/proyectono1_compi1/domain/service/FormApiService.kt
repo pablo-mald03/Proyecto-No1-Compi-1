@@ -7,6 +7,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 
+//Interface que permite poderse conectar con la API y ya poder generar los respectivos request hacia el servidor
 interface FormApiService {
 
     @Multipart
