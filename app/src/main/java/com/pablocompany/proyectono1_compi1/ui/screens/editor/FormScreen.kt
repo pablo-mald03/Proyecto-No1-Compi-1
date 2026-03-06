@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BottomSheetScaffold
@@ -313,9 +314,9 @@ fun FormScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.spacedBy(20.dp)
                         ) {
-
+                            //Boton que permite refrescar los cambios (por si se necesita)
                             Button(
 
                                 onClick = {
@@ -350,9 +351,43 @@ fun FormScreen(
                                     color = Color.White
                                 )
                             }
+
+                            //Boton que permite navegar a contestar el formulario
+                            Button(
+
+                                onClick = {
+
+                                    if (sharedFormViewModel.codigoProcesado.isNotBlank()) {
+                                        navController.navigate("answer")
+                                    }else{
+                                        Toast.makeText(context, "No hay formulario compilado para contestar", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                },
+                                modifier = Modifier.weight(1f),
+
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF0D47A1)
+                                ),
+
+                                shape = RoundedCornerShape(14.dp)
+
+                            ) {
+
+                                Icon(
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = "Contestar",
+                                    tint = Color.White
+                                )
+
+                                Spacer(Modifier.width(6.dp))
+
+                                Text(
+                                    "Contestar",
+                                    color = Color.White
+                                )
+                            }
                         }
-
-
                     }
                 }
             ) {

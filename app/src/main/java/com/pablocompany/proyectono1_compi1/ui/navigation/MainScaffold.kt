@@ -24,7 +24,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
+import com.pablocompany.proyectono1_compi1.ui.screens.editor.AnswerScreen
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.EditorScreen
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.FormScreen
 
@@ -34,6 +36,8 @@ fun MainScaffold() {
     val navController = rememberNavController()
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val sharedFormViewModel: SharedFormViewModel = viewModel()
+    val answerViewModell: AnswerViewModel = viewModel()
+
 
     Box(
         modifier = Modifier
@@ -155,12 +159,13 @@ fun MainScaffold() {
                     )
                 }
 
-                //Metodo que despliega la pantalla del servidor
+                //Metodo que despliega la pantalla para poder contestar el formulario
                 composable("answer") {
-                    // TEMPORAL
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Screen para contestar formularios", color = Color.White)
-                    }
+                    AnswerScreen(
+                        navController = navController,
+                        sharedFormViewModel = sharedFormViewModel,
+                        answerViewModel = answerViewModell
+                    )
                 }
 
                 //Metodo que despliega la pantalla del servidor
