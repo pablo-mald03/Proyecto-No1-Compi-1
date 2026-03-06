@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -68,11 +69,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun AnswerScreen(
     navController: NavController,
-    sharedFormViewModel: SharedFormViewModel,
     answerViewModel: AnswerViewModel
-) {
+){
 
-    val codigoProcesadoForm = sharedFormViewModel.codigoProcesado
+    val codigo by answerViewModel.codigoFormularioState
 
     var showCloseDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
@@ -86,9 +86,6 @@ fun AnswerScreen(
 
     val errores = answerViewModel.listaErrores
 
-    LaunchedEffect(codigoProcesadoForm) {
-        answerViewModel.setCodigoProcesado(codigoProcesadoForm)
-    }
 
     LaunchedEffect(hayErrores) {
         if (hayErrores) {
@@ -97,7 +94,6 @@ fun AnswerScreen(
         }
     }
 
-    val codigo by answerViewModel.codigoFormularioState
 
     LaunchedEffect(codigo) {
 
@@ -114,6 +110,9 @@ fun AnswerScreen(
             hayErrores = true
         }
     }
+
+    Log.d("codigo procesado", codigo)
+
 
     /* ===== UI PRINCIPAL PARA PODER VER EL FORM Y PODERLO CONTESTAR ===== */
 

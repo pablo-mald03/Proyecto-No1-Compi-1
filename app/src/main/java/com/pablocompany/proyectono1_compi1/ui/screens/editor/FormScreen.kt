@@ -84,6 +84,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
 import com.pablocompany.proyectono1_compi1.domain.usecase.UploadFormUseCase
@@ -94,7 +95,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun FormScreen(
     navController: NavController,
-    sharedFormViewModel: SharedFormViewModel
+    sharedFormViewModel: SharedFormViewModel,
+    answerViewModel: AnswerViewModel
 ) {
     //Variable que permite ir analizando el codigo de entrada
     val analizarFormulario = remember { AnalizarFormularioUseCase() }
@@ -358,6 +360,9 @@ fun FormScreen(
                                 onClick = {
 
                                     if (sharedFormViewModel.codigoProcesado.isNotBlank()) {
+                                        answerViewModel.setCodigoProcesado(
+                                            sharedFormViewModel.codigoProcesado
+                                        )
                                         navController.navigate("answer")
                                     }else{
                                         Toast.makeText(context, "No hay formulario compilado para contestar", Toast.LENGTH_SHORT).show()

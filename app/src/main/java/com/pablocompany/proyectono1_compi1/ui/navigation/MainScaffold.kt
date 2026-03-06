@@ -29,6 +29,7 @@ import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.AnswerScreen
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.EditorScreen
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.FormScreen
+import com.pablocompany.proyectono1_compi1.ui.screens.editor.ServerScreen
 
 @Composable
 fun MainScaffold() {
@@ -146,16 +147,19 @@ fun MainScaffold() {
             ) {
 
                 //Metodo que sirve para invocar la pantalla del editor
-                composable("editor") { EditorScreen(
-                    navController = navController,
-                    sharedFormViewModel = sharedFormViewModel
-                ) }
+                composable("editor") {
+                    EditorScreen(
+                        navController = navController,
+                        sharedFormViewModel = sharedFormViewModel
+                    )
+                }
 
                 //Metodo que permite invocar la pantalla del formulario
                 composable("form") {
                     FormScreen(
                         navController = navController,
-                        sharedFormViewModel = sharedFormViewModel
+                        sharedFormViewModel = sharedFormViewModel,
+                        answerViewModel = answerViewModell
                     )
                 }
 
@@ -163,17 +167,16 @@ fun MainScaffold() {
                 composable("answer") {
                     AnswerScreen(
                         navController = navController,
-                        sharedFormViewModel = sharedFormViewModel,
                         answerViewModel = answerViewModell
                     )
                 }
 
                 //Metodo que despliega la pantalla del servidor
                 composable("server") {
-                    // TEMPORAL
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("Server Screen", color = Color.White)
-                    }
+                    ServerScreen(
+                        navController = navController,
+                        answerViewModel = answerViewModell
+                    )
                 }
             }
         }
