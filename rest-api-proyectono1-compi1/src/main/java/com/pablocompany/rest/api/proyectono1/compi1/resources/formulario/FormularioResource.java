@@ -84,26 +84,36 @@ public class FormularioResource {
 
     //Metodo que permite retornar el contenido para descargar el formulario
     @GET
-    @Path("/descargar/{id}")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Path("descargar/{id}")
+    @Produces({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
     public Response descargarFormulario(@PathParam("id") String id) {
-
         try {
-
             FormularioCrudService service = new FormularioCrudService();
-
             FormularioDescargaDTO formDescarga = service.obtenerFormularioDescarga(id);
 
-            return Response.ok(formDescarga.getContenido())
+            byte[] bytes = formDescarga.getContenido();
+
+            return Response.ok(bytes)
+                    .type(MediaType.APPLICATION_OCTET_STREAM)
                     .header("Content-Disposition", "attachment; filename=\"" + formDescarga.getNombre() + "\"")
+                    .header("Content-Length", bytes.length)
                     .build();
 
         } catch (DatosNoEncontradosException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Map.of("mensaje", e.getMessage())).build();
+            return Response.status(Response.Status.NOT_FOUND)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(Map.of("mensaje", e.getMessage()))
+                    .build();
         } catch (ErrorInesperadoException ex) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Map.of("mensaje", ex.getMessage())).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(Map.of("mensaje", ex.getMessage()))
+                    .build();
         } catch (FormatoInvalidoException ex) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(Map.of("mensaje", ex.getMessage())).build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .type(MediaType.APPLICATION_JSON)
+                    .entity(Map.of("mensaje", ex.getMessage()))
+                    .build();
         }
     }
 
