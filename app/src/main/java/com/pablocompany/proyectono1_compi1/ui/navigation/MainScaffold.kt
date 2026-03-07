@@ -25,6 +25,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
+import com.pablocompany.proyectono1_compi1.data.repository.ServerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.AnswerScreen
 import com.pablocompany.proyectono1_compi1.ui.screens.editor.EditorScreen
@@ -38,6 +39,7 @@ fun MainScaffold() {
     val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
     val sharedFormViewModel: SharedFormViewModel = viewModel()
     val answerViewModell: AnswerViewModel = viewModel()
+    val serverViewModel: ServerViewModel = viewModel()
 
 
     Box(
@@ -159,7 +161,8 @@ fun MainScaffold() {
                     FormScreen(
                         navController = navController,
                         sharedFormViewModel = sharedFormViewModel,
-                        answerViewModel = answerViewModell
+                        answerViewModel = answerViewModell,
+                        serverViewModel = serverViewModel
                     )
                 }
 
@@ -175,7 +178,8 @@ fun MainScaffold() {
                 composable("server") {
                     ServerScreen(
                         navController = navController,
-                        answerViewModel = answerViewModell
+                        answerViewModel = answerViewModell,
+                        serverViewModel = serverViewModel
                     )
                 }
             }

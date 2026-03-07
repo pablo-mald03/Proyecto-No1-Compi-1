@@ -4,7 +4,9 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +35,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -63,7 +68,7 @@ import kotlinx.coroutines.launch
 fun ServerScreen(
     navController: NavController,
     answerViewModel: AnswerViewModel,
-    serverViewModel: ServerViewModel = viewModel()
+    serverViewModel: ServerViewModel
 ) {
 
 
@@ -72,7 +77,22 @@ fun ServerScreen(
     val error = serverViewModel.error
     val context = LocalContext.current
 
+    var panelExpanded by remember { mutableStateOf(false) }
+
     var serverUrl by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+
+        if(serverViewModel.baseUrl != null){
+            serverViewModel.resetPaginacion()
+            serverViewModel.getForms()
+        }
+
+        if (serverViewModel.baseUrl != null && serverUrl.isBlank()) {
+            serverUrl = serverViewModel.baseUrl!!
+        }
+
+    }
 
     Scaffold(
 
@@ -110,58 +130,122 @@ fun ServerScreen(
             Spacer(Modifier.height(12.dp))
 
             // CAMPO PARA INSERTAR LA URL SERVIDOR
-
-            OutlinedTextField(
-                value = serverUrl,
-                onValueChange = { serverUrl = it },
-                label = { Text("URL del servidor (Ngrok)") },
-                placeholder = {
-                    Text("https://xxxxx.ngrok-free.app/rest-api-proyectono1-compi1/api/v1/")
-                },
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            Button(
-                onClick = {
-
-                    serverViewModel.setBaseUrl(serverUrl)
-
-                    serverViewModel.testConnection(
-
-                        onSuccess = {
-
-                            Toast
-                                .makeText(context,"Conectado al servidor",Toast.LENGTH_SHORT)
-                                .show()
-
-                            serverViewModel.getForms()
-
-                        },
-
-                        onError = {
-
-                            Toast
-                                .makeText(context,"Servidor no válido",Toast.LENGTH_SHORT)
-                                .show()
-
-                            serverUrl = ""
-
-                        }
-                    )
-
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF111111)),
+                shape = RoundedCornerShape(14.dp)
             ) {
 
-                Icon(Icons.Default.Cloud, contentDescription = null)
+                Column {
 
-                Spacer(Modifier.width(8.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { panelExpanded = !panelExpanded }
+                            .padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
-                Text("Conectar al servidor")
+                        Icon(
+                            Icons.Default.Cloud,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+
+                        Spacer(Modifier.width(10.dp))
+
+                        Text(
+                            "Servidor API",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Icon(
+                            if (panelExpanded) Icons.Default.KeyboardArrowUp
+                            else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+
+                    AnimatedVisibility(panelExpanded) {
+
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                        ) {
+
+                            OutlinedTextField(
+                                value = serverUrl,
+                                onValueChange = { serverUrl = it },
+                                label = { Text("URL servidor", color = Color(0xFFF6F6F6)) },
+                                placeholder = {
+                                    Text("https://xxxxx.ngrok-free.dev/rest-api-proyectono1-compi1/api/v1/", color = Color(
+                                        0xFFA7A6A9
+                                    )
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White,
+
+                                    focusedBorderColor = Color(0xFF6A2DA8),
+                                    unfocusedBorderColor = Color.LightGray,
+
+                                    cursorColor = Color(0xFFF7F7F8),
+
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                ),
+                            )
+
+                            Spacer(Modifier.height(10.dp))
+
+                            Button(
+                                onClick = {
+
+                                    serverViewModel.setBaseUrl(serverUrl)
+
+                                    serverViewModel.testConnection(
+
+                                        onSuccess = {
+
+                                            Toast
+                                                .makeText(context,"Conectado al servidor",Toast.LENGTH_SHORT)
+                                                .show()
+
+                                            serverViewModel.getForms()
+
+                                        },
+
+                                        onError = {
+
+                                            Toast
+                                                .makeText(context,"Servidor no válido",Toast.LENGTH_SHORT)
+                                                .show()
+
+                                            serverUrl = ""
+
+                                        }
+                                    )
+
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+
+                                Icon(Icons.Default.Cloud, contentDescription = null)
+
+                                Spacer(Modifier.width(8.dp))
+
+                                Text("Conectar al servidor")
+                            }
+                        }
+                    }
+                }
             }
 
             Spacer(Modifier.height(16.dp))
@@ -231,7 +315,33 @@ fun ServerScreen(
                         item {
                             Spacer(Modifier.height(30.dp))
                         }
+
+                        item {
+                            //Boton para paginar
+                            Spacer(Modifier.height(12.dp))
+
+                            Button(
+                                onClick = { serverViewModel.loadMoreForms() },
+                                enabled = serverViewModel.hasMore,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+
+                                Text(
+                                    if(serverViewModel.hasMore)
+                                        "Cargar más"
+                                    else
+                                        "No hay más formularios"
+                                )
+
+                            }
+
+                            Spacer(Modifier.height(30.dp))
+                        }
                     }
+
+
+
                 }
             }
         }

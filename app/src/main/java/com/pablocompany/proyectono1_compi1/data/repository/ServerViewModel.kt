@@ -19,6 +19,14 @@ class ServerViewModel : ViewModel() {
     //Atributo que permite generar la URL seteable
     private var api: FormApiService? = null
 
+    //Atributo que define de forma global la url de la api
+    var baseUrl: String? = null
+        private set
+
+    //Atributo que define si se puede seguir cargando mas (si ya no hay mas en la db bloquear el cargar mas)
+    var hasMore by mutableStateOf(true)
+        private set
+
     //Listado de formularios que se llenan con el request
     var formularios by mutableStateOf<List<FormServer>>(emptyList())
         private set
@@ -31,11 +39,29 @@ class ServerViewModel : ViewModel() {
     var error by mutableStateOf<String?>(null)
         private set
 
+    //Variables de paginacion
+    private val pageSize = 5
+    private var offset = 0
+
+    //Metodo que permite reiniciar la paginacion
+    fun resetPaginacion(){
+        offset = 0
+        hasMore = true
+        formularios = emptyList()
+
+    }
+
     //METODO QUE PERMITE SETEAR LA URL PARA PODER GENERAR LA CONEXION A LA API
     fun setBaseUrl(url: String) {
 
+        if(url.isBlank()){
+            error = "La URL no puede estar vacía"
+            return
+        }
+
         try {
 
+            baseUrl = url
             api = RetrofitFactory.create(url)
 
         } catch (e: Exception) {
@@ -86,6 +112,8 @@ class ServerViewModel : ViewModel() {
     //METODO QUE PERMITE OBTENER LOS ARCHIVOS ALMACENADOS EL SERVIDOR (PAGINACION)
     fun getForms() {
 
+        offset = 0
+
         viewModelScope.launch {
 
             loading = true
@@ -93,11 +121,15 @@ class ServerViewModel : ViewModel() {
 
             try {
 
-                val response = api?.getForms(10,0)
+                val response = api?.getForms(pageSize, offset)
 
                 if(response?.isSuccessful == true){
 
-                    formularios = response.body() ?: emptyList()
+                    val nuevos = response.body() ?: emptyList()
+
+                    formularios = nuevos
+
+                    hasMore = nuevos.size == pageSize
 
                 }else{
 
@@ -110,7 +142,40 @@ class ServerViewModel : ViewModel() {
                 error = "No se pudo conectar al servidor"
 
             }
+
             loading = false
+        }
+    }
+
+    /*====METODO QUE PERMITE IR PAGINANDO=====*/
+    fun loadMoreForms() {
+
+        viewModelScope.launch {
+
+            try {
+
+                val newOffset = offset + pageSize
+
+                val response = api?.getForms(pageSize, newOffset)
+
+                if(response?.isSuccessful == true){
+
+                    val nuevos = response.body() ?: emptyList()
+
+                    formularios = formularios + nuevos
+
+                    offset = newOffset
+
+                    if(nuevos.size < pageSize){
+                        hasMore = false
+                    }
+                }
+
+            } catch (e: Exception) {
+
+                error = "Error cargando más formularios"
+
+            }
         }
     }
 
