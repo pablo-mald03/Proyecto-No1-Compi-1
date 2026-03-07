@@ -24,7 +24,7 @@ class UploadFormUseCase(
     ): Boolean {
 
         return try {
-
+/*
             val inputStream = context.contentResolver.openInputStream(fileUri)
                 ?: return false
 
@@ -40,7 +40,9 @@ class UploadFormUseCase(
 
             val response = api.uploadForm(multipart)
 
-            response.isSuccessful
+            response.isSuccessful*/
+
+            true
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -56,7 +58,7 @@ class UploadFormUseCase(
 
         return try {
 
-            val requestFile = content
+            /*val requestFile = content
                 .toRequestBody("text/plain".toMediaTypeOrNull())
 
             val multipart = MultipartBody.Part.createFormData(
@@ -67,7 +69,9 @@ class UploadFormUseCase(
 
             val response = api.uploadForm(multipart)
 
-            response.isSuccessful
+            response.isSuccessful*/
+
+            true
 
         } catch (e: Exception) {
             e.printStackTrace()

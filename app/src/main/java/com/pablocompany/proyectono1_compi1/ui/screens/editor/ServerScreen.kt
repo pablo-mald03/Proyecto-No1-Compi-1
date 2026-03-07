@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
@@ -28,6 +30,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -63,12 +66,13 @@ fun ServerScreen(
     serverViewModel: ServerViewModel = viewModel()
 ) {
 
+
     val formularios = serverViewModel.formularios
     val loading = serverViewModel.loading
+    val error = serverViewModel.error
+    val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        serverViewModel.getForms()
-    }
+    var serverUrl by remember { mutableStateOf("") }
 
     Scaffold(
 
@@ -89,76 +93,144 @@ fun ServerScreen(
 
     ) { padding ->
 
-        when {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+        ) {
 
-            loading -> {
+            Spacer(Modifier.height(12.dp))
 
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            HorizontalDivider(
+                color = Color(0xFF060434),
+                thickness = 5.dp
+            )
 
-                    CircularProgressIndicator()
-                }
+            Spacer(Modifier.height(12.dp))
+
+            // CAMPO PARA INSERTAR LA URL SERVIDOR
+
+            OutlinedTextField(
+                value = serverUrl,
+                onValueChange = { serverUrl = it },
+                label = { Text("URL del servidor (Ngrok)") },
+                placeholder = {
+                    Text("https://xxxxx.ngrok-free.app/rest-api-proyectono1-compi1/api/v1/")
+                },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+
+            Spacer(Modifier.height(10.dp))
+
+            Button(
+                onClick = {
+
+                    serverViewModel.setBaseUrl(serverUrl)
+
+                    serverViewModel.testConnection(
+
+                        onSuccess = {
+
+                            Toast
+                                .makeText(context,"Conectado al servidor",Toast.LENGTH_SHORT)
+                                .show()
+
+                            serverViewModel.getForms()
+
+                        },
+
+                        onError = {
+
+                            Toast
+                                .makeText(context,"Servidor no válido",Toast.LENGTH_SHORT)
+                                .show()
+
+                            serverUrl = ""
+
+                        }
+                    )
+
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+
+                Icon(Icons.Default.Cloud, contentDescription = null)
+
+                Spacer(Modifier.width(8.dp))
+
+                Text("Conectar al servidor")
             }
 
-            formularios.isEmpty() -> {
+            Spacer(Modifier.height(16.dp))
 
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
+            when {
 
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF1E1E1E)
-                        )
+                loading -> {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                error != null -> {
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
 
                         Text(
-                            "No hay formularios subidos en el servidor",
-                            modifier = Modifier.padding(24.dp),
-                            color = Color.White
+                            text = error!!,
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
-            }
+                formularios.isEmpty() -> {
 
-            else -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(horizontal = 16.dp),
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color(0xFF1E1E1E)
+                            )
+                        ) {
 
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-
-                    item {
-
-                        Spacer(Modifier.height(10.dp))
-
-                        HorizontalDivider(
-                            color = Color(0xFF060434),
-                            thickness = 5.dp
-                        )
-
-                        Spacer(Modifier.height(10.dp))
+                            Text(
+                                "No hay formularios subidos en el servidor",
+                                modifier = Modifier.padding(24.dp),
+                                color = Color.White
+                            )
+                        }
                     }
+                }
+                else -> {
 
-                    items(formularios) { form ->
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
 
-                        ServerFormCard(
-                            form = form,
-                            navController = navController,
-                            answerViewModel = answerViewModel,
-                            serverViewModel = serverViewModel
-                        )
-                    }
+                        items(formularios) { form ->
 
-                    item {
-                        Spacer(Modifier.height(30.dp))
+                            ServerFormCard(
+                                form = form,
+                                navController = navController,
+                                answerViewModel = answerViewModel,
+                                serverViewModel = serverViewModel
+                            )
+                        }
+
+                        item {
+                            Spacer(Modifier.height(30.dp))
+                        }
                     }
                 }
             }
@@ -177,8 +249,6 @@ fun ServerFormCard(
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    var fileUri by remember { mutableStateOf<Uri?>(null) }
 
     val createFileLauncher =
         rememberLauncherForActivityResult(

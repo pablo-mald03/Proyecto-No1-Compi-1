@@ -33,8 +33,8 @@ public class FormularioResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response subirFormulario(
             @FormDataParam("autor") String autor,
-            @FormDataParam("foto") InputStream archivo,
-            @FormDataParam("foto") FormDataContentDisposition archivoDetalles) {
+            @FormDataParam("formulario") InputStream archivo,
+            @FormDataParam("formulario") FormDataContentDisposition archivoDetalles) {
 
         Formulario formularioNuevo = new Formulario(autor, archivo, archivoDetalles);
 
