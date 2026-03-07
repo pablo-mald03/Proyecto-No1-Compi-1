@@ -63,11 +63,21 @@ parser code {:
 -----------------------------------------------------------*/
 
 /* Terminales: tokens que el parser nos retorna */
-terminal    ERROR, WHITESPACE, NEWLINE;
+terminal    ERROR, WHITESPACE, NEWLINE,COLOR_PRESET,
+            SUMA, RESTA, MULTIPLICACION, DIVISION, POTENCIA, MODULO,
+            PARENT_APERTURA, PARENT_CIERRE,
+            IGUALDAD, DIFERENTE, MAYOR, MENOR, MAYOR_IGUAL, MENOR_IGUAL,
+            AND, OR, NOT,
+            VAR_NUMERO, VAR_STRING, VAR_ESPECIAL,
+            IGUALACION, COMODIN, COMA,
+            INICIO_CADENA, FIN_CADENA,
+            EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT,
+            TEXTO_PLANO
+            ;
 
 
 /*======Apartado de tipado de tokens que vienen del lexer======*/
-terminal String ID;
+terminal String ID,COLOR_HEX;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
 

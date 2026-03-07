@@ -8,21 +8,91 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int ID = 5;
-  public static final int ERROR = 2;
-  public static final int error = 1;
+  public static final int EMOJI_MULTI_STAR = 36;
+  public static final int VAR_STRING = 24;
+  public static final int INICIO_CADENA = 29;
+  public static final int IGUALACION = 26;
+  public static final int ENTERO = 42;
+  public static final int DIFERENTE = 15;
+  public static final int RESTA = 7;
+  public static final int PARENT_CIERRE = 13;
+  public static final int VAR_NUMERO = 23;
+  public static final int EMOJI_HEART = 34;
+  public static final int VAR_ESPECIAL = 25;
   public static final int WHITESPACE = 3;
-  public static final int DECIMAL = 6;
+  public static final int EMOJI_SAD = 32;
+  public static final int NOT = 22;
+  public static final int AND = 20;
+  public static final int IGUALDAD = 14;
+  public static final int OR = 21;
+  public static final int SUMA = 6;
+  public static final int EMOJI_STAR = 35;
+  public static final int ID = 39;
+  public static final int COLOR_HEX = 40;
+  public static final int DECIMAL = 41;
   public static final int EOF = 0;
-  public static final int ENTERO = 7;
+  public static final int error = 1;
+  public static final int FIN_CADENA = 30;
+  public static final int COMA = 28;
   public static final int NEWLINE = 4;
+  public static final int MODULO = 11;
+  public static final int MENOR = 17;
+  public static final int PARENT_APERTURA = 12;
+  public static final int ERROR = 2;
+  public static final int MAYOR = 16;
+  public static final int POTENCIA = 10;
+  public static final int EMOJI_SMILE = 31;
+  public static final int COMODIN = 27;
+  public static final int MAYOR_IGUAL = 18;
+  public static final int TEXTO_PLANO = 38;
+  public static final int EMOJI_SERIOUS = 33;
+  public static final int COLOR_PRESET = 5;
+  public static final int MENOR_IGUAL = 19;
+  public static final int DIVISION = 9;
+  public static final int EMOJI_CAT = 37;
+  public static final int MULTIPLICACION = 8;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ERROR",
   "WHITESPACE",
   "NEWLINE",
+  "COLOR_PRESET",
+  "SUMA",
+  "RESTA",
+  "MULTIPLICACION",
+  "DIVISION",
+  "POTENCIA",
+  "MODULO",
+  "PARENT_APERTURA",
+  "PARENT_CIERRE",
+  "IGUALDAD",
+  "DIFERENTE",
+  "MAYOR",
+  "MENOR",
+  "MAYOR_IGUAL",
+  "MENOR_IGUAL",
+  "AND",
+  "OR",
+  "NOT",
+  "VAR_NUMERO",
+  "VAR_STRING",
+  "VAR_ESPECIAL",
+  "IGUALACION",
+  "COMODIN",
+  "COMA",
+  "INICIO_CADENA",
+  "FIN_CADENA",
+  "EMOJI_SMILE",
+  "EMOJI_SAD",
+  "EMOJI_SERIOUS",
+  "EMOJI_HEART",
+  "EMOJI_STAR",
+  "EMOJI_MULTI_STAR",
+  "EMOJI_CAT",
+  "TEXTO_PLANO",
   "ID",
+  "COLOR_HEX",
   "DECIMAL",
   "ENTERO"
   };
