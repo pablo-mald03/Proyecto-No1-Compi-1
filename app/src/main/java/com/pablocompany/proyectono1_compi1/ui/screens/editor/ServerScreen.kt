@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,6 +78,8 @@ fun ServerScreen(
     val loading = serverViewModel.loading
     val error = serverViewModel.error
     val context = LocalContext.current
+
+    val focusManager = LocalFocusManager.current
 
     var panelExpanded by remember { mutableStateOf(false) }
 
@@ -207,6 +211,8 @@ fun ServerScreen(
                             Button(
                                 onClick = {
 
+                                    focusManager.clearFocus()
+
                                     serverViewModel.setBaseUrl(serverUrl)
 
                                     serverViewModel.testConnection(
@@ -323,15 +329,17 @@ fun ServerScreen(
                             Button(
                                 onClick = { serverViewModel.loadMoreForms() },
                                 enabled = serverViewModel.hasMore,
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
+                                modifier = Modifier.fillMaxWidth().background(Color(0xFF036450)),
+                                shape = RoundedCornerShape(12.dp),
+
                             ) {
 
                                 Text(
                                     if(serverViewModel.hasMore)
                                         "Cargar más"
                                     else
-                                        "No hay más formularios"
+                                        "No hay más formularios",
+                                    color = Color.White
                                 )
 
                             }

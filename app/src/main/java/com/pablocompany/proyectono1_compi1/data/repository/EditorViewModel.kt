@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pablocompany.proyectono1_compi1.compiler.logic.sym
+import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.sym
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarLexicoUseCase

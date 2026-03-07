@@ -1,7 +1,7 @@
 package com.pablocompany.proyectono1_compi1.domain.usecase
 
-import com.pablocompany.proyectono1_compi1.compiler.logic.LexerForms
-import com.pablocompany.proyectono1_compi1.compiler.logic.sym
+import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.LexerForms
+import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.sym
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
 import com.pablocompany.proyectono1_compi1.data.clases.ResultadoLexico

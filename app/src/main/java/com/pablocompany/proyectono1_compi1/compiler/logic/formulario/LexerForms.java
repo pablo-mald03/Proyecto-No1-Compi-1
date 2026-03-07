@@ -3,7 +3,7 @@
 // source: LexerFormsConfig.jflex
 
 /********************** paquetes y otros ***********************/
-package com.pablocompany.proyectono1_compi1.compiler.logic;
+package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 
 /*P*/
 

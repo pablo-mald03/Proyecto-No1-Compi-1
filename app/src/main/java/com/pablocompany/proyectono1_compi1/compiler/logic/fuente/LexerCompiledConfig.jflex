@@ -1,5 +1,5 @@
-/********************** paquetes y otros ***********************/
-package com.pablocompany.proyectono1_compi1.compiler.logic;
+/****************** packages and imports **************/
+package com.pablocompany.proyectono1_compi1.compiler.logic.fuente;
 
 /*P*/
 
@@ -14,7 +14,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 /********************* Declaraciones de jflex ******************/
 %public
 %unicode
-%class LexerForms
+%class LexerCompiled
 %cup
 %line
 %column
@@ -95,31 +95,29 @@ Id = {jletter}{jletterdigit}*
 
 /* Espacios y tabs */
 
-{WhiteSpace} { return symbol(sym.WHITESPACE, yytext()); }
+{WhiteSpace} { /*ignorar*/ }
 
 /* Saltos de línea */
 
-{LineTerminator} { return symbol(sym.NEWLINE, yytext()); }
+{LineTerminator} { /*ignorar*/ }
 
 
 /*==========ER CON CONTEXTO DE VALORES EN EL LENGUAJE============*/
 
-{Decimal}  {return symbol(sym.DECIMAL, Double.parseDouble(yytext()));}
+{Decimal}  {return symbol(SymCompiled.DECIMAL, Double.parseDouble(yytext()));}
 
-{Numero} {return symbol(sym.ENTERO, Integer.parseInt(yytext()));}
+{Numero} {return symbol(SymCompiled.ENTERO, Integer.parseInt(yytext()));}
 
-{Id} { return symbol(sym.ID, yytext()); }
+{Id} { return symbol(SymCompiled.ID, yytext()); }
 
 
 }
 
 .               {
                     reportError("Simbolo no existe en el lenguaje", yytext());
-                    return symbol(sym.ERROR, yytext());
+                    return symbol(SymCompiled.ERROR, yytext());
                 }
 
 <<EOF>>         {
-                    return symbol(sym.EOF);
+                    return symbol(SymCompiled.EOF);
                 }
-
-

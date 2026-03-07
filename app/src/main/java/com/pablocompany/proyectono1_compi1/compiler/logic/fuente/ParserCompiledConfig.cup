@@ -1,11 +1,11 @@
 /****************** packages and imports **************/
-package com.pablocompany.proyectono1_compi1.compiler.logic;
+package com.pablocompany.proyectono1_compi1.compiler.logic.fuente;
 
 /*Created by Pablo*/
 import java_cup.runtime.*;
 import java.util.*;
 
-/*Imports de mis clases*/
+/*Imports de mis clases (P)*/
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
 /*------------------------------------------------------
@@ -13,23 +13,23 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 --------------------------------------------------------*/
 parser code {:
 
-       LexerForms lex;
-       private List<ErrorAnalisis> syntaxErrorList;
+       LexerCompiled lex;
+       private List<ErrorAnalisis> syntaxErrorListCompiled;
 
        // conexion de parser y lexer
-       public Parser(LexerForms lex){
+       public ParserCompiled(LexerCompiled lex){
            super(lex);
            this.lex = lex;
-           syntaxErrorList = new ArrayList<>();
+           syntaxErrorListCompiled = new ArrayList<>();
        }
 
        // Getters
-       public LexerForms getLexer(){
+       public LexerCompiled getLexer(){
            return this.lex;
        }
 
        public List<ErrorAnalisis> getSyntaxErrorList(){
-           return this.syntaxErrorList;
+           return this.syntaxErrorListCompiled;
        }
 
         //Metodo que permite retornar los errores sintacticos
@@ -46,7 +46,7 @@ parser code {:
                 }
             }
 
-            syntaxErrorList.add(new ErrorAnalisis(
+            syntaxErrorListCompiled.add(new ErrorAnalisis(
                 encontrado,
                 cur_token.left,
                 cur_token.right,
@@ -66,21 +66,26 @@ parser code {:
 terminal    ERROR, WHITESPACE, NEWLINE;
 
 
+
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 terminal String ID;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
 
+/*QUEMADO DE MOMENTO*/
+
 
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 
 /* No terminales, reglas que nosotros vamos a definir sintacticamente */
-non terminal formulario;
+non terminal compilado;
 
 /* Símbolo inicial */
-start with formulario;
+start with compilado;
 
-formulario          ::=
+/*QUEMADO DE MOMENTO*/
+
+compilado          ::=
                     ;
 
 
