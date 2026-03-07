@@ -58,42 +58,59 @@ class EditorViewModel(
 
         highlightJob = viewModelScope.launch {
 
-            delay(150)
+            delay(20)
             recalcularHighlight()
         }
     }
 
     //Metodo que permite reescribir el codigo
     private fun recalcularHighlight() {
-
-        val texto = codeField.text
-        if (texto.isEmpty()) {
+        val textoActual = codeField.text
+        if (textoActual.isEmpty()) {
             highlightedCode = AnnotatedString("")
-            listaErrores = emptyList()
             return
         }
 
-        val resultado = analizarLexico(codeField.text)
+        val resultado = analizarLexico(textoActual)
 
-        highlightedCode = construirAnnotated(resultado.tokens)
+        val nuevoAnnotated = construirAnnotated(resultado.tokens)
+
+        if (nuevoAnnotated.text == codeField.text) {
+            highlightedCode = nuevoAnnotated
+        } else {
+            highlightedCode = AnnotatedString(codeField.text)
+        }
+
         erroresVisuales = resultado.errores
     }
 
     //Metodo que permite ir coloreando el texto acorde a lo que se requiere
     private fun construirAnnotated(tokens: List<TokenUI>): AnnotatedString {
-
         return buildAnnotatedString {
-
             tokens.forEach { token ->
-
                 val color = when (token.tipo) {
-                    sym.ID -> Color(0xFFFFFFFF)
-                    sym.ENTERO -> Color(0xFF07E3DB)
-                    sym.DECIMAL -> Color(0xFFF5B342)
                     sym.ERROR -> Color(0xFFB90101)
-                    else -> Color.White
-                }
+                    sym.ID -> Color(0xFFFFFFFF)
+                    sym.SUMA, sym.RESTA, sym.MULTIPLICACION, sym.DIVISION,
+                    sym.POTENCIA, sym.MODULO -> Color(0xFF1AD305)
 
+                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING -> Color(0xFF6602F1)
+
+                    sym.ENTERO, sym.DECIMAL -> Color(0xFF07E3DB)
+
+                    sym.INICIO_CADENA, sym.FIN_CADENA, sym.TEXTO_PLANO -> Color(0xFFE17C02)
+
+                    sym.EMOJI_SMILE, sym.EMOJI_SAD, sym.EMOJI_SERIOUS,
+                    sym.EMOJI_HEART, sym.EMOJI_STAR, sym.EMOJI_MULTI_STAR,
+                    sym.EMOJI_CAT -> Color(0xFFE1C302)
+
+                    sym.PARENT_CIERRE, sym.PARENT_APERTURA, sym.CORCHETE_CIERRE,
+                    sym.CORCHETE_APERTURA, sym.LLAVE_APERTURA, sym.LLAVE_CIERRE -> Color(0xFF073EE3)
+                    sym.COMENTARIO_TEXTO -> Color(0xFF7E7D7D)
+
+
+                    else -> Color(0xFFFCF5C4)
+                }
                 withStyle(SpanStyle(color = color)) {
                     append(token.lexema)
                 }
@@ -121,11 +138,28 @@ class EditorViewModel(
         private set
 
     //Metodo que permite ir subrayando a tiempo real mientras se escriba
-    fun updateCodeField(value: TextFieldValue) {
-        codeField = value
+    fun updateCodeField(newValue: TextFieldValue) {
+        val oldText = codeField.text
+        val newText = newValue.text
+
+        codeField = newValue
         isModified = true
-        recalcularHighlightDebounced()
+
+        if (oldText != newValue.text) {
+            highlightedCode = patchAnnotatedString(highlightedCode, newValue)
+            recalcularHighlightDebounced()
+        }
     }
+
+    //Metodo que permite parchear automaticamente
+    private fun patchAnnotatedString(old: AnnotatedString, newValue: TextFieldValue): AnnotatedString {
+        if (old.text.length == newValue.text.length) return old
+
+        return buildAnnotatedString {
+            append(newValue.text)
+        }
+    }
+
 
     //Metodo que permite insertar texto en cualquier lugar del codigo en base al cursor
     fun insertTextAtCursor(text: String) {
@@ -253,7 +287,7 @@ class EditorViewModel(
 
     //Metodo para limpiar codigo
     fun limpiarCodigo() {
-
+        highlightJob?.cancel()
         codeField = TextFieldValue("")
         highlightedCode = AnnotatedString("")
         listaErrores = emptyList()

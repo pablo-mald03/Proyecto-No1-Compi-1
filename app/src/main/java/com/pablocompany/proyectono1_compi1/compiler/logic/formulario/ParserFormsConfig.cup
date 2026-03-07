@@ -63,7 +63,7 @@ parser code {:
 -----------------------------------------------------------*/
 
 /* Terminales: tokens que el parser nos retorna */
-terminal    ERROR, WHITESPACE, NEWLINE,COLOR_PRESET,
+terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
             SUMA, RESTA, MULTIPLICACION, DIVISION, POTENCIA, MODULO,
             PARENT_APERTURA, PARENT_CIERRE,
             IGUALDAD, DIFERENTE, MAYOR, MENOR, MAYOR_IGUAL, MENOR_IGUAL,
@@ -72,7 +72,9 @@ terminal    ERROR, WHITESPACE, NEWLINE,COLOR_PRESET,
             IGUALACION, COMODIN, COMA,
             INICIO_CADENA, FIN_CADENA,
             EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT,
-            TEXTO_PLANO
+            TEXTO_PLANO,
+            CORCHETE_APERTURA, CORCHETE_CIERRE,
+            LLAVE_APERTURA, LLAVE_CIERRE
             ;
 
 

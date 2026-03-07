@@ -1076,16 +1076,13 @@ fun ConsoleSection(
                 onValueChange = onCodeChange,
                 maxLines = Int.MAX_VALUE,
                 visualTransformation = {
-                    val safeHighlighted =
-                        if (highlightedCode.text.length != codeField.text.length)
-                            AnnotatedString(codeField.text)
-                        else
-                            highlightedCode
+                    val actualContent = if (highlightedCode.text.length == codeField.text.length) {
+                        highlightedCode
+                    } else {
+                        AnnotatedString(codeField.text)
+                    }
 
-                    TransformedText(
-                        safeHighlighted,
-                        OffsetMapping.Identity
-                    )
+                    TransformedText(actualContent, OffsetMapping.Identity)
                 },
                 modifier = Modifier
                     .height(250.dp)

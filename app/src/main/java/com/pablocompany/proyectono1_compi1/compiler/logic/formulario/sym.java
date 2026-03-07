@@ -8,55 +8,61 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int EMOJI_MULTI_STAR = 36;
-  public static final int VAR_STRING = 24;
-  public static final int INICIO_CADENA = 29;
-  public static final int IGUALACION = 26;
-  public static final int ENTERO = 42;
-  public static final int DIFERENTE = 15;
-  public static final int RESTA = 7;
-  public static final int PARENT_CIERRE = 13;
-  public static final int VAR_NUMERO = 23;
-  public static final int EMOJI_HEART = 34;
-  public static final int VAR_ESPECIAL = 25;
+  public static final int EMOJI_MULTI_STAR = 37;
+  public static final int VAR_STRING = 25;
+  public static final int INICIO_CADENA = 30;
+  public static final int IGUALACION = 27;
+  public static final int ENTERO = 47;
+  public static final int DIFERENTE = 16;
+  public static final int RESTA = 8;
+  public static final int COMENTARIO_TEXTO = 5;
+  public static final int PARENT_CIERRE = 14;
+  public static final int VAR_NUMERO = 24;
+  public static final int EMOJI_HEART = 35;
+  public static final int VAR_ESPECIAL = 26;
   public static final int WHITESPACE = 3;
-  public static final int EMOJI_SAD = 32;
-  public static final int NOT = 22;
-  public static final int AND = 20;
-  public static final int IGUALDAD = 14;
-  public static final int OR = 21;
-  public static final int SUMA = 6;
-  public static final int EMOJI_STAR = 35;
-  public static final int ID = 39;
-  public static final int COLOR_HEX = 40;
-  public static final int DECIMAL = 41;
+  public static final int EMOJI_SAD = 33;
+  public static final int NOT = 23;
+  public static final int AND = 21;
+  public static final int CORCHETE_CIERRE = 41;
+  public static final int IGUALDAD = 15;
+  public static final int OR = 22;
+  public static final int SUMA = 7;
+  public static final int EMOJI_STAR = 36;
+  public static final int ID = 44;
+  public static final int COLOR_HEX = 45;
+  public static final int DECIMAL = 46;
   public static final int EOF = 0;
+  public static final int CORCHETE_APERTURA = 40;
   public static final int error = 1;
-  public static final int FIN_CADENA = 30;
-  public static final int COMA = 28;
+  public static final int FIN_CADENA = 31;
+  public static final int COMA = 29;
   public static final int NEWLINE = 4;
-  public static final int MODULO = 11;
-  public static final int MENOR = 17;
-  public static final int PARENT_APERTURA = 12;
+  public static final int MODULO = 12;
+  public static final int MENOR = 18;
+  public static final int PARENT_APERTURA = 13;
   public static final int ERROR = 2;
-  public static final int MAYOR = 16;
-  public static final int POTENCIA = 10;
-  public static final int EMOJI_SMILE = 31;
-  public static final int COMODIN = 27;
-  public static final int MAYOR_IGUAL = 18;
-  public static final int TEXTO_PLANO = 38;
-  public static final int EMOJI_SERIOUS = 33;
-  public static final int COLOR_PRESET = 5;
-  public static final int MENOR_IGUAL = 19;
-  public static final int DIVISION = 9;
-  public static final int EMOJI_CAT = 37;
-  public static final int MULTIPLICACION = 8;
+  public static final int MAYOR = 17;
+  public static final int POTENCIA = 11;
+  public static final int EMOJI_SMILE = 32;
+  public static final int LLAVE_APERTURA = 42;
+  public static final int COMODIN = 28;
+  public static final int MAYOR_IGUAL = 19;
+  public static final int TEXTO_PLANO = 39;
+  public static final int LLAVE_CIERRE = 43;
+  public static final int EMOJI_SERIOUS = 34;
+  public static final int COLOR_PRESET = 6;
+  public static final int MENOR_IGUAL = 20;
+  public static final int DIVISION = 10;
+  public static final int EMOJI_CAT = 38;
+  public static final int MULTIPLICACION = 9;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
   "ERROR",
   "WHITESPACE",
   "NEWLINE",
+  "COMENTARIO_TEXTO",
   "COLOR_PRESET",
   "SUMA",
   "RESTA",
@@ -91,6 +97,10 @@ public class sym {
   "EMOJI_MULTI_STAR",
   "EMOJI_CAT",
   "TEXTO_PLANO",
+  "CORCHETE_APERTURA",
+  "CORCHETE_CIERRE",
+  "LLAVE_APERTURA",
+  "LLAVE_CIERRE",
   "ID",
   "COLOR_HEX",
   "DECIMAL",

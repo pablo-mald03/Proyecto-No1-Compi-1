@@ -108,9 +108,9 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 
 /*--Comentarios--*/
-"$".*      {/*Ignorado*/}
+"$".*      { return symbol(sym.COMENTARIO_TEXTO, yytext());}
 
-{ComentarioBloque}      {/*Ignorado*/}
+{ComentarioBloque}      { return symbol(sym.COMENTARIO_TEXTO, yytext());}
 
 
 /*=========APARTADO DE ER QUE IGNORAN O REPRESENTAN ESPACIOS EL CODIGO==========*/
@@ -131,70 +131,79 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES ARITMETICOS EN EL LENGUAJE==========*/
 
-"+" {return symbol(sym.SUMA);}
+"+" {return symbol(sym.SUMA, yytext());}
 
-"-" {return symbol(sym.RESTA);}
+"-" {return symbol(sym.RESTA, yytext());}
 
-"*" {return symbol(sym.MULTIPLICACION);}
+"*" {return symbol(sym.MULTIPLICACION, yytext());}
 
-"/" {return symbol(sym.DIVISION);}
+"/" {return symbol(sym.DIVISION, yytext());}
 
-"^" {return symbol(sym.POTENCIA);}
+"^" {return symbol(sym.POTENCIA, yytext());}
 
-"%" {return symbol(sym.MODULO);}
+"%" {return symbol(sym.MODULO, yytext());}
 
-"("       {return symbol(sym.PARENT_APERTURA);}
+"("       {return symbol(sym.PARENT_APERTURA, yytext());}
 
-")"       {return symbol(sym.PARENT_CIERRE);}
+")"       {return symbol(sym.PARENT_CIERRE, yytext());}
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES ARITMETICOS EN EL LENGUAJE==========*/
 
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE COMPARACION EN EL LENGUAJE==========*/
 
-"=="    {return symbol(sym.IGUALDAD);}
+"=="    {return symbol(sym.IGUALDAD, yytext());}
 
-"!!" {return symbol(sym.DIFERENTE);}
+"!!" {return symbol(sym.DIFERENTE, yytext());}
 
-">"    {return symbol(sym.MAYOR);}
+">"    {return symbol(sym.MAYOR, yytext());}
 
-"<"    {return symbol(sym.MENOR);}
+"<"    {return symbol(sym.MENOR, yytext());}
 
-">="    {return symbol(sym.MAYOR_IGUAL);}
+">="    {return symbol(sym.MAYOR_IGUAL, yytext());}
 
-"<="    {return symbol(sym.MENOR_IGUAL);}
+"<="    {return symbol(sym.MENOR_IGUAL, yytext());}
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE COMPARACION EN EL LENGUAJE==========*/
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE LOGICOS EN EL LENGUAJE==========*/
 
-"&&"    {return symbol(sym.AND);}
+"&&"    {return symbol(sym.AND, yytext());}
 
-"||"    {return symbol(sym.OR);}
+"||"    {return symbol(sym.OR, yytext());}
 
-"~"    {return symbol(sym.NOT);}
+"~"    {return symbol(sym.NOT, yytext());}
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE LOGICOS EN EL LENGUAJE==========*/
 
 
 /*=========APARTADO DE ER QUE REPRESENTAN LOS TIPOS DE VARIABLES EN EL LENGUAJE==========*/
 
-"number"        {return symbol(sym.VAR_NUMERO);}
+"number"        {return symbol(sym.VAR_NUMERO, yytext());}
 
-"string"        {return symbol(sym.VAR_STRING);}
+"string"        {return symbol(sym.VAR_STRING, yytext());}
 
-"special"       {return symbol(sym.VAR_ESPECIAL);}
+"special"       {return symbol(sym.VAR_ESPECIAL, yytext());}
 
 
 /*=========APARTADO DE ER QUE REPRESENTAN LOS TIPOS DE VARIABLES EN EL LENGUAJE==========*/
 
 /*=========APARTADO DE ER QUE REPRESENTAN LOS LAS DECLARACIONES DE VARIABLES O TIENEN ALGUN CONTEXTO DE ASIGNACION EN EL LENGUAJE==========*/
 
-"="    {return symbol(sym.IGUALACION);}
+"="    {return symbol(sym.IGUALACION, yytext());}
 
-"?"    {return symbol(sym.COMODIN);}
+"?"    {return symbol(sym.COMODIN, yytext());}
 
-","    {return symbol(sym.COMA);}
+","    {return symbol(sym.COMA, yytext());}
+
+"["    {return symbol(sym.CORCHETE_APERTURA, yytext());}
+
+"]"    {return symbol(sym.CORCHETE_CIERRE, yytext());}
+
+"{"    {return symbol(sym.LLAVE_APERTURA, yytext());}
+
+"}"    {return symbol(sym.LLAVE_CIERRE, yytext());}
+
 
 
 /*=========APARTADO DE ER QUE REPRESENTAN LOS LAS DECLARACIONES DE VARIABLES O TIENEN ALGUN CONTEXTO DE ASIGNACION EN EL LENGUAJE==========*/
@@ -215,7 +224,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 /*----RECONOCIMIENTO DE CADENAS DE TEXTO-----*/
 
 \"          { yybegin(STRING);
-              return symbol(sym.INICIO_CADENA); }
+              return symbol(sym.INICIO_CADENA, yytext()); }
 
 }
 
@@ -226,7 +235,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
     \" {
         yybegin(YYINITIAL);
-        return symbol(sym.FIN_CADENA);
+        return symbol(sym.FIN_CADENA, yytext());
     }
 
     /*-----EMOJIS DINAMICOS-----*/
@@ -262,7 +271,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 /*----ESTADO DE CADENAS DE TEXTO-----*/
 
 
-.               {
+[^]               {
                     reportError("Simbolo no existe en el lenguaje", yytext());
                     return symbol(sym.ERROR, yytext());
                 }
