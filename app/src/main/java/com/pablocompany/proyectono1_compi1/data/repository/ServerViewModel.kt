@@ -1,20 +1,27 @@
 package com.pablocompany.proyectono1_compi1.data.repository
 
+import android.app.Application
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pablocompany.proyectono1_compi1.data.clases.FormServer
 import com.pablocompany.proyectono1_compi1.domain.modules.RetrofitFactory
 import com.pablocompany.proyectono1_compi1.domain.service.FormApiService
+import com.pablocompany.proyectono1_compi1.domain.usecase.UploadFormUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 import retrofit2.Response
 
 //ViewModel que permite poder generar los requests y toda la interaccion automatica que hace la app al conectar con el service
-class ServerViewModel : ViewModel() {
+class ServerViewModel(application: Application) : AndroidViewModel(application){
+
+    //Constante que interconecta con el usecase para hacer el POST
+    private val uploadUseCase = UploadFormUseCase(getApplication())
 
     //Atributo que permite generar la URL seteable
     private var api: FormApiService? = null
@@ -42,6 +49,11 @@ class ServerViewModel : ViewModel() {
     //Variables de paginacion
     private val pageSize = 5
     private var offset = 0
+
+    //Metodo que permite retornar la conexion a la API
+    fun getApi(): FormApiService? {
+        return api
+    }
 
     //Metodo que permite reiniciar la paginacion
     fun resetPaginacion(){
@@ -206,11 +218,11 @@ class ServerViewModel : ViewModel() {
 
             val response = api?.getFormContent(id)
 
-            if(response?.isSuccessful == true){
+            if (response?.isSuccessful == true) {
 
-                response.body()
+                response.body()?.contenido
 
-            }else null
+            } else null
 
         } catch (e: Exception) {
 
@@ -229,6 +241,36 @@ class ServerViewModel : ViewModel() {
 
             "Error desconocido"
         }
+    }
+
+    //Metodo que permite subir un archivo al servidor (SE TIENE GUARDADO LOCAL)
+    suspend fun uploadForm(
+        fileUri: Uri,
+        fileName: String
+    ): Boolean {
+
+        val apiService = api ?: return false
+
+        return uploadUseCase.uploadForm(
+            api = apiService,
+            fileUri = fileUri,
+            fileName = fileName
+        )
+    }
+
+    //Metodo que permite subir un archivo al servidor (SE TIENE GUARDADO LOCAL)
+    suspend fun uploadFormContent(
+        content: String,
+        fileName: String
+    ): Boolean {
+
+        val apiService = api ?: return false
+
+        return uploadUseCase.uploadFormContent(
+            api = apiService,
+            content = content,
+            fileName = fileName
+        )
     }
 
 }

@@ -396,7 +396,7 @@ fun ServerFormCard(
         ) {
 
             Text(
-                form.nombre,
+                form.nombreArchivo?: "Sin Nombre",
                 color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
@@ -405,13 +405,13 @@ fun ServerFormCard(
             Spacer(Modifier.height(6.dp))
 
             Text(
-                "Creador: ${form.creador}",
+                "Creador: ${form.autor}",
                 color = Color(0xFFCCCCCC),
                 fontSize = 13.sp
             )
 
             Text(
-                "Subido: ${form.fecha} ${form.hora}",
+                "Subido: ${form.fechaPublicacion}       Hora: ${form.horaPublicacion}",
                 color = Color(0xFF9E9E9E),
                 fontSize = 12.sp
             )
@@ -431,7 +431,7 @@ fun ServerFormCard(
 
                     onClick = {
 
-                        createFileLauncher.launch("${form.nombre}.txt")
+                        createFileLauncher.launch("${form.nombreArchivo}")
 
                     },
 
@@ -461,14 +461,23 @@ fun ServerFormCard(
 
                         scope.launch {
 
-                            val codigo =
-                                serverViewModel.getFormContent(form.id)
+                            val codigo = serverViewModel.getFormContent(form.id)
 
-                            codigo?.let {
+                            if (codigo != null && codigo.isNotBlank()) {
 
-                                answerViewModel.setCodigoProcesado(it)
+                                answerViewModel.setCodigoProcesado(codigo)
 
                                 navController.navigate("answer")
+
+                            } else {
+
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "El contenido del formulario está vacío",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    .show()
                             }
                         }
                     },

@@ -262,7 +262,8 @@ fun FormScreen(
                 currentFileUri = currentUri,
                 isModified = isModified,
                 fileName = sharedFormViewModel.fileName ?: "Sin nombre",
-                sharedFormViewModel = sharedFormViewModel
+                sharedFormViewModel = sharedFormViewModel,
+                serverViewModel = serverViewModel
             )
         }
     ) {
@@ -629,7 +630,8 @@ fun DrawerFormContent(
     currentFileUri: Uri?,
     isModified: Boolean,
     fileName: String,
-    sharedFormViewModel: SharedFormViewModel
+    sharedFormViewModel: SharedFormViewModel,
+    serverViewModel: ServerViewModel
     ) {
 
     val scope = rememberCoroutineScope()
@@ -751,8 +753,9 @@ fun DrawerFormContent(
                             val sanitizedFileName = sanitizeFileName(fileName)
 
                             scope.launch {
+                                //PENDIENTE LA INTEGRACION PARA PASAR EL NOMBRE DEL AUTOR :)
 
-                                val success = uploadUseCase.uploadForm(
+                                val success = serverViewModel.uploadForm(
                                     fileUri = currentFileUri,
                                     fileName = sanitizedFileName
                                 )
@@ -844,7 +847,7 @@ fun DrawerFormContent(
 
                         scope.launch {
 
-                            val success = uploadUseCase.uploadFormContent(
+                            val success = serverViewModel.uploadFormContent(
                                 content = formContent,
                                 fileName = sanitizedName
                             )

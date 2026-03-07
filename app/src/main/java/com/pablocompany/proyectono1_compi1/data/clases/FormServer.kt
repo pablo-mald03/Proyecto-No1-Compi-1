@@ -4,10 +4,10 @@ package com.pablocompany.proyectono1_compi1.data.clases
 data class FormServer(
 
     val id: String,
-    val nombre: String,
-    val creador: String,
-    val fecha: String,
-    val hora: String,
+    val autor: String,
+    val nombreArchivo: String,
+    val fechaPublicacion: String,
+    val horaPublicacion: String,
 
 
 )

@@ -3,6 +3,7 @@ package com.pablocompany.rest.api.proyectono1.compi1.resources.formulario;
 import com.pablocompany.rest.api.proyectono1.compi1.exceptions.DatosNoEncontradosException;
 import com.pablocompany.rest.api.proyectono1.compi1.exceptions.ErrorInesperadoException;
 import com.pablocompany.rest.api.proyectono1.compi1.exceptions.FormatoInvalidoException;
+import com.pablocompany.rest.api.proyectono1.compi1.formularios.dtos.FormContentDTOResponse;
 import com.pablocompany.rest.api.proyectono1.compi1.formularios.models.Formulario;
 import com.pablocompany.rest.api.proyectono1.compi1.formularios.models.FormularioDTO;
 import com.pablocompany.rest.api.proyectono1.compi1.formularios.models.FormularioDescargaDTO;
@@ -70,7 +71,7 @@ public class FormularioResource {
 
             String contenido = service.obtenerContenidoFormulario(id);
 
-            return Response.ok(contenido).build();
+            return Response.ok(new FormContentDTOResponse(contenido)).build();
 
         } catch (DatosNoEncontradosException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(Map.of("mensaje", e.getMessage())).build();

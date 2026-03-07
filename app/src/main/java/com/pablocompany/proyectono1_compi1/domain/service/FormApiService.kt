@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.domain.service
 
+import com.pablocompany.proyectono1_compi1.data.clases.FormContentDTO
 import com.pablocompany.proyectono1_compi1.data.clases.FormServer
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -25,7 +26,7 @@ interface FormApiService {
     @GET("forms/content/{id}")
     suspend fun getFormContent(
         @Path("id") id: String
-    ): Response<String>
+    ): Response<FormContentDTO>
 
     //Metodo que permite la descarga del archivo desde el servidor
     @GET("forms/descargar/{id}")
