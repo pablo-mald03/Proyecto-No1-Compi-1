@@ -280,6 +280,8 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 "who_is_that_pokemon" {return symbol(sym.WHO_IS_THAT_POKEMON, yytext());}
 
+"NUMBER"        {return symbol(sym.NUMBER_REQUEST, yytext());}
+
 /*---CONFIGURACIONES DE DOCK---*/
 "VERTICAL"      {return symbol(sym.CONFIG_DOCK, yytext());}
 

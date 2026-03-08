@@ -13,6 +13,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.operaciones.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.*;
 
 /*------------------------------------------------------
                         CUP
@@ -78,8 +79,6 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
             VAR_NUMERO, VAR_STRING, VAR_ESPECIAL,
             IGUALACION, COMODIN, COMA,
             INICIO_CADENA, FIN_CADENA,
-            EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT,
-            TEXTO_PLANO,
             CORCHETE_APERTURA, CORCHETE_CIERRE,
             LLAVE_APERTURA, LLAVE_CIERRE,
             IF, ELSE, ELSE_IF, WHILE, FOR, DO, IN,
@@ -91,12 +90,13 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
             DRAW, WHO_IS_THAT_POKEMON, CONFIG_DOCK, TIPOGRAFIA, GROSOR_LINEA,
             SECTION, TABLE, TEXT,
             OPEN_QUESTION, DROP_QUESTION, SELECT_QUESTION, MULTIPLE_QUESTION,
-            CORRECT, OPTIONS
+            CORRECT, OPTIONS, NUMBER_REQUEST
             ;
 
 /*Created by Pablo*/
 /*======Apartado de tipado de tokens que vienen del lexer======*/
-terminal String ID,COLOR_HEX;
+terminal String ID,COLOR_HEX,TEXTO_PLANO;
+terminal String EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
 
@@ -115,6 +115,12 @@ non terminal List<Nodo> lista_codigo;
 non terminal Nodo instruccion;
 
 non terminal NodoExpresion expresion;
+
+//---*--Declaracion de cadenas con emojis o cadenas normales---*---
+non terminal List<NodoFragmento> lista_fragmentos;
+
+non terminal NodoFragmento fragmento;
+
 
 
 /*======*******=====Presedencia de tipos==========*******===========*/
@@ -175,6 +181,7 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     :}
                     ;
 
+ /*----Expresiones del lenguaje-----*/
 expresion ::=       expresion:exp1 SUMA expresion:exp2
                     {:
                         RESULT = new NodoSuma(exp1, exp2, exp1left, exp1right);
@@ -215,15 +222,67 @@ expresion ::=       expresion:exp1 SUMA expresion:exp2
                     {:
                         RESULT = new NodoLiteral(dec, decleft, decright);
                     :}
-                    | INICIO_CADENA TEXTO_PLANO:texto FIN_CADENA
-                    {:
-                        RESULT = new NodoLiteral(texto, textoleft, textoright);
-                    :}
                     | ID:id
                     {:
                         RESULT = new NodoAccesoVariable(id, idleft, idright);
                     :}
+                    | INICIO_CADENA lista_fragmentos:list FIN_CADENA
+                    {:
+                        RESULT = new NodoCadenaCompuesta(list, listleft, listright);
+                    :}
                     ;
+
+//----*----Representa las cadenas con fragmentos de texto y emojis----*----
+
+lista_fragmentos    ::= lista_fragmentos:list fragmento:frag
+                    {:
+                        list.add(frag);
+                        RESULT = list;
+                    :}
+                    | fragmento:frag
+                    {:
+                        List<NodoFragmento> list = new ArrayList<>();
+                        list.add(frag);
+                        RESULT = list;
+                    :}
+                    ;
+
+//----*----Representa cada uno de los fragmentos de texto y emojis que vienen dentro de una cadena de texto----*----
+fragmento           ::= TEXTO_PLANO:texto
+                    {:
+                        RESULT = new NodoTexto(texto, textoleft, textoright);
+                    :}
+                    | EMOJI_SMILE:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.SMILE, emoji, emojileft, emojiright);
+                    :}
+                    | EMOJI_SAD:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.SAD, emoji, emojileft, emojiright);
+                    :}
+                    | EMOJI_SERIOUS:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.SERIOUS, emoji, emojileft, emojiright);
+                    :}
+                    | EMOJI_HEART:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.HEART, emoji, emojileft, emojiright);
+                    :}
+                    | EMOJI_STAR:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.STAR, emoji, emojileft, emojiright);
+                    :}
+                    | EMOJI_MULTI_STAR:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.MULTI_STAR, emoji, emojileft, emojiright);
+                    :}
+                    | EMOJI_CAT:emoji
+                    {:
+                        RESULT = new NodoEmoji(TipoEmoji.CAT, emoji, emojileft, emojiright);
+                    :}
+                    ;
+
+
 
 
 
