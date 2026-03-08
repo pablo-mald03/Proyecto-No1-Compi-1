@@ -121,11 +121,24 @@ HexColor = "#"[0-9A-Fa-f]{6}
 /*---FIN DEL APARTADO DE COLORES---*/
 
 
+/*=====***--DEFINICION DE EXPRESIONES MATEMATICAS-***====*/
+
+"-" {return symbol(SymCompiled.RESTA, yytext());}
+
+
+/*=====***--DEFINICION DE EXPRESIONES MATEMATICAS-***====*/
+
+
 /*=====***--DEFINICION DE CARACTERES ESPECIALES DE ETIQUETAS--***====*/
 
 "="      { return symbol(SymCompiled.IGUAL); }
 
 ","      { return symbol(SymCompiled.COMA); }
+
+"{"      { return symbol(SymCompiled.LLAVE_APERTURA); }
+
+"}"      { return symbol(SymCompiled.LLAVE_CIERRE); }
+
 
 
 /*=====***--DEFINICION DE CARACTERES ESPECIALES DE ETIQUETAS--***====*/
@@ -154,15 +167,19 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 "table"      { return symbol(SymCompiled.TABLE); }
 
-"text"       { return symbol(SymCompiled.TEXT); }"
+"text"       { return symbol(SymCompiled.TEXT); }
 
-"line"       { return symbol(SymCompiled.LINE); }
+"line"       { return symbol(SymCompiled.LINE, yytext()); }
 
 "element"    { return symbol(SymCompiled.ELEMENT); }
 
 "open"       { return symbol(SymCompiled.OPEN); }
 
 "drop"       { return symbol(SymCompiled.DROP); }
+
+"select"     { return symbol(SymCompiled.SELECT); }
+
+"multiple"   { return symbol(SymCompiled.MULTIPLE); }
 
 
 /*=====***--FIN DEL APARTADO DE ETIQUETAS COMPUESTAS--***====*/
@@ -171,12 +188,6 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 /*------*****--------APARTADO DE SIMBOLOS ESPECIALES--------*****------*/
 
-"<"      { return symbol(SymCompiled.MENOR); }
-
-">"      { return symbol(SymCompiled.MAYOR); }
-
-"/"      { return symbol(SymCompiled.DIAGONAL); }
-
 "/>"     { return symbol(SymCompiled.CIERRE_ETIQUETA); }
 
 "</"     { return symbol(SymCompiled.INICIO_ETIQUETA); }
@@ -184,6 +195,12 @@ HexColor = "#"[0-9A-Fa-f]{6}
 "("       {return symbol(SymCompiled.PARENT_APERTURA);}
 
 ")"       {return symbol(SymCompiled.PARENT_CIERRE);}
+
+"<"      { return symbol(SymCompiled.MENOR); }
+
+">"      { return symbol(SymCompiled.MAYOR); }
+
+"/"      { return symbol(SymCompiled.DIAGONAL); }
 
 
 /*------*****--------FIN DEL APARTADO DE SIMBOLOS ESPECIALES--------*****------*/
@@ -207,7 +224,6 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 
 /*---GROSOR DE LINEA---*/
-"LINE"      {return symbol(SymCompiled.GROSOR_LINEA, yytext());}
 
 "DOTTED"    {return symbol(SymCompiled.GROSOR_LINEA, yytext());}
 
@@ -226,8 +242,53 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 {Id} { return symbol(SymCompiled.ID, yytext()); }
 
+/*----RECONOCIMIENTO DE CADENAS DE TEXTO-----*/
+
+\"          { yybegin(STRING);
+              return symbol(SymCompiled.INICIO_CADENA, yytext()); }
 
 }
+
+/*----ESTADO DE CADENAS DE TEXTO INCLUIDO RECONOCIMIENTO DE EMOJIS-----*/
+<STRING> {
+
+    /*-----FIN DE LA CADENA DE TEXTO-----*/
+
+    \" {
+        yybegin(YYINITIAL);
+        return symbol(SymCompiled.FIN_CADENA, yytext());
+    }
+
+    /*-----EMOJIS DINAMICOS-----*/
+    ( "@[:" ")"+ "]" | "@[:smile:]" )       { return symbol(SymCompiled.EMOJI_SMILE, yytext()); }
+
+    ( "@[:" "("+ "]" | "@[:sad:]" )         { return symbol(SymCompiled.EMOJI_SAD, yytext()); }
+
+    ( "@[:" "|"+ "]" | "@[:serious:]" )     { return symbol(SymCompiled.EMOJI_SERIOUS, yytext()); }
+
+    ( "@[" "<"+ "3"+ "]" | "@[:heart:]" )   { return symbol(SymCompiled.EMOJI_HEART, yytext()); }
+
+    "@[:star:]"                             { return symbol(SymCompiled.EMOJI_STAR, yytext()); }
+
+    ( "@[:star:" {Numero} ":]" | "@[:star-" {Numero} ":]" )     { return symbol(SymCompiled.EMOJI_MULTI_STAR, yytext()); }
+
+    ( "@[:^^:]" | "@[:cat:]" )               { return symbol(SymCompiled.EMOJI_CAT, yytext()); }
+
+
+    /*-----Texto normal (OBVIA @):-----*/
+
+    [^\n\r\"\\@]+ { return symbol(SymCompiled.TEXTO_PLANO, yytext()); }
+
+    /*-----RECONOCE COMO TEXTO NORMAL A @-----*/
+
+    "@" { return symbol(SymCompiled.TEXTO_PLANO, "@"); }
+
+    /*-----Escapes de cadenas siguen devolviendo texto plano------*/
+
+    \\\" { return symbol(SymCompiled.TEXTO_PLANO, "\""); }
+    \\n  { return symbol(SymCompiled.TEXTO_PLANO, "\n"); }
+}
+
 
 [^]               {
                     reportError("Simbolo no existe en el lenguaje", yytext());

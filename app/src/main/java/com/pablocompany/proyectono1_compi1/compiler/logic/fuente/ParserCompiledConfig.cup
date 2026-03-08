@@ -63,7 +63,17 @@ parser code {:
 -----------------------------------------------------------*/
 
 /* Terminales: tokens que el parser nos retorna */
-terminal    ERROR;
+terminal    ERROR, RESTA,
+            IGUAL, COMA, LLAVE_APERTURA, LLAVE_CIERRE,
+            STYLE, CONTENT, COLOR_KEY, BACKGROUND, FONT, FAMILY, SIZE, BORDER,
+            SECTION, TABLE, TEXT, LINE, ELEMENT, OPEN, DROP, SELECT, MULTIPLE,
+            CIERRE_ETIQUETA, INICIO_ETIQUETA, MENOR, MAYOR, DIAGONAL,
+            PARENT_APERTURA, PARENT_CIERRE,
+            CONFIG_DOCK, TIPOGRAFIA, GROSOR_LINEA,
+            EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR,
+            EMOJI_MULTI_STAR, EMOJI_CAT,
+            TEXTO_PLANO, INICIO_CADENA, FIN_CADENA
+            ;
 
 
 
