@@ -63,12 +63,12 @@ parser code {:
 -----------------------------------------------------------*/
 
 /* Terminales: tokens que el parser nos retorna */
-terminal    ERROR, WHITESPACE, NEWLINE;
+terminal    ERROR;
 
 
 
 /*======Apartado de tipado de tokens que vienen del lexer======*/
-terminal String ID;
+terminal String ID,COLOR_HEX;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
 

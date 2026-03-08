@@ -18,6 +18,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 %cup
 %line
 %column
+%ignorecase
 %state STRING
 
 /*P*/
@@ -38,6 +39,12 @@ Decimal = {Numero}"."{Numero}
 jletter = [:jletter:]
 jletterdigit = [:jletterdigit:]
 Id = {jletter}{jletterdigit}*
+
+//Metadatos
+
+MetaDatos = "###" ( [^#] | "#" [^#] | "##" [^#] )* "###"
+
+HexColor = "#"[0-9A-Fa-f]{6}
 
 %{
     /****************** Codigo de usuario (codigo java) ***********************/
@@ -101,6 +108,115 @@ Id = {jletter}{jletterdigit}*
 
 {LineTerminator} { /*ignorar*/ }
 
+/*Ignorar metadatos*/
+
+{MetaDatos}     {/*ignorar*/}
+
+
+
+/*---APARTADO DE COLORES---*/
+
+{HexColor} { return symbol(SymCompiled.COLOR_HEX, yytext()); }
+
+/*---FIN DEL APARTADO DE COLORES---*/
+
+
+/*=====***--DEFINICION DE CARACTERES ESPECIALES DE ETIQUETAS--***====*/
+
+"="      { return symbol(SymCompiled.IGUAL); }
+
+","      { return symbol(SymCompiled.COMA); }
+
+
+/*=====***--DEFINICION DE CARACTERES ESPECIALES DE ETIQUETAS--***====*/
+
+
+
+/*---APARTADO DE PALABRAS RESERVADAS---*/
+
+"style"      { return symbol(SymCompiled.STYLE); }
+
+"content"    { return symbol(SymCompiled.CONTENT); }
+
+"color"      { return symbol(SymCompiled.COLOR_KEY); }
+
+"background" { return symbol(SymCompiled.BACKGROUND); }
+
+"font"       { return symbol(SymCompiled.FONT); }
+
+"family"     { return symbol(SymCompiled.FAMILY); }
+
+"size"       { return symbol(SymCompiled.SIZE); }
+
+"border"     { return symbol(SymCompiled.BORDER); }
+
+"section"    { return symbol(SymCompiled.SECTION); }
+
+"table"      { return symbol(SymCompiled.TABLE); }
+
+"text"       { return symbol(SymCompiled.TEXT); }"
+
+"line"       { return symbol(SymCompiled.LINE); }
+
+"element"    { return symbol(SymCompiled.ELEMENT); }
+
+"open"       { return symbol(SymCompiled.OPEN); }
+
+"drop"       { return symbol(SymCompiled.DROP); }
+
+
+/*=====***--FIN DEL APARTADO DE ETIQUETAS COMPUESTAS--***====*/
+
+
+
+/*------*****--------APARTADO DE SIMBOLOS ESPECIALES--------*****------*/
+
+"<"      { return symbol(SymCompiled.MENOR); }
+
+">"      { return symbol(SymCompiled.MAYOR); }
+
+"/"      { return symbol(SymCompiled.DIAGONAL); }
+
+"/>"     { return symbol(SymCompiled.CIERRE_ETIQUETA); }
+
+"</"     { return symbol(SymCompiled.INICIO_ETIQUETA); }
+
+"("       {return symbol(SymCompiled.PARENT_APERTURA);}
+
+")"       {return symbol(SymCompiled.PARENT_CIERRE);}
+
+
+/*------*****--------FIN DEL APARTADO DE SIMBOLOS ESPECIALES--------*****------*/
+
+
+
+/*=====***--DEFINICION DE TIPOS DE LETRA Y PRESETS--***====*/
+
+/*---CONFIGURACIONES DE DOCK---*/
+"VERTICAL"      {return symbol(SymCompiled.CONFIG_DOCK, yytext());}
+
+"HORIZONTAL"    {return symbol(SymCompiled.CONFIG_DOCK, yytext());}
+
+/*---TIPOGRAFIAS DE LETRAS---*/
+
+"MONO"      {return symbol(SymCompiled.TIPOGRAFIA, yytext());}
+
+"SANS_SERIF"      {return symbol(SymCompiled.TIPOGRAFIA, yytext());}
+
+"CURSIVE"     {return symbol(SymCompiled.TIPOGRAFIA, yytext());}
+
+
+/*---GROSOR DE LINEA---*/
+"LINE"      {return symbol(SymCompiled.GROSOR_LINEA, yytext());}
+
+"DOTTED"    {return symbol(SymCompiled.GROSOR_LINEA, yytext());}
+
+"DOUBLE"    {return symbol(SymCompiled.GROSOR_LINEA, yytext());}
+
+
+
+/*=====***--FIN DE LA DEFINICION DE TIPOS DE LETRA Y PRESETS--***====*/
+
 
 /*==========ER CON CONTEXTO DE VALORES EN EL LENGUAJE============*/
 
@@ -113,7 +229,7 @@ Id = {jletter}{jletterdigit}*
 
 }
 
-.               {
+[^]               {
                     reportError("Simbolo no existe en el lenguaje", yytext());
                     return symbol(SymCompiled.ERROR, yytext());
                 }
