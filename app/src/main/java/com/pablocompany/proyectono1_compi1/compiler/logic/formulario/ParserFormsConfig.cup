@@ -7,6 +7,9 @@ import java.util.*;
 
 /*Imports de mis clases*/
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.*;
 
 /*------------------------------------------------------
                         CUP
@@ -97,13 +100,77 @@ terminal Integer ENTERO;
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 
 /* No terminales, reglas que nosotros vamos a definir sintacticamente */
-non terminal formulario;
 
-/* Símbolo inicial */
+//---AST---
+non terminal NodoCodigo formulario;
+
+//---*--Inicio del codigo fuente---*---
+non terminal List<Nodo> lista_codigo;
+
+//---*--Declaracion de variables---*---
+non terminal Nodo instruccion;
+
+non terminal Nodo expresion;
+
+
+/*======*******=====Presedencia de tipos==========*******===========*/
+
+precedence left OR;
+precedence left AND;
+precedence left SUMA, RESTA;
+precedence left MULTIPLICACION, DIVISION;
+precedence left MODULO;
+precedence right POTENCIA;
+precedence right NOT;
+
+
+
+
+
+/*------ Símbolo inicial ------*/
 start with formulario;
 
-formulario          ::=
+formulario          ::= lista_codigo:list
+                    {: RESULT = new NodoCodigo(list); :}
                     ;
+
+lista_codigo        ::= lista_codigo:list instruccion:ins
+                    {:
+                        list.add(ins);
+                        RESULT = list;
+                    :}
+                    | instruccion:ins
+                    {:
+                        List<Nodo> list = new ArrayList<>();
+                        list.add(ins);
+                        RESULT = list;
+                    :}
+                    ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE VAIRABLES (SPECIAL PENDIENTE)-----*/
+instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
+                    {:
+                        RESULT = new NodoDeclaracion(TipoVariable.NUMBER, id, expresion, idleft, idright);
+                    :}
+                    | VAR_STRING ID:id IGUALACION expresion:expresion
+                    {:
+                        RESULT = new NodoDeclaracion(TipoVariable.STRING, id, expresion, idleft, idright);
+                    :}
+                    | VAR_NUMERO ID:id
+                    {:
+                        RESULT = new NodoDeclaracion(TipoVariable.NUMBER, id, null, idleft, idright);
+                    :}
+                    | VAR_STRING ID:id
+                    {:
+                        RESULT = new NodoDeclaracion(TipoVariable.STRING, id, null, idleft, idright);
+                    :}
+                    | ID:id IGUALACION expresion:expresion
+                    {:
+                        RESULT = new NodoAsignacion(id, expresion, idleft, idright);
+                    :}
+                    ;
+
 
 
 

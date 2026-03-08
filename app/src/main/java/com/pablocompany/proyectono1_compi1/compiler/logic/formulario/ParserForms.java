@@ -8,6 +8,9 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 import java_cup.runtime.*;
 import java.util.*;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.*;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -33,7 +36,9 @@ public class ParserForms extends java_cup.runtime.lr_parser {
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\002\000\002\002\004\000\002\002\002" });
+    "\000\011\000\002\002\004\000\002\002\003\000\002\003" +
+    "\004\000\002\003\003\000\002\004\006\000\002\004\006" +
+    "\000\002\004\004\000\002\004\004\000\002\004\005" });
 
   /** Access to production table. */
   public short[][] production_table() {return _production_table;}
@@ -41,8 +46,18 @@ public class ParserForms extends java_cup.runtime.lr_parser {
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\003\000\004\002\000\001\002\000\004\002\005\001" +
-    "\002\000\004\002\001\001\002" });
+    "\000\021\000\010\032\011\033\005\123\004\001\002\000" +
+    "\004\035\022\001\002\000\004\123\017\001\002\000\004" +
+    "\002\016\001\002\000\012\002\000\032\011\033\005\123" +
+    "\004\001\002\000\012\002\ufffe\032\ufffe\033\ufffe\123\ufffe" +
+    "\001\002\000\004\123\012\001\002\000\014\002\ufffb\032" +
+    "\ufffb\033\ufffb\035\013\123\ufffb\001\002\000\002\001\002" +
+    "\000\012\002\ufffd\032\ufffd\033\ufffd\123\ufffd\001\002\000" +
+    "\012\002\uffff\032\uffff\033\uffff\123\uffff\001\002\000\004" +
+    "\002\001\001\002\000\014\002\ufffa\032\ufffa\033\ufffa\035" +
+    "\020\123\ufffa\001\002\000\002\001\002\000\012\002\ufffc" +
+    "\032\ufffc\033\ufffc\123\ufffc\001\002\000\002\001\002\000" +
+    "\012\002\ufff9\032\ufff9\033\ufff9\123\ufff9\001\002" });
 
   /** Access to parse-action table. */
   public short[][] action_table() {return _action_table;}
@@ -50,8 +65,13 @@ public class ParserForms extends java_cup.runtime.lr_parser {
   /** <code>reduce_goto</code> table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\003\000\004\002\003\001\001\000\002\001\001\000" +
-    "\002\001\001" });
+    "\000\021\000\010\002\005\003\006\004\007\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\004" +
+    "\004\014\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\004\005\013\001\001\000\002\001\001" +
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\004\005\020\001\001\000\002\001\001\000\004\005\022" +
+    "\001\001\000\002\001\001" });
 
   /** Access to <code>reduce_goto</code> table. */
   public short[][] reduce_table() {return _reduce_table;}
@@ -166,7 +186,7 @@ class CUP$ParserForms$actions {
               Object RESULT =null;
 		int start_valleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).left;
 		int start_valright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).right;
-		Object start_val = (Object)((java_cup.runtime.Symbol) CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).value;
+		NodoCodigo start_val = (NodoCodigo)((java_cup.runtime.Symbol) CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).value;
 		RESULT = start_val;
               CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("$START",0, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
             }
@@ -175,11 +195,127 @@ class CUP$ParserForms$actions {
           return CUP$ParserForms$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 1: // formulario ::= 
+          case 1: // formulario ::= lista_codigo 
             {
-              Object RESULT =null;
+              NodoCodigo RESULT =null;
+		int listleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int listright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		List<Nodo> list = (List<Nodo>)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		 RESULT = new NodoCodigo(list); 
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("formulario",0, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
 
-              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("formulario",0, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 2: // lista_codigo ::= lista_codigo instruccion 
+            {
+              List<Nodo> RESULT =null;
+		int listleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).left;
+		int listright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).right;
+		List<Nodo> list = (List<Nodo>)((java_cup.runtime.Symbol) CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)).value;
+		int insleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int insright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		Nodo ins = (Nodo)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        list.add(ins);
+                        RESULT = list;
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("lista_codigo",1, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 3: // lista_codigo ::= instruccion 
+            {
+              List<Nodo> RESULT =null;
+		int insleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int insright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		Nodo ins = (Nodo)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        List<Nodo> list = new ArrayList<>();
+                        list.add(ins);
+                        RESULT = list;
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("lista_codigo",1, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 4: // instruccion ::= VAR_NUMERO ID IGUALACION expresion 
+            {
+              Nodo RESULT =null;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).right;
+		String id = (String)((java_cup.runtime.Symbol) CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).value;
+		int expresionleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int expresionright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		Nodo expresion = (Nodo)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        RESULT = new NodoDeclaracion(TipoVariable.NUMBER, id, expresion, idleft, idright);
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("instruccion",2, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-3)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 5: // instruccion ::= VAR_STRING ID IGUALACION expresion 
+            {
+              Nodo RESULT =null;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).right;
+		String id = (String)((java_cup.runtime.Symbol) CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).value;
+		int expresionleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int expresionright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		Nodo expresion = (Nodo)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        RESULT = new NodoDeclaracion(TipoVariable.STRING, id, expresion, idleft, idright);
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("instruccion",2, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-3)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 6: // instruccion ::= VAR_NUMERO ID 
+            {
+              Nodo RESULT =null;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		String id = (String)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        RESULT = new NodoDeclaracion(TipoVariable.NUMBER, id, null, idleft, idright);
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("instruccion",2, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 7: // instruccion ::= VAR_STRING ID 
+            {
+              Nodo RESULT =null;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		String id = (String)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        RESULT = new NodoDeclaracion(TipoVariable.STRING, id, null, idleft, idright);
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("instruccion",2, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-1)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
+            }
+          return CUP$ParserForms$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 8: // instruccion ::= ID IGUALACION expresion 
+            {
+              Nodo RESULT =null;
+		int idleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).left;
+		int idright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).right;
+		String id = (String)((java_cup.runtime.Symbol) CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)).value;
+		int expresionleft = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).left;
+		int expresionright = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
+		Nodo expresion = (Nodo)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
+		
+                        RESULT = new NodoAsignacion(id, expresion, idleft, idright);
+                    
+              CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("instruccion",2, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
             }
           return CUP$ParserForms$result;
 
