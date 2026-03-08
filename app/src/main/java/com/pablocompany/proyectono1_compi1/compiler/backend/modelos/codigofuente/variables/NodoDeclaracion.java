@@ -7,6 +7,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 
 import java.util.List;
 
+/*Created by Pablo*/
 //Clase que representa la declaracion de una variable
 public class NodoDeclaracion extends Nodo {
 

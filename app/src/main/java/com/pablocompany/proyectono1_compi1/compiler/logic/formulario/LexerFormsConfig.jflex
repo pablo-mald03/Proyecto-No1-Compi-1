@@ -148,7 +148,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 ")"       {return symbol(sym.PARENT_CIERRE, yytext());}
 
 /*=========FIN DEL APARTADO DE ER QUE REPRESENTAN OPERADORES ARITMETICOS EN EL LENGUAJE==========*/
-
+/*Created by Pablo*/
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE COMPARACION EN EL LENGUAJE==========*/
 
@@ -228,7 +228,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 "in"    {return symbol(sym.IN, yytext());}
 
 
-
+/*Created by Pablo*/
 /*=========FIN DEL APARTADO DE ER QUE REPRESENTAN LOS LAS DECLARACIONES DE VARIABLES O TIENEN ALGUN CONTEXTO DE ASIGNACION EN EL LENGUAJE==========*/
 
 /*=========APARTADO EN EL QUE SE REGISTRAN LAS PALABRAS QUE CONFIGURAN ESTILOS (COMPONENTES INICIALES)==========*/
@@ -285,7 +285,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 "HORIZONTAL"    {return symbol(sym.CONFIG_DOCK, yytext());}
 
-
+/*Created by Pablo*/
 /*---TIPOGRAFIAS DE LETRAS---*/
 
 "MONO"      {return symbol(sym.TIPOGRAFIA, yytext());}
@@ -305,7 +305,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 /*------FIN DE LAS EXPRESIONES CON UN CONTEXTO ESPECIAL PARA GENERACION DEL CODIGO COMPILADO-------*/
 
 
-
+/*Created by Pablo*/
 
 /*=========APARTADO EN EL QUE SE REGISTRAN LAS PALABRAS RESERVADAS (PREGUNTAS O CONFIGURACIONES DEL FORMULARIO)==========*/
 
@@ -394,7 +394,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 }
 
 /*----ESTADO DE CADENAS DE TEXTO-----*/
-
+/*Created by Pablo*/
 
 [^]               {
                     reportError("Simbolo no existe en el lenguaje", yytext());
@@ -403,6 +403,6 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 <<EOF>>         {
                     return symbol(sym.EOF);
-                }
+                } /*Created by Pablo*/
 
 

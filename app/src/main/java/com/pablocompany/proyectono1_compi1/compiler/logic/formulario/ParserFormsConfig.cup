@@ -10,6 +10,9 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.operaciones.*;
 
 /*------------------------------------------------------
                         CUP
@@ -61,6 +64,7 @@ parser code {:
 
 :}
 
+/*Created by Pablo*/
 /*----------------------------------------------------------
                          reglas
 -----------------------------------------------------------*/
@@ -90,7 +94,7 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
             CORRECT, OPTIONS
             ;
 
-
+/*Created by Pablo*/
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 terminal String ID,COLOR_HEX;
 terminal Double DECIMAL;
@@ -110,7 +114,7 @@ non terminal List<Nodo> lista_codigo;
 //---*--Declaracion de variables---*---
 non terminal Nodo instruccion;
 
-non terminal Nodo expresion;
+non terminal NodoExpresion expresion;
 
 
 /*======*******=====Presedencia de tipos==========*******===========*/
@@ -124,7 +128,7 @@ precedence right POTENCIA;
 precedence right NOT;
 
 
-
+/*Created by Pablo*/
 
 
 /*------ Símbolo inicial ------*/
@@ -171,7 +175,59 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     :}
                     ;
 
+expresion ::=       expresion:exp1 SUMA expresion:exp2
+                    {:
+                        RESULT = new NodoSuma(exp1, exp2, exp1left, exp1right);
+                    :}
+                    | expresion:exp1 RESTA expresion:exp2
+                    {:
+                        RESULT = new NodoResta(exp1, exp2, exp1left, exp1right);
+                    :}
+                    | expresion:exp1 MULTIPLICACION expresion:exp2
+                    {:
+                        RESULT = new NodoMultiplicacion(exp1, exp2, exp1left, exp1right);
+                    :}
+                    | expresion:exp1 DIVISION expresion:exp2
+                    {:
+                        RESULT = new NodoDivision(exp1, exp2, exp1left, exp1right);
+                    :}
+                    | expresion:exp1 MODULO expresion:exp2
+                    {:
+                        RESULT = new NodoModulo(exp1, exp2, exp1left, exp1right);
+                    :}
+                    | expresion:exp1 POTENCIA expresion:exp2
+                    {:
+                        RESULT = new NodoPotencia(exp1, exp2, exp1left, exp1right);
+                    :}
+                    | PARENT_APERTURA expresion:exp PARENT_CIERRE
+                    {:
+                        RESULT = exp;
+                    :}
+                    | COMODIN:comodin
+                    {:
+                        RESULT = new NodoComodin(comodinleft, comodinright);
+                    :}
+                    | ENTERO:entero
+                    {:
+                        RESULT = new NodoLiteral(entero, enteroleft, enteroright);
+                    :}
+                    | DECIMAL:dec
+                    {:
+                        RESULT = new NodoLiteral(dec, decleft, decright);
+                    :}
+                    | INICIO_CADENA TEXTO_PLANO:texto FIN_CADENA
+                    {:
+                        RESULT = new NodoLiteral(texto, textoleft, textoright);
+                    :}
+                    | ID:id
+                    {:
+                        RESULT = new NodoAccesoVariable(id, idleft, idright);
+                    :}
+                    ;
 
+
+
+/*Created by Pablo*/
 
 
 

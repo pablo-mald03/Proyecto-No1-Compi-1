@@ -26,7 +26,7 @@ public class Simbolo {
     public int getColumna() {
         return columna;
     }
-
+    /*P*/
     public int getLinea() {
         return linea;
     }
@@ -62,4 +62,6 @@ public class Simbolo {
     public void setId(String id) {
         this.id = id;
     }
+
+    /*Created by Pablo*/
 }

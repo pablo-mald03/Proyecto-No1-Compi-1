@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbol
 
 import java.util.HashMap;
 
+/*Created by Pablo*/
 //Clase que permite manejar las tablas de simbolos (Patron experto)
 public class TablaSimbolos {
 
@@ -30,6 +31,6 @@ public class TablaSimbolos {
     }
 
 
-
+    /*P*/
 
 }
