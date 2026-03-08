@@ -113,7 +113,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 {ComentarioBloque}      { return symbol(sym.COMENTARIO_TEXTO, yytext());}
 
 
-/*=========APARTADO DE ER QUE IGNORAN O REPRESENTAN ESPACIOS EL CODIGO==========*/
+/*=========FIN DEL APARTADO DE ER QUE IGNORAN O REPRESENTAN ESPACIOS EL CODIGO==========*/
 
 /*---RECONOCIMIENTO DE COLORES---*/
 
@@ -127,7 +127,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 "BLACK"     { return symbol(sym.COLOR_PRESET, yytext()); }
 "WHITE"     { return symbol(sym.COLOR_PRESET, yytext()); }
 
-/*---RECONOCIMIENTO DE COLORES---*/
+/*---FIN DEL RECONOCIMIENTO DE COLORES---*/
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES ARITMETICOS EN EL LENGUAJE==========*/
 
@@ -147,7 +147,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 ")"       {return symbol(sym.PARENT_CIERRE, yytext());}
 
-/*=========APARTADO DE ER QUE REPRESENTAN OPERADORES ARITMETICOS EN EL LENGUAJE==========*/
+/*=========FIN DEL APARTADO DE ER QUE REPRESENTAN OPERADORES ARITMETICOS EN EL LENGUAJE==========*/
 
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE COMPARACION EN EL LENGUAJE==========*/
@@ -164,7 +164,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 "<="    {return symbol(sym.MENOR_IGUAL, yytext());}
 
-/*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE COMPARACION EN EL LENGUAJE==========*/
+/*=========FIN DEL APARTADO DE ER QUE REPRESENTAN OPERADORES DE COMPARACION EN EL LENGUAJE==========*/
 
 /*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE LOGICOS EN EL LENGUAJE==========*/
 
@@ -174,7 +174,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 "~"    {return symbol(sym.NOT, yytext());}
 
-/*=========APARTADO DE ER QUE REPRESENTAN OPERADORES DE LOGICOS EN EL LENGUAJE==========*/
+/*=========FIN DEL APARTADO DE ER QUE REPRESENTAN OPERADORES DE LOGICOS EN EL LENGUAJE==========*/
 
 
 /*=========APARTADO DE ER QUE REPRESENTAN LOS TIPOS DE VARIABLES EN EL LENGUAJE==========*/
@@ -186,7 +186,7 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 "special"       {return symbol(sym.VAR_ESPECIAL, yytext());}
 
 
-/*=========APARTADO DE ER QUE REPRESENTAN LOS TIPOS DE VARIABLES EN EL LENGUAJE==========*/
+/*=========FIN DEL APARTADO DE ER QUE REPRESENTAN LOS TIPOS DE VARIABLES EN EL LENGUAJE==========*/
 
 /*=========APARTADO DE ER QUE REPRESENTAN LOS LAS DECLARACIONES DE VARIABLES O TIENEN ALGUN CONTEXTO DE ASIGNACION EN EL LENGUAJE==========*/
 
@@ -204,10 +204,135 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 "}"    {return symbol(sym.LLAVE_CIERRE, yytext());}
 
+"."    {return symbol(sym.PUNTO, yytext());}
+
+":"    {return symbol(sym.DOS_PUNTOS, yytext());}
 
 
-/*=========APARTADO DE ER QUE REPRESENTAN LOS LAS DECLARACIONES DE VARIABLES O TIENEN ALGUN CONTEXTO DE ASIGNACION EN EL LENGUAJE==========*/
+/*====***===APARTADO DE PALABRAS RESERVADAS DEL LENGUAJE====**====*/
 
+"IF"    {return symbol(sym.IF, yytext());}
+
+"ELSE"    {return symbol(sym.ELSE, yytext());}
+
+"ELSE IF"    {return symbol(sym.ELSE_IF, yytext());}
+
+"WHILE"    {return symbol(sym.WHILE, yytext());}
+
+"FOR"    {return symbol(sym.FOR, yytext());}
+
+"DO"    {return symbol(sym.DO, yytext());}
+
+
+/*===---****ATRIBUTO ESPECIAL DE LA SEGUNDA MANERA DEL FOR***---====*/
+"in"    {return symbol(sym.IN, yytext());}
+
+
+
+/*=========FIN DEL APARTADO DE ER QUE REPRESENTAN LOS LAS DECLARACIONES DE VARIABLES O TIENEN ALGUN CONTEXTO DE ASIGNACION EN EL LENGUAJE==========*/
+
+/*=========APARTADO EN EL QUE SE REGISTRAN LAS PALABRAS QUE CONFIGURAN ESTILOS (COMPONENTES INICIALES)==========*/
+
+"width"         {return symbol(sym.WIDTH, yytext());}
+
+"height"         {return symbol(sym.HEIGHT, yytext());}
+
+"label"         {return symbol(sym.LABEL, yytext());}
+
+"pointX"         {return symbol(sym.POINT_X, yytext());}
+
+"pointY"         {return symbol(sym.POINT_Y, yytext());}
+
+"orientation"         {return symbol(sym.ORIENTATION, yytext());}
+
+"elements"         {return symbol(sym.ELEMENTS, yytext());}
+
+/*--Define estilos--*/
+"styles"    {return symbol(sym.STYLES, yytext());}
+
+/*Define el contenido de un texto*/
+"content"    {return symbol(sym.CONTENT, yytext());}
+
+
+/*=========FIN DEL APARTADO EN EL QUE SE REGISTRAN LAS PALABRAS QUE CONFIGURAN ESTILOS==========*/
+
+
+
+/*------EXPRESIONES CON UN CONTEXTO ESPECIAL PARA LOS ESTILOS DEL CODIGO COMPILADO-------*/
+
+"\"color\""             {return symbol(sym.BACKGROUND_COLOR, yytext());}
+
+"\"background color\""        {return symbol(sym.COLOR_TEXTO, yytext());}
+
+"\"font family\""              {return symbol(sym.FONT_FAMILY, yytext());}
+
+"\"text size\""         {return symbol(sym.TEXT_SIZE, yytext());}
+
+"\"border\""         {return symbol(sym.BORDER, yytext());}
+
+
+/*------FIN DE LAS EXPRESIONES CON UN CONTEXTO ESPECIAL PARA LOS ESTILOS DEL CODIGO COMPILADO-------*/
+
+
+/*------EXPRESIONES CON UN CONTEXTO ESPECIAL PARA GENERACION DEL CODIGO COMPILADO-------*/
+
+"draw"      {return symbol(sym.DRAW, yytext());}
+
+"who_is_that_pokemon" {return symbol(sym.WHO_IS_THAT_POKEMON, yytext());}
+
+/*---CONFIGURACIONES DE DOCK---*/
+"VERTICAL"      {return symbol(sym.CONFIG_DOCK, yytext());}
+
+"HORIZONTAL"    {return symbol(sym.CONFIG_DOCK, yytext());}
+
+
+/*---TIPOGRAFIAS DE LETRAS---*/
+
+"MONO"      {return symbol(sym.TIPOGRAFIA, yytext());}
+
+"SANS_SERIF"      {return symbol(sym.TIPOGRAFIA, yytext());}
+
+"CURSIVE"     {return symbol(sym.TIPOGRAFIA, yytext());}
+
+
+/*---GROSOR DE LINEA---*/
+"LINE"      {return symbol(sym.GROSOR_LINEA, yytext());}
+
+"DOTTED"    {return symbol(sym.GROSOR_LINEA, yytext());}
+
+"DOUBLE"    {return symbol(sym.GROSOR_LINEA, yytext());}
+
+/*------FIN DE LAS EXPRESIONES CON UN CONTEXTO ESPECIAL PARA GENERACION DEL CODIGO COMPILADO-------*/
+
+
+
+
+/*=========APARTADO EN EL QUE SE REGISTRAN LAS PALABRAS RESERVADAS (PREGUNTAS O CONFIGURACIONES DEL FORMULARIO)==========*/
+
+"SECTION"               {return symbol(sym.SECTION, yytext());}
+
+"TABLE"                 {return symbol(sym.TABLE, yytext());}
+
+"TEXT"                  {return symbol(sym.TEXT, yytext());}
+
+
+/*--*--Seccion de perguntas--*--*/
+"OPEN_QUESTION"         {return symbol(sym.OPEN_QUESTION, yytext());}
+
+"DROP_QUESTION"         {return symbol(sym.DROP_QUESTION, yytext());}
+
+"SELECT_QUESTION"       {return symbol(sym.SELECT_QUESTION, yytext());}
+
+"MULTIPLE_QUESTION"     {return symbol(sym.MULTIPLE_QUESTION, yytext());}
+
+
+/*------*---Apartado de contenido especial que tienen las preguntas----*--------*/
+"correct"               {return symbol(sym.CORRECT, yytext());}
+
+"options"               {return symbol(sym.OPTIONS, yytext());}
+
+
+/*=========APARTADO EN EL QUE SE REGISTRAN LAS PALABRAS RESERVADAS (PREGUNTAS O CONFIGURACIONES DEL FORMULARIO)==========*/
 
 
 /*==========ER CON CONTEXTO DE VALORES EN EL LENGUAJE============*/

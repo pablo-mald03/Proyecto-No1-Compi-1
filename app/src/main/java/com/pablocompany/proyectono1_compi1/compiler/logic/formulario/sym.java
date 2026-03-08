@@ -8,54 +8,91 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int EMOJI_MULTI_STAR = 37;
-  public static final int VAR_STRING = 25;
+  public static final int SELECT_QUESTION = 77;
+  public static final int COLOR_TEXTO = 63;
+  public static final int TEXT_SIZE = 65;
+  public static final int DIVISION = 10;
+  public static final int MENOR_IGUAL = 20;
   public static final int INICIO_CADENA = 30;
-  public static final int IGUALACION = 27;
-  public static final int ENTERO = 47;
+  public static final int TABLE = 73;
+  public static final int NEWLINE = 4;
+  public static final int COLOR_HEX = 82;
+  public static final int POTENCIA = 11;
+  public static final int MAYOR = 17;
+  public static final int DROP_QUESTION = 76;
+  public static final int CORCHETE_APERTURA = 40;
   public static final int DIFERENTE = 16;
-  public static final int RESTA = 8;
-  public static final int COMENTARIO_TEXTO = 5;
-  public static final int PARENT_CIERRE = 14;
-  public static final int VAR_NUMERO = 24;
-  public static final int EMOJI_HEART = 35;
-  public static final int VAR_ESPECIAL = 26;
-  public static final int WHITESPACE = 3;
-  public static final int EMOJI_SAD = 33;
+  public static final int ELEMENTS = 59;
+  public static final int DRAW = 67;
+  public static final int VAR_STRING = 25;
+  public static final int OPEN_QUESTION = 75;
+  public static final int BACKGROUND_COLOR = 62;
   public static final int NOT = 23;
+  public static final int TEXT = 74;
+  public static final int EMOJI_STAR = 36;
+  public static final int ERROR = 2;
+  public static final int EMOJI_CAT = 38;
+  public static final int COLOR_PRESET = 6;
+  public static final int DOS_PUNTOS = 52;
+  public static final int WIDTH = 53;
+  public static final int IGUALDAD = 15;
+  public static final int STYLES = 60;
+  public static final int LLAVE_CIERRE = 43;
+  public static final int COMA = 29;
+  public static final int ENTERO = 84;
+  public static final int MODULO = 12;
+  public static final int WHILE = 47;
+  public static final int DECIMAL = 83;
+  public static final int EMOJI_SERIOUS = 34;
+  public static final int ELSE_IF = 46;
+  public static final int VAR_NUMERO = 24;
+  public static final int FIN_CADENA = 31;
+  public static final int VAR_ESPECIAL = 26;
+  public static final int DO = 49;
+  public static final int FOR = 48;
+  public static final int EMOJI_MULTI_STAR = 37;
+  public static final int COMODIN = 28;
+  public static final int ORIENTATION = 58;
+  public static final int MULTIPLE_QUESTION = 78;
+  public static final int ELSE = 45;
+  public static final int MENOR = 18;
+  public static final int CONFIG_DOCK = 69;
+  public static final int PARENT_CIERRE = 14;
+  public static final int CORRECT = 79;
+  public static final int TEXTO_PLANO = 39;
+  public static final int CONTENT = 61;
+  public static final int EOF = 0;
+  public static final int PUNTO = 51;
+  public static final int SUMA = 7;
+  public static final int EMOJI_SMILE = 32;
+  public static final int LABEL = 55;
+  public static final int COMENTARIO_TEXTO = 5;
+  public static final int LLAVE_APERTURA = 42;
+  public static final int GROSOR_LINEA = 71;
+  public static final int IN = 50;
+  public static final int EMOJI_HEART = 35;
+  public static final int OR = 22;
+  public static final int error = 1;
+  public static final int RESTA = 8;
+  public static final int WHITESPACE = 3;
+  public static final int POINT_Y = 57;
+  public static final int IF = 44;
+  public static final int POINT_X = 56;
+  public static final int ID = 81;
+  public static final int PARENT_APERTURA = 13;
+  public static final int IGUALACION = 27;
+  public static final int TIPOGRAFIA = 70;
+  public static final int MULTIPLICACION = 9;
+  public static final int BORDER = 66;
+  public static final int HEIGHT = 54;
+  public static final int FONT_FAMILY = 64;
+  public static final int EMOJI_SAD = 33;
+  public static final int OPTIONS = 80;
   public static final int AND = 21;
   public static final int CORCHETE_CIERRE = 41;
-  public static final int IGUALDAD = 15;
-  public static final int OR = 22;
-  public static final int SUMA = 7;
-  public static final int EMOJI_STAR = 36;
-  public static final int ID = 44;
-  public static final int COLOR_HEX = 45;
-  public static final int DECIMAL = 46;
-  public static final int EOF = 0;
-  public static final int CORCHETE_APERTURA = 40;
-  public static final int error = 1;
-  public static final int FIN_CADENA = 31;
-  public static final int COMA = 29;
-  public static final int NEWLINE = 4;
-  public static final int MODULO = 12;
-  public static final int MENOR = 18;
-  public static final int PARENT_APERTURA = 13;
-  public static final int ERROR = 2;
-  public static final int MAYOR = 17;
-  public static final int POTENCIA = 11;
-  public static final int EMOJI_SMILE = 32;
-  public static final int LLAVE_APERTURA = 42;
-  public static final int COMODIN = 28;
+  public static final int WHO_IS_THAT_POKEMON = 68;
   public static final int MAYOR_IGUAL = 19;
-  public static final int TEXTO_PLANO = 39;
-  public static final int LLAVE_CIERRE = 43;
-  public static final int EMOJI_SERIOUS = 34;
-  public static final int COLOR_PRESET = 6;
-  public static final int MENOR_IGUAL = 20;
-  public static final int DIVISION = 10;
-  public static final int EMOJI_CAT = 38;
-  public static final int MULTIPLICACION = 9;
+  public static final int SECTION = 72;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -101,6 +138,43 @@ public class sym {
   "CORCHETE_CIERRE",
   "LLAVE_APERTURA",
   "LLAVE_CIERRE",
+  "IF",
+  "ELSE",
+  "ELSE_IF",
+  "WHILE",
+  "FOR",
+  "DO",
+  "IN",
+  "PUNTO",
+  "DOS_PUNTOS",
+  "WIDTH",
+  "HEIGHT",
+  "LABEL",
+  "POINT_X",
+  "POINT_Y",
+  "ORIENTATION",
+  "ELEMENTS",
+  "STYLES",
+  "CONTENT",
+  "BACKGROUND_COLOR",
+  "COLOR_TEXTO",
+  "FONT_FAMILY",
+  "TEXT_SIZE",
+  "BORDER",
+  "DRAW",
+  "WHO_IS_THAT_POKEMON",
+  "CONFIG_DOCK",
+  "TIPOGRAFIA",
+  "GROSOR_LINEA",
+  "SECTION",
+  "TABLE",
+  "TEXT",
+  "OPEN_QUESTION",
+  "DROP_QUESTION",
+  "SELECT_QUESTION",
+  "MULTIPLE_QUESTION",
+  "CORRECT",
+  "OPTIONS",
   "ID",
   "COLOR_HEX",
   "DECIMAL",

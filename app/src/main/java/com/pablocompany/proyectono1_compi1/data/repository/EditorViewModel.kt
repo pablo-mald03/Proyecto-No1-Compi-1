@@ -58,7 +58,7 @@ class EditorViewModel(
 
         highlightJob = viewModelScope.launch {
 
-            delay(20)
+            delay(80)
             recalcularHighlight()
         }
     }
@@ -94,7 +94,7 @@ class EditorViewModel(
                     sym.SUMA, sym.RESTA, sym.MULTIPLICACION, sym.DIVISION,
                     sym.POTENCIA, sym.MODULO -> Color(0xFF1AD305)
 
-                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING -> Color(0xFF6602F1)
+                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING,sym.FOR,sym.IF,sym.ELSE,sym.WHILE,sym.DO,sym.IN -> Color(0xFF6602F1)
 
                     sym.ENTERO, sym.DECIMAL -> Color(0xFF07E3DB)
 
@@ -142,11 +142,24 @@ class EditorViewModel(
         val oldText = codeField.text
         val newText = newValue.text
 
+        val oldAnnotated = highlightedCode
+
         codeField = newValue
         isModified = true
 
         if (oldText != newValue.text) {
-            highlightedCode = patchAnnotatedString(highlightedCode, newValue)
+            highlightedCode = if (newText.length > oldText.length && oldAnnotated.text.isNotEmpty()) {
+                buildAnnotatedString {
+                    append(newText)
+                    oldAnnotated.spanStyles.forEach { style ->
+                        if (style.end <= newText.length) {
+                            addStyle(style.item, style.start, style.end)
+                        }
+                    }
+                }
+            } else {
+                AnnotatedString(newText)
+            }
             recalcularHighlightDebounced()
         }
     }
