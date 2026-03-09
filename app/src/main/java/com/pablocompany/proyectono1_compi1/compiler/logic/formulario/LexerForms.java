@@ -1606,20 +1606,18 @@ public class LexerForms implements java_cup.runtime.Scanner {
           // fall through
           case 90: break;
           case 2:
-            { if(modoParser){
-                       /* ignorar */
-                    }else{
+            { if(!modoParser){
                         return symbol(sym.WHITESPACE, yytext());
                     }
+                    /* ignorar */
             }
           // fall through
           case 91: break;
           case 3:
-            { if(modoParser){
-                            /* ignorar */
-                        }else{
+            { if(!modoParser){
                             return symbol(sym.NEWLINE, yytext());
                         }
+                        /* ignorar */
             }
           // fall through
           case 92: break;
@@ -1636,11 +1634,10 @@ public class LexerForms implements java_cup.runtime.Scanner {
           // fall through
           case 94: break;
           case 6:
-            { if(modoParser){
-                    /* ignorar */
-                }else{
+            { if(!modoParser){
                     return symbol(sym.COMENTARIO_TEXTO, yytext());
                 }
+                /* ignorar */
             }
           // fall through
           case 95: break;
@@ -1841,9 +1838,7 @@ public class LexerForms implements java_cup.runtime.Scanner {
           // fall through
           case 134: break;
           case 46:
-            { if(modoParser){
-                                /* ignorar */
-                            }else{
+            { if(!modoParser){
                                 return symbol(sym.COMENTARIO_TEXTO, yytext());
                             }
             }

@@ -133,6 +133,7 @@ non terminal NodoFragmento fragmento;
 
 //---*--No terminales de configuracion---*---
 non terminal List<AtributoConfig> lista_config_open;
+non terminal List<AtributoConfig> cuerpo_open;
 non terminal AtributoConfig atributo_open;
 
 non terminal List<NodoEstilos> lista_estilos_basicos;
@@ -200,7 +201,7 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     {:
                         RESULT = new NodoAsignacion(id, expresion, idleft, idright);
                     :}
-                    | VAR_ESPECIAL ID:id IGUALACION OPEN_QUESTION CORCHETE_APERTURA lista_config_open:listconfig CORCHETE_CIERRE
+                    | VAR_ESPECIAL ID:id IGUALACION OPEN_QUESTION CORCHETE_APERTURA cuerpo_open:listconfig CORCHETE_CIERRE
                     {:
                         RESULT = new NodoOpenQuestion(TipoVariable.SPECIAL,id, listconfig, idleft, idright);
                     :}
@@ -208,6 +209,30 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
 
 
 /*-----Reglas que permiten definir las configuraciones de las openQuestions-----*/
+
+/*--***---Produccion que obliga a tener como obligatorio el label----***---*/
+
+cuerpo_open         ::= lista_config_open:list COMA LABEL DOS_PUNTOS expresion:e
+                    {:
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        RESULT = list;
+                    :}
+                    | LABEL DOS_PUNTOS expresion:e COMA lista_config_open:list
+                    {:
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        RESULT = list;
+                    :}
+                    | LABEL DOS_PUNTOS expresion:e
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        RESULT = list;
+                    :}
+                    ;
+
+
+/*--***---Produccion que obliga a tener como obligatorio el label----***---*/
+
 lista_config_open   ::= lista_config_open:list COMA atributo_open:atributo
                     {:
                         list.add(atributo);
@@ -221,6 +246,9 @@ lista_config_open   ::= lista_config_open:list COMA atributo_open:atributo
                     :}
                     ;
 
+
+/*--***---Reglas que permite definir configuraciones del label----***---*/
+
 atributo_open       ::= WIDTH DOS_PUNTOS expresion:expresion
                     {:
                         RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, expresion);
@@ -228,10 +256,6 @@ atributo_open       ::= WIDTH DOS_PUNTOS expresion:expresion
                     | HEIGHT DOS_PUNTOS expresion:expresion
                     {:
                         RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, expresion);
-                    :}
-                    | LABEL DOS_PUNTOS expresion:expresion
-                    {:
-                        RESULT = new AtributoConfig(TipoConfiguracion.LABEL, expresion);
                     :}
                     | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
                     {:
