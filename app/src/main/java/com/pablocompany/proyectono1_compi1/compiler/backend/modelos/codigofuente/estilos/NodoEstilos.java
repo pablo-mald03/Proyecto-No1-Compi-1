@@ -12,28 +12,42 @@ public class NodoEstilos extends Nodo {
 
     private TipoEstilo tipoEstilo;
 
-    private NodoExpresion valor;
+    private Object valor;
 
-    public NodoEstilos(TipoEstilo tipoEstilo, NodoExpresion valor,int linea, int columna) {
+    public NodoEstilos(TipoEstilo tipoEstilo, Object valor, int linea, int columna) {
         super(linea, columna);
         this.tipoEstilo = tipoEstilo;
         this.valor = valor;
     }
 
     // Getters para que el NodoOpenQuestion pueda leerlos
-    public TipoEstilo getTipo() { return tipoEstilo; }
-    public NodoExpresion getValor() { return valor; }
+    public TipoEstilo getTipo() {
+        return tipoEstilo;
+    }
 
+    public Object getValor() {
+        return valor;
+    }
 
     //Metodo que permite ejecutar el valor que debe tener el estilo (pendiente validar el analisis sintactico)
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return valor.ejecutar(tabla, listaErrores);
+
+        if (valor instanceof Nodo) {
+            return ((Nodo) valor).ejecutar(tabla, listaErrores);
+        }
+
+        return valor.toString();
     }
 
     //Metodo que permite retornar el valor en String
     @Override
     public String getString() {
-        return ": " + valor.getString();
+
+        if (valor instanceof Nodo) {
+            return tipoEstilo.getString() + ": "+ ((Nodo) valor).getString();
+        }
+
+        return tipoEstilo.getString() + ": " + valor.toString();
     }
 }

@@ -5,6 +5,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 
+import java.util.List;
+
 /*Created by Pablo*/
 //Superclase que representa toda la jeraquia de preguntas que puede haber en el formulario
 public abstract class NodoQuestion extends Nodo {

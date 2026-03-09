@@ -7,12 +7,12 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 public class Estilos {
 
     //Atributos
-    private NodoExpresion backgroundColor;
+    private NodoColor backgroundColor;
     private NodoColor color;
     private TipoLetra fontFamily;
     private NodoExpresion textSize;
 
-    public Estilos(NodoExpresion backgroundColor, NodoColor color, TipoLetra fontFamily, NodoExpresion textSize) {
+    public Estilos(NodoColor backgroundColor, NodoColor color, TipoLetra fontFamily, NodoExpresion textSize) {
         this.backgroundColor = backgroundColor;
         this.color = color;
         this.fontFamily = fontFamily;
@@ -20,12 +20,11 @@ public class Estilos {
     }
 
     //Getters y setters
-
-    public NodoExpresion getBackgroundColor() {
+    public NodoColor getBackgroundColor() {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(NodoExpresion backgroundColor) {
+    public void setBackgroundColor(NodoColor backgroundColor) {
         this.backgroundColor = backgroundColor;
     }
 
