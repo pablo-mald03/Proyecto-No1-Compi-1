@@ -12,3 +12,5 @@ public enum TipoEmoji {
     CAT
 
 }
+
+/*Created by P*/

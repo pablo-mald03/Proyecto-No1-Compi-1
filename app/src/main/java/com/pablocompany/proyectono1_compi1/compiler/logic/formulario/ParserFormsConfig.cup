@@ -158,7 +158,7 @@ lista_codigo        ::= lista_codigo:list instruccion:ins
                     ;
 
 
-/*-----REGLAS DE PRODUCCION PARA DECLARACION DE VAIRABLES (SPECIAL PENDIENTE)-----*/
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE VAIRABLES-----*/
 instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     {:
                         RESULT = new NodoDeclaracion(TipoVariable.NUMBER, id, expresion, idleft, idright);
@@ -179,7 +179,46 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     {:
                         RESULT = new NodoAsignacion(id, expresion, idleft, idright);
                     :}
+                    | VAR_ESPECIAL ID:id IGUALACION OPEN_QUESTION CORCHETE_APERTURA
+                      WIDTH DOS_PUNTOS expresion:width COMA
+                      HEIGHT DOS_PUNTOS expresion:height COMA
+                      LABEL DOS_PUNTOS expresion:label COMA
+                      STYLES CORCHETE_APERTURA lista_estilos:list CORCHETE_CIERRE CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoOpenQuestion(TipoVariable.SPECIAL, id, width, height, label, list, idleft, idright);
+
+                    :}
                     ;
+
+
+
+/*-----Reglas que permiten definir los estilos-----*/
+
+lista_estilos_basicos ::= lista_estilos_basicos:list COMA estilo_individual:estilo
+                    {:
+                        list.add(estilo);
+                        RESULT = list;
+                    :}
+                    |estilo_individual:estilo
+                    {:
+                        List<NodoEstilos> list = new ArrayList<>();
+                        list.add(estilo);
+                        RESULT = list;
+                    :}
+                    ;
+
+
+ /*----Generacion de preguntas con la variable special-----*/
+
+estilo_individual       ::= BACKGROUND_COLOR DOS_PUNTOS expresion:expresion
+                        {:
+                            RESULT = new NodoEstilos(TipoEstilo.BACKGROUND_COLOR, expresion, expresionleft, expresionright);
+                        :}
+
+                        ;
+
+
+
 
  /*----Expresiones del lenguaje-----*/
 expresion ::=       expresion:exp1 SUMA expresion:exp2

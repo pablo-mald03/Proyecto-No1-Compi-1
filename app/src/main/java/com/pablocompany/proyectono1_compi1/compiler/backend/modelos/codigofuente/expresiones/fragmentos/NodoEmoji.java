@@ -12,16 +12,46 @@ public class NodoEmoji extends NodoFragmento {
     private TipoEmoji tipo;
     private String valorTexto;
 
+    private int cantidad = 1;
+
     public NodoEmoji(TipoEmoji tipo, String valorTexto, int linea, int columna) {
         super(linea, columna);
         this.valorTexto = valorTexto;
         this.tipo = tipo;
+
+        this.reconocerEmoji(tipo);
+
     }
 
+    //Metodo propio de la clase polimorfica (La ER utilizada no tiene ningun efecto en tiempo de PARSEO)
+    private void reconocerEmoji(TipoEmoji tipo){
+
+        if (tipo != TipoEmoji.MULTI_STAR) {
+            return;
+        }
+        try {
+            //ER UTILIZADA SOLO PARA JALAR EL VALOR (NO TIENE NINGUN OTRO CONTEXTO EN TIEMPO DE EJCUCION)
+
+            String numerico = valorTexto.replaceAll("[^0-9]", "");
+
+            if (!numerico.isEmpty()) {
+                this.cantidad = Integer.parseInt(numerico);
+            }
+
+        } catch (NumberFormatException e) {
+            this.cantidad = 1; //Prevencion de excepcion
+        }
+
+    }
+    /*Created by P*/
     //Metodo que retorna el tipo de emoji
     public TipoEmoji getTipo() {
 
         return this.tipo;
+    }
+    //Metodo que retorna la cantidad que se repetira el emoji
+    public int getCantidad() {
+        return cantidad;
     }
 
     //Se retorna a si mismo para poderlo reconocerlo por su superClase NodoCadena
@@ -31,9 +61,16 @@ public class NodoEmoji extends NodoFragmento {
         return this;
     }
 
-    //Metodo que retorna el valor del emoji (como cadena de texto)
+    //Metodo que retorna el valor del emoji (como cadena de texto. Tambien contiempla la cantidad de veces que retornara el emoji multiEstrella)
     @Override
     public String getString() {
+
+        if (tipo == TipoEmoji.MULTI_STAR) {
+            return "@[:star:]".repeat(this.cantidad);
+        }
+
         return this.valorTexto;
+
     }
 }
+/*Created by Pablo*/
