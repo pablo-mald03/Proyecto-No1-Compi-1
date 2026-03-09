@@ -48,6 +48,15 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
     //StringBuilder para cadenas de texto
     private StringBuilder string;
 
+    //Variable que permite ignorar espacios en el modo parser
+    private boolean modoParser = false;
+
+    //Constructor sobreescrito
+    public LexerForms(java.io.Reader in, boolean modoParser) {
+        this(in);
+        this.modoParser = modoParser;
+    }
+
  /*-----------------------------------------------
                    Codigo del lexer
              -------------------------------------------------*/
@@ -96,21 +105,36 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 /* Ignorar caracteres invisibles o de control no útiles */
 
-[\p{C}&&[^\n\r\t]]  { /* ignorar */ }
+[\p{C}&&[^\n\r\t]]      { /* ignorar */ }
 
 /* Espacios y tabs */
 
-{WhiteSpace} { return symbol(sym.WHITESPACE, yytext()); }
+{WhiteSpace}    {   if(!modoParser){
+                        return symbol(sym.WHITESPACE, yytext());
+                    }
+                    /* ignorar */
+                }
 
 /* Saltos de línea */
 
-{LineTerminator} { return symbol(sym.NEWLINE, yytext()); }
+{LineTerminator}    {   if(!modoParser){
+                            return symbol(sym.NEWLINE, yytext());
+                        }
+                        /* ignorar */
+                    }
 
 
 /*--Comentarios--*/
-"$".*      { return symbol(sym.COMENTARIO_TEXTO, yytext());}
+"$".*      {    if(!modoParser){
+                    return symbol(sym.COMENTARIO_TEXTO, yytext());
+                }
+                /* ignorar */
+            }
 
-{ComentarioBloque}      { return symbol(sym.COMENTARIO_TEXTO, yytext());}
+{ComentarioBloque}      {   if(!modoParser){
+                                return symbol(sym.COMENTARIO_TEXTO, yytext());
+                            }
+                        }
 
 
 /*=========FIN DEL APARTADO DE ER QUE IGNORAN O REPRESENTAN ESPACIOS EL CODIGO==========*/

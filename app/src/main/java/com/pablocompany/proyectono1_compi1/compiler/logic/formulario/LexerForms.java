@@ -413,19 +413,19 @@ public class LexerForms implements java_cup.runtime.Scanner {
     "\1\40\5\0\1\6\1\41\2\0\1\42\1\43\1\44"+
     "\2\26\1\45\5\26\1\46\23\26\1\47\11\26\1\50"+
     "\1\0\1\51\1\52\7\0\1\53\7\26\1\54\10\26"+
-    "\1\55\27\26\10\0\1\6\5\26\1\56\2\26\1\57"+
-    "\1\60\10\26\1\61\5\26\1\62\14\26\16\0\3\26"+
-    "\1\0\7\26\1\63\1\26\1\64\5\26\1\65\10\26"+
-    "\1\66\1\67\1\70\7\0\1\71\1\72\6\0\2\26"+
-    "\1\0\2\26\1\73\10\26\1\74\1\75\2\26\1\76"+
-    "\1\77\1\26\1\100\1\101\1\26\10\0\1\102\2\0"+
-    "\1\103\1\26\1\104\4\26\1\105\2\26\1\106\1\107"+
-    "\1\26\1\110\1\26\1\111\1\26\1\112\6\0\1\113"+
-    "\2\0\5\26\1\114\1\115\2\26\10\0\7\26\4\0"+
-    "\1\116\3\0\6\26\4\0\1\117\4\26\1\120\1\26"+
-    "\1\0\1\121\2\0\5\26\1\0\1\122\1\123\1\26"+
-    "\1\124\2\26\1\0\3\26\1\0\1\26\1\125\1\26"+
-    "\1\0\2\26\1\0\1\126\1\26\1\127\1\26\1\130";
+    "\1\55\27\26\10\0\1\56\5\26\1\57\2\26\1\60"+
+    "\1\61\10\26\1\62\5\26\1\63\14\26\16\0\3\26"+
+    "\1\0\7\26\1\64\1\26\1\65\5\26\1\66\10\26"+
+    "\1\67\1\70\1\71\7\0\1\72\1\73\6\0\2\26"+
+    "\1\0\2\26\1\74\10\26\1\75\1\76\2\26\1\77"+
+    "\1\100\1\26\1\101\1\102\1\26\10\0\1\103\2\0"+
+    "\1\104\1\26\1\105\4\26\1\106\2\26\1\107\1\110"+
+    "\1\26\1\111\1\26\1\112\1\26\1\113\6\0\1\114"+
+    "\2\0\5\26\1\115\1\116\2\26\10\0\7\26\4\0"+
+    "\1\117\3\0\6\26\4\0\1\120\4\26\1\121\1\26"+
+    "\1\0\1\122\2\0\5\26\1\0\1\123\1\124\1\26"+
+    "\1\125\2\26\1\0\3\26\1\0\1\26\1\126\1\26"+
+    "\1\0\2\26\1\0\1\127\1\26\1\130\1\26\1\131";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[424];
@@ -1129,6 +1129,15 @@ public class LexerForms implements java_cup.runtime.Scanner {
     //StringBuilder para cadenas de texto
     private StringBuilder string;
 
+    //Variable que permite ignorar espacios en el modo parser
+    private boolean modoParser = false;
+
+    //Constructor sobreescrito
+    public LexerForms(java.io.Reader in, boolean modoParser) {
+        this(in);
+        this.modoParser = modoParser;
+    }
+
  /*-----------------------------------------------
                    Codigo del lexer
              -------------------------------------------------*/
@@ -1595,445 +1604,466 @@ public class LexerForms implements java_cup.runtime.Scanner {
             { /* ignorar */
             }
           // fall through
-          case 89: break;
-          case 2:
-            { return symbol(sym.WHITESPACE, yytext());
-            }
-          // fall through
           case 90: break;
-          case 3:
-            { return symbol(sym.NEWLINE, yytext());
+          case 2:
+            { if(modoParser){
+                       /* ignorar */
+                    }else{
+                        return symbol(sym.WHITESPACE, yytext());
+                    }
             }
           // fall through
           case 91: break;
+          case 3:
+            { if(modoParser){
+                            /* ignorar */
+                        }else{
+                            return symbol(sym.NEWLINE, yytext());
+                        }
+            }
+          // fall through
+          case 92: break;
           case 4:
             { reportError("Simbolo no existe en el lenguaje", yytext());
                     return symbol(sym.ERROR, yytext());
             }
           // fall through
-          case 92: break;
+          case 93: break;
           case 5:
             { yybegin(STRING);
               return symbol(sym.INICIO_CADENA, yytext());
             }
           // fall through
-          case 93: break;
+          case 94: break;
           case 6:
-            { return symbol(sym.COMENTARIO_TEXTO, yytext());
+            { if(modoParser){
+                    /* ignorar */
+                }else{
+                    return symbol(sym.COMENTARIO_TEXTO, yytext());
+                }
             }
           // fall through
-          case 94: break;
+          case 95: break;
           case 7:
             { return symbol(sym.MODULO, yytext());
             }
           // fall through
-          case 95: break;
+          case 96: break;
           case 8:
             { return symbol(sym.PARENT_APERTURA, yytext());
             }
           // fall through
-          case 96: break;
+          case 97: break;
           case 9:
             { return symbol(sym.PARENT_CIERRE, yytext());
             }
           // fall through
-          case 97: break;
+          case 98: break;
           case 10:
             { return symbol(sym.MULTIPLICACION, yytext());
             }
           // fall through
-          case 98: break;
+          case 99: break;
           case 11:
             { return symbol(sym.SUMA, yytext());
             }
           // fall through
-          case 99: break;
+          case 100: break;
           case 12:
             { return symbol(sym.COMA, yytext());
             }
           // fall through
-          case 100: break;
+          case 101: break;
           case 13:
             { return symbol(sym.RESTA, yytext());
             }
           // fall through
-          case 101: break;
+          case 102: break;
           case 14:
             { return symbol(sym.PUNTO, yytext());
             }
           // fall through
-          case 102: break;
+          case 103: break;
           case 15:
             { return symbol(sym.DIVISION, yytext());
             }
           // fall through
-          case 103: break;
+          case 104: break;
           case 16:
             { return symbol(sym.ENTERO, Integer.parseInt(yytext()));
             }
           // fall through
-          case 104: break;
+          case 105: break;
           case 17:
             { return symbol(sym.DOS_PUNTOS, yytext());
             }
           // fall through
-          case 105: break;
+          case 106: break;
           case 18:
             { return symbol(sym.MENOR, yytext());
             }
           // fall through
-          case 106: break;
+          case 107: break;
           case 19:
             { return symbol(sym.IGUALACION, yytext());
             }
           // fall through
-          case 107: break;
+          case 108: break;
           case 20:
             { return symbol(sym.MAYOR, yytext());
             }
           // fall through
-          case 108: break;
+          case 109: break;
           case 21:
             { return symbol(sym.COMODIN, yytext());
             }
           // fall through
-          case 109: break;
+          case 110: break;
           case 22:
             { return symbol(sym.ID, yytext());
             }
           // fall through
-          case 110: break;
+          case 111: break;
           case 23:
             { return symbol(sym.CORCHETE_APERTURA, yytext());
             }
           // fall through
-          case 111: break;
+          case 112: break;
           case 24:
             { return symbol(sym.CORCHETE_CIERRE, yytext());
             }
           // fall through
-          case 112: break;
+          case 113: break;
           case 25:
             { return symbol(sym.POTENCIA, yytext());
             }
           // fall through
-          case 113: break;
+          case 114: break;
           case 26:
             { return symbol(sym.LLAVE_APERTURA, yytext());
             }
           // fall through
-          case 114: break;
+          case 115: break;
           case 27:
             { return symbol(sym.LLAVE_CIERRE, yytext());
             }
           // fall through
-          case 115: break;
+          case 116: break;
           case 28:
             { return symbol(sym.NOT, yytext());
             }
           // fall through
-          case 116: break;
+          case 117: break;
           case 29:
             { return symbol(sym.TEXTO_PLANO, yytext());
             }
           // fall through
-          case 117: break;
+          case 118: break;
           case 30:
             { yybegin(YYINITIAL);
         return symbol(sym.FIN_CADENA, yytext());
             }
           // fall through
-          case 118: break;
+          case 119: break;
           case 31:
             { return symbol(sym.TEXTO_PLANO, "@");
             }
           // fall through
-          case 119: break;
+          case 120: break;
           case 32:
             { return symbol(sym.DIFERENTE, yytext());
             }
           // fall through
-          case 120: break;
+          case 121: break;
           case 33:
             { return symbol(sym.AND, yytext());
             }
           // fall through
-          case 121: break;
+          case 122: break;
           case 34:
             { return symbol(sym.MENOR_IGUAL, yytext());
             }
           // fall through
-          case 122: break;
+          case 123: break;
           case 35:
             { return symbol(sym.IGUALDAD, yytext());
             }
           // fall through
-          case 123: break;
+          case 124: break;
           case 36:
             { return symbol(sym.MAYOR_IGUAL, yytext());
             }
           // fall through
-          case 124: break;
+          case 125: break;
           case 37:
             { return symbol(sym.DO, yytext());
             }
           // fall through
-          case 125: break;
+          case 126: break;
           case 38:
             { return symbol(sym.IF, yytext());
             }
           // fall through
-          case 126: break;
+          case 127: break;
           case 39:
             { return symbol(sym.IN, yytext());
             }
           // fall through
-          case 127: break;
+          case 128: break;
           case 40:
             { return symbol(sym.OR, yytext());
             }
           // fall through
-          case 128: break;
+          case 129: break;
           case 41:
             { return symbol(sym.TEXTO_PLANO, "\"");
             }
           // fall through
-          case 129: break;
+          case 130: break;
           case 42:
             { return symbol(sym.TEXTO_PLANO, "\n");
             }
           // fall through
-          case 130: break;
+          case 131: break;
           case 43:
             { return symbol(sym.DECIMAL, Double.parseDouble(yytext()));
             }
           // fall through
-          case 131: break;
+          case 132: break;
           case 44:
             { return symbol(sym.FOR, yytext());
             }
           // fall through
-          case 132: break;
+          case 133: break;
           case 45:
             { return symbol(sym.COLOR_PRESET, yytext());
             }
           // fall through
-          case 133: break;
-          case 46:
-            { return symbol(sym.ELSE, yytext());
-            }
-          // fall through
           case 134: break;
-          case 47:
-            { return symbol(sym.GROSOR_LINEA, yytext());
+          case 46:
+            { if(modoParser){
+                                /* ignorar */
+                            }else{
+                                return symbol(sym.COMENTARIO_TEXTO, yytext());
+                            }
             }
           // fall through
           case 135: break;
-          case 48:
-            { return symbol(sym.TIPOGRAFIA, yytext());
+          case 47:
+            { return symbol(sym.ELSE, yytext());
             }
           // fall through
           case 136: break;
-          case 49:
-            { return symbol(sym.TEXT, yytext());
+          case 48:
+            { return symbol(sym.GROSOR_LINEA, yytext());
             }
           // fall through
           case 137: break;
-          case 50:
-            { return symbol(sym.DRAW, yytext());
+          case 49:
+            { return symbol(sym.TIPOGRAFIA, yytext());
             }
           // fall through
           case 138: break;
-          case 51:
-            { return symbol(sym.TABLE, yytext());
+          case 50:
+            { return symbol(sym.TEXT, yytext());
             }
           // fall through
           case 139: break;
-          case 52:
-            { return symbol(sym.WHILE, yytext());
+          case 51:
+            { return symbol(sym.DRAW, yytext());
             }
           // fall through
           case 140: break;
-          case 53:
-            { return symbol(sym.LABEL, yytext());
+          case 52:
+            { return symbol(sym.TABLE, yytext());
             }
           // fall through
           case 141: break;
-          case 54:
-            { return symbol(sym.WIDTH, yytext());
+          case 53:
+            { return symbol(sym.WHILE, yytext());
             }
           // fall through
           case 142: break;
-          case 55:
-            { return symbol(sym.EMOJI_SAD, yytext());
+          case 54:
+            { return symbol(sym.LABEL, yytext());
             }
           // fall through
           case 143: break;
-          case 56:
-            { return symbol(sym.EMOJI_SMILE, yytext());
+          case 55:
+            { return symbol(sym.WIDTH, yytext());
             }
           // fall through
           case 144: break;
-          case 57:
-            { return symbol(sym.EMOJI_SERIOUS, yytext());
+          case 56:
+            { return symbol(sym.EMOJI_SAD, yytext());
             }
           // fall through
           case 145: break;
-          case 58:
-            { return symbol(sym.EMOJI_HEART, yytext());
+          case 57:
+            { return symbol(sym.EMOJI_SMILE, yytext());
             }
           // fall through
           case 146: break;
-          case 59:
-            { return symbol(sym.NUMBER_REQUEST, yytext());
+          case 58:
+            { return symbol(sym.EMOJI_SERIOUS, yytext());
             }
           // fall through
           case 147: break;
-          case 60:
-            { return symbol(sym.HEIGHT, yytext());
+          case 59:
+            { return symbol(sym.EMOJI_HEART, yytext());
             }
           // fall through
           case 148: break;
-          case 61:
-            { return symbol(sym.VAR_NUMERO, yytext());
+          case 60:
+            { return symbol(sym.NUMBER_REQUEST, yytext());
             }
           // fall through
           case 149: break;
-          case 62:
-            { return symbol(sym.POINT_X, yytext());
+          case 61:
+            { return symbol(sym.HEIGHT, yytext());
             }
           // fall through
           case 150: break;
-          case 63:
-            { return symbol(sym.POINT_Y, yytext());
+          case 62:
+            { return symbol(sym.VAR_NUMERO, yytext());
             }
           // fall through
           case 151: break;
-          case 64:
-            { return symbol(sym.VAR_STRING, yytext());
+          case 63:
+            { return symbol(sym.POINT_X, yytext());
             }
           // fall through
           case 152: break;
-          case 65:
-            { return symbol(sym.STYLES, yytext());
+          case 64:
+            { return symbol(sym.POINT_Y, yytext());
             }
           // fall through
           case 153: break;
-          case 66:
-            { return symbol(sym.BACKGROUND_COLOR, yytext());
+          case 65:
+            { return symbol(sym.VAR_STRING, yytext());
             }
           // fall through
           case 154: break;
-          case 67:
-            { return symbol(sym.COLOR_HEX, yytext());
+          case 66:
+            { return symbol(sym.STYLES, yytext());
             }
           // fall through
           case 155: break;
-          case 68:
-            { return symbol(sym.ELSE_IF, yytext());
+          case 67:
+            { return symbol(sym.BACKGROUND_COLOR, yytext());
             }
           // fall through
           case 156: break;
-          case 69:
-            { return symbol(sym.SECTION, yytext());
+          case 68:
+            { return symbol(sym.COLOR_HEX, yytext());
             }
           // fall through
           case 157: break;
-          case 70:
-            { return symbol(sym.CONTENT, yytext());
+          case 69:
+            { return symbol(sym.ELSE_IF, yytext());
             }
           // fall through
           case 158: break;
-          case 71:
-            { return symbol(sym.CORRECT, yytext());
+          case 70:
+            { return symbol(sym.SECTION, yytext());
             }
           // fall through
           case 159: break;
-          case 72:
-            { return symbol(sym.OPTIONS, yytext());
+          case 71:
+            { return symbol(sym.CONTENT, yytext());
             }
           // fall through
           case 160: break;
-          case 73:
-            { return symbol(sym.VAR_ESPECIAL, yytext());
+          case 72:
+            { return symbol(sym.CORRECT, yytext());
             }
           // fall through
           case 161: break;
-          case 74:
-            { return symbol(sym.EMOJI_CAT, yytext());
+          case 73:
+            { return symbol(sym.OPTIONS, yytext());
             }
           // fall through
           case 162: break;
-          case 75:
-            { return symbol(sym.BORDER, yytext());
+          case 74:
+            { return symbol(sym.VAR_ESPECIAL, yytext());
             }
           // fall through
           case 163: break;
-          case 76:
-            { return symbol(sym.CONFIG_DOCK, yytext());
+          case 75:
+            { return symbol(sym.EMOJI_CAT, yytext());
             }
           // fall through
           case 164: break;
-          case 77:
-            { return symbol(sym.ELEMENTS, yytext());
+          case 76:
+            { return symbol(sym.BORDER, yytext());
             }
           // fall through
           case 165: break;
-          case 78:
-            { return symbol(sym.EMOJI_STAR, yytext());
+          case 77:
+            { return symbol(sym.CONFIG_DOCK, yytext());
             }
           // fall through
           case 166: break;
-          case 79:
-            { return symbol(sym.TEXT_SIZE, yytext());
+          case 78:
+            { return symbol(sym.ELEMENTS, yytext());
             }
           // fall through
           case 167: break;
-          case 80:
-            { return symbol(sym.ORIENTATION, yytext());
+          case 79:
+            { return symbol(sym.EMOJI_STAR, yytext());
             }
           // fall through
           case 168: break;
-          case 81:
-            { return symbol(sym.EMOJI_MULTI_STAR, yytext());
+          case 80:
+            { return symbol(sym.TEXT_SIZE, yytext());
             }
           // fall through
           case 169: break;
-          case 82:
-            { return symbol(sym.FONT_FAMILY, yytext());
+          case 81:
+            { return symbol(sym.ORIENTATION, yytext());
             }
           // fall through
           case 170: break;
-          case 83:
-            { return symbol(sym.DROP_QUESTION, yytext());
+          case 82:
+            { return symbol(sym.EMOJI_MULTI_STAR, yytext());
             }
           // fall through
           case 171: break;
-          case 84:
-            { return symbol(sym.OPEN_QUESTION, yytext());
+          case 83:
+            { return symbol(sym.FONT_FAMILY, yytext());
             }
           // fall through
           case 172: break;
-          case 85:
-            { return symbol(sym.SELECT_QUESTION, yytext());
+          case 84:
+            { return symbol(sym.DROP_QUESTION, yytext());
             }
           // fall through
           case 173: break;
-          case 86:
-            { return symbol(sym.MULTIPLE_QUESTION, yytext());
+          case 85:
+            { return symbol(sym.OPEN_QUESTION, yytext());
             }
           // fall through
           case 174: break;
-          case 87:
-            { return symbol(sym.COLOR_TEXTO, yytext());
+          case 86:
+            { return symbol(sym.SELECT_QUESTION, yytext());
             }
           // fall through
           case 175: break;
-          case 88:
-            { return symbol(sym.WHO_IS_THAT_POKEMON, yytext());
+          case 87:
+            { return symbol(sym.MULTIPLE_QUESTION, yytext());
             }
           // fall through
           case 176: break;
+          case 88:
+            { return symbol(sym.COLOR_TEXTO, yytext());
+            }
+          // fall through
+          case 177: break;
+          case 89:
+            { return symbol(sym.WHO_IS_THAT_POKEMON, yytext());
+            }
+          // fall through
+          case 178: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

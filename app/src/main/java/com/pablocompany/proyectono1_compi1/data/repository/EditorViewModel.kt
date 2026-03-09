@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.data.repository
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,6 +14,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.NodoCodigo
+import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.LexerForms
+import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.ParserForms
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.sym
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
@@ -21,6 +25,7 @@ import kotlin.collections.emptyList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.StringReader
 
 class EditorViewModel(
     private val repository: FormFileRepository
@@ -249,23 +254,62 @@ class EditorViewModel(
 
         val resultadoLexico = analizarLexico(texto)
 
-        // PENDIENTE POR DEFINIR LO QUE SEA EL BACKEND REAL
-        // val resultadoParser = analizarSintactico(texto)
-        // val erroresTotales = resultadoLexico.errores + resultadoParser.errores
+        if (resultadoLexico.errores.isNotEmpty()) {
+            return Pair(resultadoLexico.errores, null)
+        }
 
-        //QUEMADO MIENTRAS
-        val erroresTotales = resultadoLexico.errores
+        val (erroresParser, ast) = analizarSintactico(texto)
+
+        val erroresTotales = resultadoLexico.errores + erroresParser
 
         if (erroresTotales.isNotEmpty()) {
             return Pair(erroresTotales, null)
         }
 
-        // Aquí en el futuro irá EL CODIGO GENERADO POR BACKEND (QUEMADO MIENTRAS)
-        //val codigoGenerado = resultadoParser
+        Log.d("AST", "===== AST GENERADO =====")
+        Log.d("AST1", ast?.toString() ?: "AST NULL")
+
+        // TEMPORAL
         val codigoGenerado = texto
 
         return Pair(emptyList(), codigoGenerado)
     }
+
+    //Metodo que permite ejecutar el analisis formal del parser
+    private fun analizarSintactico(texto: String): Pair<List<ErrorAnalisis>, NodoCodigo?> {
+
+        return try {
+
+            val reader = StringReader(texto)
+
+            val lexer = LexerForms(reader,true)
+
+            val parser = ParserForms(lexer)
+
+            val resultado = parser.parse()
+
+            val ast = resultado.value as? NodoCodigo
+
+            val erroresParser = parser.syntaxErrorList
+
+            Pair(erroresParser, ast)
+
+        } catch (ex: Exception) {
+
+            val errores = listOf(
+                ErrorAnalisis(
+                    "Desconocido",
+                    "Sintáctico",
+                    ex.message ?: "Error desconocido en parser",
+                    -1,
+                    -1
+                )
+            )
+
+            Pair(errores, null)
+        }
+    }
+
 
 
     //METODO QUE GENERA EL PRE-COMPILADO PARA ACTUALIZAR LA PREVISUALIZACION

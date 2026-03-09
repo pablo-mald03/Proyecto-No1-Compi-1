@@ -45,28 +45,31 @@ parser code {:
            return this.syntaxErrorList;
        }
 
-        //Metodo que permite retornar los errores sintacticos
-        public void syntax_error(Symbol cur_token) {
-           /* List<Integer> ids = expected_token_ids();
-            String encontrado = (cur_token.value != null) ? cur_token.value.toString() : sym.terminalNames[cur_token.sym];
+       //Deteccion de errores sintacticos
+       public void syntax_error(Symbol s) {
 
-            StringBuilder sugerencias = new StringBuilder();
-            if (!ids.isEmpty()) {
-                sugerencias.append(". Se esperaba: ");
-                for (int i = 0; i < ids.size(); i++) {
-                    sugerencias.append(traducirToken(sym.terminalNames[ids.get(i)]));
-                    if (i < ids.size() - 1) sugerencias.append(", ");
-                }
-            }
+            System.err.println("Error sintáctico en línea: " + s.left + " columna: " + s.right);
+            System.err.println("Token inesperado: " + s.value);
 
-            syntaxErrorList.add(new ErrorAnalisis(
-                encontrado,
-                cur_token.left,
-                cur_token.right,
-                "Sintáctico",
-                encontrado + "'" + sugerencias.toString()
-            ));*/
-        }
+            syntaxErrorList.add(
+                new ErrorAnalisis(
+                    "Desconocido",
+                    "Sintáctico",
+                    "Token inesperado: " + s.value,
+                    s.left,
+                    s.right
+                )
+            );
+       }
+
+       //Deteccion de errores en los que no se puede recuperar el analisis
+       public void unrecovered_syntax_error(Symbol s) throws Exception {
+
+           System.err.println("Error sintáctico fatal en línea: " + s.left + " columna: " + s.right);
+           System.err.println("Token inesperado: " + s.value);
+
+           super.unrecovered_syntax_error(s);
+       }
 
 
 :}
@@ -78,7 +81,7 @@ parser code {:
 
 /* Terminales: tokens que el parser nos retorna */
 terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
-            SUMA, RESTA, MULTIPLICACION, DIVISION, POTENCIA, MODULO,
+            UNARIO,SUMA, RESTA, MULTIPLICACION, DIVISION, POTENCIA, MODULO,
             PARENT_APERTURA, PARENT_CIERRE,
             IGUALDAD, DIFERENTE, MAYOR, MENOR, MAYOR_IGUAL, MENOR_IGUAL,
             AND, OR, NOT,
@@ -149,6 +152,7 @@ precedence left MULTIPLICACION, DIVISION;
 precedence left MODULO;
 precedence right POTENCIA;
 precedence right NOT;
+precedence right UNARIO;
 
 
 /*Created by Pablo*/
@@ -298,6 +302,9 @@ expresion ::=       expresion:exp1 SUMA expresion:exp2
                     {:
                         RESULT = new NodoResta(exp1, exp2, exp1left, exp1right);
                     :}
+                    | RESTA expresion:exp1
+                    {: RESULT = new NodoMenosUnario(exp1, exp1left, exp1right); :}
+                    %prec UNARIO
                     | expresion:exp1 MULTIPLICACION expresion:exp2
                     {:
                         RESULT = new NodoMultiplicacion(exp1, exp2, exp1left, exp1right);
@@ -395,12 +402,3 @@ fragmento           ::= TEXTO_PLANO:texto
 
 
 /*Created by Pablo*/
-
-
-
-
-
-
-
-
-
