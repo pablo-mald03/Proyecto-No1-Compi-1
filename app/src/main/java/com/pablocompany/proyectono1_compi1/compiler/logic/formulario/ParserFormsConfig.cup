@@ -7,6 +7,7 @@ import java.util.*;
 
 /*Imports de mis clases*/
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.*;
@@ -187,6 +188,18 @@ non terminal NodoEstilos estilo_individual;
 //---*--No terminales de colores---*---
 non terminal NodoColor color_valor;
 
+//---*--No terminales de configuracion de drop questions---*---
+non terminal List<AtributoConfig> cuerpo_drop;
+non terminal List<AtributoConfig> lista_config_drop;
+non terminal AtributoConfig atributo_drop;
+
+
+/*---*--No terminales que permiten generar las preguntas de una pregunta con varias opciones---*---*/
+non terminal List<Nodo> lista_opciones;
+non terminal Nodo opcion_individual;
+non terminal NodoFuncionPokemon funcion_pokemon;
+
+
 
 /*======*******=====Presedencia de tipos==========*******===========*/
 
@@ -253,12 +266,170 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     {:
                         RESULT = new NodoOpenQuestion(TipoVariable.SPECIAL,id, listconfig, idleft, idright);
                     :}
+                    | VAR_ESPECIAL ID:id IGUALACION DROP_QUESTION CORCHETE_APERTURA cuerpo_drop:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoDropQuestion(TipoVariable.SPECIAL,id, list, idleft, idright);
+                    :}
                     ;
 
 
 /*-----Reglas que permiten definir las configuraciones de las openQuestions-----*/
 
-/*--***---Produccion que obliga a tener como obligatorio el label----***---*/
+/*--***---Produccion que permite definir las producciones de configuracion de una drop question----***---*/
+
+cuerpo_drop         ::= lista_config_drop:listdrop COMA LABEL DOS_PUNTOS expresion:exp COMA
+                    lista_config_drop:list2 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:listconfig
+                    {:
+                        listdrop.addAll(list2);
+                        listdrop.addAll(listconfig);
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = listdrop;
+                    :}
+                    |
+                    lista_config_drop:listdrop COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list2 COMA
+                    LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:listconfig
+                    {:
+                        listdrop.addAll(list2);
+                        listdrop.addAll(listconfig);
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = listdrop;
+                    :}
+                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list2 COMA
+                    LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:listconfig
+                    {:
+                        list2.addAll(listconfig);
+                        list2.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        list2.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list2;
+                    :}
+                    | LABEL DOS_PUNTOS expresion:exp COMA
+                    lista_config_drop:list2 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:listconfig
+                    {:
+                        list2.addAll(listconfig);
+                        list2.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        list2.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list2;
+                    :}
+                    | LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list;
+                    :}
+                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list;
+                    :}
+                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1
+                    {:
+                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list1
+                    {:
+                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | error
+                    {:
+                        RESULT = new ArrayList<AtributoConfig>();
+                    :}
+                    ;
+
+/*---Define la produccion para poder definir los atributos dentor de la drop question----*/
+lista_config_drop   ::= lista_config_drop:list COMA atributo_drop:atr
+                    {:
+                        list.add(atr);
+                        RESULT = list;
+                    :}
+                    | atributo_drop:atr
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(atr);
+                        RESULT = list;
+                    :}
+                    | lista_config_drop:list COMA error
+                    {:
+                        RESULT = list;
+                    :}
+                    ;
+
+atributo_drop       ::= WIDTH DOS_PUNTOS expresion:exp
+                    {:
+                       RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, exp);
+                    :}
+                    | HEIGHT DOS_PUNTOS expresion:exp
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, exp);
+                    :}
+                    | CORRECT DOS_PUNTOS expresion:exp
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.CORRECT, exp);
+                    :}
+                    | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.STYLES, list);
+                    :}
+                    | funcion_pokemon:funcion
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.POKEMON, funcion);
+                    :}
+                    ;
+
+
+/*--****====--Regla de produccion que permite definir la lista de opciones que se tienen o declarar la funcion de la API --====****--*/
+
+lista_opciones      ::=  lista_opciones:list COMA opcion_individual:opt
+                    {:
+                        list.add(opt);
+                        RESULT = list;
+                    :}
+                    | opcion_individual:opt
+                    {:
+                        List<Nodo> list = new ArrayList<>();
+                        list.add(opt);
+                        RESULT = list;
+                    :}
+                    | error
+                    {:
+                        RESULT = new ArrayList<Nodo>();
+                    :}
+                    ;
+
+/*--****====--Regla de produccion que permite definir los posibles resultados de un drop question--====****--*/
+
+opcion_individual       ::= expresion:exp
+                        {:
+                            RESULT = exp;
+                        :}
+                        | funcion_pokemon:funcion
+                        {:
+                            RESULT = funcion;
+                        :}
+                        ;
+
+/*--****====--Regla de produccion que permite declarar la funcion de la API --====****--*/
+
+funcion_pokemon     ::= WHO_IS_THAT_POKEMON PARENT_APERTURA NUMBER_REQUEST COMA expresion:exp1 COMA expresion:exp2 PARENT_CIERRE
+                    {:
+                        RESULT = new NodoFuncionPokemon(exp1, exp2,exp1left, exp1right);
+                    :}
+                    ;
+
+
+/*--***---Produccion que permite definir las producciones de configuracion de una open question----***---*/
 
 cuerpo_open         ::=
                     lista_config_open:list1 COMA LABEL:lb DOS_PUNTOS expresion:e COMA lista_config_open:list2

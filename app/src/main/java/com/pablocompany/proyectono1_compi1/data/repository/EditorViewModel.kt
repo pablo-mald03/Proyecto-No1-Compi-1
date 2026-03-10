@@ -254,10 +254,6 @@ class EditorViewModel(
 
         val resultadoLexico = analizarLexico(texto)
 
-        if (resultadoLexico.errores.isNotEmpty()) {
-            return Pair(resultadoLexico.errores, null)
-        }
-
         val (erroresParser, ast) = analizarSintactico(texto)
 
         val erroresTotales = resultadoLexico.errores + erroresParser

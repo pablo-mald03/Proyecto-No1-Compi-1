@@ -6,13 +6,17 @@ public enum TipoConfiguracion {
     WIDTH("width"),
     HEIGHT("height"),
     LABEL("label"),
+    POKEMON("pokemon"),
 
     STYLES("styles"),
     CONTENT("content"),
     POINT_X("pointX"),
     POINT_Y("pointY"),
     ORIENTATION("orientation"),
+    CORRECT("correct"),
+    OPTIONS("options"),
     ELEMENTS("elements");
+
 
     private String valor;
 
