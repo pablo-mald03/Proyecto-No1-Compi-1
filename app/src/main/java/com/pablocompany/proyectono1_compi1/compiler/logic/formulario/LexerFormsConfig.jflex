@@ -424,8 +424,10 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 [^]               {
                     reportError("Simbolo no existe en el lenguaje", yytext());
-                    return symbol(sym.ERROR, yytext());
-                }
+                    if(!modoParser){
+                        return symbol(sym.ERROR, yytext());
+                    }
+                  }
 
 <<EOF>>         {
                     return symbol(sym.EOF);

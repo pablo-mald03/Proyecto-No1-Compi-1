@@ -1623,7 +1623,9 @@ public class LexerForms implements java_cup.runtime.Scanner {
           case 92: break;
           case 4:
             { reportError("Simbolo no existe en el lenguaje", yytext());
-                    return symbol(sym.ERROR, yytext());
+                    if(!modoParser){
+                        return symbol(sym.ERROR, yytext());
+                    }
             }
           // fall through
           case 93: break;

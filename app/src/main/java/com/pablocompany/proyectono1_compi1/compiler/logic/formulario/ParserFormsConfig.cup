@@ -48,14 +48,22 @@ parser code {:
        //Deteccion de errores sintacticos
        public void syntax_error(Symbol s) {
 
-            System.err.println("Error sintáctico en línea: " + s.left + " columna: " + s.right);
-            System.err.println("Token inesperado: " + s.value);
+            List<Integer> ids = expected_token_ids();
+            List<String> list = new ArrayList<>();
+
+            for (Integer id : ids) {
+                list.add(traductor(symbl_name_from_id(id)));
+            }
+
+            String esperado = String.join(", ", list);
+
+            String encontrado = (s.value != null) ? s.value.toString() : traductor(symbl_name_from_id(s.sym));
 
             syntaxErrorList.add(
                 new ErrorAnalisis(
-                    "Desconocido",
+                    encontrado,
                     "Sintáctico",
-                    "Token inesperado: " + s.value,
+                    "Se esperaba: " + esperado + ". Pero se encontró: '" + encontrado + "'",
                     s.left,
                     s.right
                 )
@@ -65,10 +73,46 @@ parser code {:
        //Deteccion de errores en los que no se puede recuperar el analisis
        public void unrecovered_syntax_error(Symbol s) throws Exception {
 
-           System.err.println("Error sintáctico fatal en línea: " + s.left + " columna: " + s.right);
-           System.err.println("Token inesperado: " + s.value);
+           String encontrado = (s.value != null) ? s.value.toString() : traductor(symbl_name_from_id(s.sym));
 
-           super.unrecovered_syntax_error(s);
+           syntaxErrorList.add(new ErrorAnalisis(
+                encontrado,
+                "Sintáctico",
+                "No se pudo recuperar el análisis cerca de: '" + encontrado + "'.",
+                s.left,
+                s.right
+                ));
+       }
+
+       //Metodo que permite retornar el texto de los errores que se esperan (Escalable)
+       private String traductor(String nombre) {
+           switch (nombre) {
+                case "IGUALACION":
+                    return "' = '";
+                case "CORCHETE_APERTURA":
+                    return "' [ '";
+                case "CORCHETE_CIERRE":
+                    return "' ] '";
+                case "DOS_PUNTOS":
+                    return "' : '";
+                case "COMA":
+                    return "' , '";
+                case "PARENT_APERTURA":
+                    return "' ( '";
+                case "PARENT_CIERRE":
+                    return "' ) '";
+                case "LABEL":
+                    return "atributo 'label'";
+                case "ID":
+                    return "un nombre de 'variable'";
+                case "ENTERO":
+                    return "un numero 'entero'";
+                case "EOF":
+                    return "Final del Archivo";
+                default:
+                    return nombre.toLowerCase().replace("_", " ");
+
+           }
        }
 
 
@@ -177,6 +221,10 @@ lista_codigo        ::= lista_codigo:list instruccion:ins
                         list.add(ins);
                         RESULT = list;
                     :}
+                    | lista_codigo:list error
+                    {:
+                        RESULT = list;
+                    :}
                     ;
 
 
@@ -212,7 +260,15 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
 
 /*--***---Produccion que obliga a tener como obligatorio el label----***---*/
 
-cuerpo_open         ::= lista_config_open:list COMA LABEL DOS_PUNTOS expresion:e
+cuerpo_open         ::=
+                    lista_config_open:list1 COMA LABEL:lb DOS_PUNTOS expresion:e COMA lista_config_open:list2
+                    {:
+                        list1.addAll(list2);
+                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        RESULT = list1;
+
+                    :}
+                    | lista_config_open:list COMA LABEL DOS_PUNTOS expresion:e
                     {:
                         list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
                         RESULT = list;
@@ -242,6 +298,10 @@ lista_config_open   ::= lista_config_open:list COMA atributo_open:atributo
                     {:
                         List<AtributoConfig> list = new ArrayList<>();
                         list.add(atributo);
+                        RESULT = list;
+                    :}
+                    | lista_config_open:list COMA error
+                    {:
                         RESULT = list;
                     :}
                     ;
@@ -276,6 +336,10 @@ lista_estilos_basicos ::= lista_estilos_basicos:list COMA estilo_individual:esti
                     {:
                         List<NodoEstilos> list = new ArrayList<>();
                         list.add(estilo);
+                        RESULT = list;
+                    :}
+                    | lista_estilos_basicos:list COMA error
+                    {:
                         RESULT = list;
                     :}
                     ;
@@ -384,6 +448,10 @@ lista_fragmentos    ::= lista_fragmentos:list fragmento:frag
                         list.add(frag);
                         RESULT = list;
                     :}
+                    | lista_fragmentos:list error
+                    {:
+                        RESULT = list;
+                    :}
                     ;
 
 //----*----Representa cada uno de los fragmentos de texto y emojis que vienen dentro de una cadena de texto----*----
@@ -420,9 +488,6 @@ fragmento           ::= TEXTO_PLANO:texto
                         RESULT = new NodoEmoji(TipoEmoji.CAT, emoji, emojileft, emojiright);
                     :}
                     ;
-
-
-
 
 
 /*Created by Pablo*/
