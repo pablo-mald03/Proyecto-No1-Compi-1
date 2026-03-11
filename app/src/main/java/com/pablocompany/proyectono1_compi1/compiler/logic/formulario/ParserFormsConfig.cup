@@ -94,6 +94,8 @@ parser code {:
                     return "' [ '";
                 case "CORCHETE_CIERRE":
                     return "' ] '";
+                case "PUNTO":
+                    return "' . '";
                 case "DOS_PUNTOS":
                     return "' : '";
                 case "COMA":
@@ -198,6 +200,7 @@ non terminal AtributoConfig atributo_drop;
 non terminal List<Nodo> lista_opciones;
 non terminal Nodo opcion_individual;
 non terminal NodoFuncionPokemon funcion_pokemon;
+non terminal NodoOptions contenido_options;
 
 
 
@@ -278,120 +281,115 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
 /*--***---Produccion que permite definir las producciones de configuracion de una drop question----***---*/
 
 cuerpo_drop         ::=
-                    lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA
-                    OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list2
+                    lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts COMA lista_config_drop:list2
                     {:
                         list1.addAll(list2);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA
-                    LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2
+                    | lista_config_drop:list1 COMA contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2
                     {:
                         list1.addAll(list2);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2 COMA
-                    OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list3
+                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2 COMA contenido_options:opts COMA lista_config_drop:list3
                     {:
                         list1.addAll(list2);
                         list1.addAll(list3);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list2 COMA
+                    | lista_config_drop:list1 COMA contenido_options:opts COMA lista_config_drop:list2 COMA
                     LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list3
                     {:
                         list1.addAll(list2);
                         list1.addAll(list3);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA
-                    lista_config_drop:list2
+                    | LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1 COMA contenido_options:opts COMA lista_config_drop:list2
                     {:
                         list1.addAll(list2);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list1 COMA
+                    | contenido_options:opts COMA lista_config_drop:list1 COMA
                     LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2
                     {:
                         list1.addAll(list2);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2 COMA
-                    OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
+                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2 COMA contenido_options:opts
                     {:
                         list1.addAll(list2);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA
+                    | lista_config_drop:list1 COMA contenido_options:opts COMA
                     lista_config_drop:list2 COMA LABEL DOS_PUNTOS expresion:exp
                     {:
                         list1.addAll(list2);
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list1
+                    | LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts COMA lista_config_drop:list1
                     {:
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1
+                    | contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1
                     {:
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
+                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts
                     {:
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | lista_config_drop:list1 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp
+                    | lista_config_drop:list1 COMA contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp
                     {:
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1 COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
+                    | LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1 COMA contenido_options:opts
                     {:
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp
+                    | contenido_options:opts COMA lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp
                     {:
                         list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list1;
                     :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
+                    | LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts
                     {:
                         List<AtributoConfig> list = new ArrayList<>();
                         list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list;
                     :}
-                    | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp
+                    | contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp
                     {:
                         List<AtributoConfig> list = new ArrayList<>();
                         list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions(opts, optsleft, optsright)));
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list;
                     :}
                     | error
@@ -399,6 +397,25 @@ cuerpo_drop         ::=
                         RESULT = new ArrayList<AtributoConfig>();
                     :}
                     ;
+
+
+/*---Define la produccion para poder declarar ya sea request a la API o la lista de opciones----*/
+contenido_options       ::= OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
+                        {:
+                            RESULT = new NodoOptions(opts, optsleft, optsright);
+                        :}
+                        | OPTIONS DOS_PUNTOS funcion_pokemon:fun
+                        {:
+                            List<Nodo> list = new ArrayList<>();
+                            list.add(fun);
+                            RESULT = new NodoOptions(list, funleft, funright);
+                        :}
+                        | funcion_pokemon:fun
+                        {:
+                            List<Nodo> list = new ArrayList<>();
+                            list.add(fun);
+                            RESULT = new NodoOptions(list, funleft, funright);
+                        :};
 
 
 /*---Define la produccion para poder definir los atributos dentor de la drop question----*/
@@ -436,10 +453,6 @@ atributo_drop       ::= WIDTH DOS_PUNTOS expresion:exp
                     | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
                     {:
                         RESULT = new AtributoConfig(TipoConfiguracion.STYLES, list);
-                    :}
-                    | funcion_pokemon:funcion
-                    {:
-                        RESULT = new AtributoConfig(TipoConfiguracion.POKEMON, funcion);
                     :}
                     ;
 
