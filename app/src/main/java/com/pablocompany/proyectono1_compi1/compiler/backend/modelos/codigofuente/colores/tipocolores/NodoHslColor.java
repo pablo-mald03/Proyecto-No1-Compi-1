@@ -22,6 +22,7 @@ public class NodoHslColor extends NodoColor {
         this.blue = blue;
     }
 
+    /*Metodos getter de las expresiones*/
     public NodoExpresion getRed() {
         return red;
     }
@@ -42,14 +43,24 @@ public class NodoHslColor extends NodoColor {
         Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : null;
         Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : null;
 
-        /*if (valorRed.getTipo() == TipoVariable.NUMBER && !(valorRed instanceof Double || valorRed instanceof Integer)) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es number", super.getLinea(), super.getColumna()));
+        if (!(valorRed instanceof Number)) {
+            listaErrores.add(new ErrorAnalisis(red != null ? red.getString() : "null", "Semántico", "Valor RED debe ser numerico", red.getLinea(), red.getColumna()));
             return null;
-        }*/
+        }
+        if (!(valorGreen instanceof Number)) {
+            listaErrores.add(new ErrorAnalisis(green != null ? green.getString() : "null", "Semántico", "Valor GREEN debe ser numerico", green.getLinea(), green.getColumna()));
+            return null;
+        }
+        if (!(valorBlue instanceof Number)) {
+            listaErrores.add(new ErrorAnalisis(blue != null ? blue.getString() : "null", "Semántico", "Valor BLUE debe ser numerico", blue.getLinea(), blue.getColumna()));
+            return null;
+        }
 
-
-
-        return new int[0];
+        return new int[]{
+                ((Number) valorRed).intValue(),
+                ((Number) valorGreen).intValue(),
+                ((Number) valorBlue).intValue()
+        };
     }
 }
 /*Created by P*/

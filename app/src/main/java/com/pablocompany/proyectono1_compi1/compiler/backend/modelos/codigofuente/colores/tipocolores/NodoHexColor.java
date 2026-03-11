@@ -15,9 +15,6 @@ public class NodoHexColor extends NodoColor {
         this.color = color;
     }
 
-
-
-
     //Metodo que permite obtener el color especificado en la expresion
     @Override
     public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

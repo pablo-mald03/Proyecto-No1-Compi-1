@@ -135,7 +135,7 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
             INICIO_CADENA, FIN_CADENA,
             CORCHETE_APERTURA, CORCHETE_CIERRE,
             LLAVE_APERTURA, LLAVE_CIERRE,
-            IF, ELSE, ELSE_IF, WHILE, FOR, DO, IN,
+            IF, ELSE, WHILE, FOR, DO, IN,
             PUNTO, DOS_PUNTOS,
             WIDTH, HEIGHT, LABEL, POINT_X, POINT_Y, ORIENTATION,
             ELEMENTS,
@@ -283,19 +283,38 @@ cuerpo_drop         ::= lista_config_drop:listdrop COMA LABEL DOS_PUNTOS expresi
                     {:
                         listdrop.addAll(list2);
                         listdrop.addAll(listconfig);
-                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp,expleft, expright)));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = listdrop;
                     :}
-                    |
-                    lista_config_drop:listdrop COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    | lista_config_drop:listdrop COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    lista_opciones:opts LLAVE_CIERRE COMA
+                    LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:listconfig
+                    {:
+                        listdrop.addAll(listconfig);
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp,expleft, expright)));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
+                        RESULT = listdrop;
+                    :}
+                    | lista_config_drop:listdrop COMA
+                    LABEL DOS_PUNTOS expresion:exp COMA
+                    OPTIONS DOS_PUNTOS LLAVE_APERTURA
+                    lista_opciones:opts LLAVE_CIERRE COMA
+                     lista_config_drop:listconfig
+                    {:
+                        listdrop.addAll(listconfig);
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp,expleft, expright)));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
+                        RESULT = listdrop;
+                    :}
+                    | lista_config_drop:listdrop COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA
                     lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list2 COMA
                     LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:listconfig
                     {:
                         listdrop.addAll(list2);
                         listdrop.addAll(listconfig);
-                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp,expleft, expright)));
+                        listdrop.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = listdrop;
                     :}
                     | OPTIONS DOS_PUNTOS LLAVE_APERTURA
@@ -303,8 +322,8 @@ cuerpo_drop         ::= lista_config_drop:listdrop COMA LABEL DOS_PUNTOS expresi
                     LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:listconfig
                     {:
                         list2.addAll(listconfig);
-                        list2.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        list2.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        list2.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
+                        list2.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = list2;
                     :}
                     | LABEL DOS_PUNTOS expresion:exp COMA
@@ -312,34 +331,34 @@ cuerpo_drop         ::= lista_config_drop:listdrop COMA LABEL DOS_PUNTOS expresi
                     lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:listconfig
                     {:
                         list2.addAll(listconfig);
-                        list2.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        list2.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        list2.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
+                        list2.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = list2;
                     :}
                     | LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
                     {:
                         List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = list;
                     :}
                     | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp
                     {:
                         List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = list;
                     :}
                     | OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1
                     {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = list1;
                     :}
                     | LABEL DOS_PUNTOS expresion:exp COMA OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE COMA lista_config_drop:list1
                     {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, exp));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, new NodoOptions (opts, optsleft, optsright)));
                         RESULT = list1;
                     :}
                     | error
@@ -366,17 +385,19 @@ lista_config_drop   ::= lista_config_drop:list COMA atributo_drop:atr
                     :}
                     ;
 
+/*----Define los atributos que puede tener la drop question----*/
+
 atributo_drop       ::= WIDTH DOS_PUNTOS expresion:exp
                     {:
-                       RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, exp);
+                       RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, new NodoWidth(exp, expleft, expright));
                     :}
                     | HEIGHT DOS_PUNTOS expresion:exp
                     {:
-                        RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, exp);
+                        RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
                     :}
                     | CORRECT DOS_PUNTOS expresion:exp
                     {:
-                        RESULT = new AtributoConfig(TipoConfiguracion.CORRECT, exp);
+                        RESULT = new AtributoConfig(TipoConfiguracion.CORRECT, new NodoCorrect(exp, expleft, expright));
                     :}
                     | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
                     {:
@@ -435,24 +456,23 @@ cuerpo_open         ::=
                     lista_config_open:list1 COMA LABEL:lb DOS_PUNTOS expresion:e COMA lista_config_open:list2
                     {:
                         list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
                         RESULT = list1;
-
                     :}
                     | lista_config_open:list COMA LABEL DOS_PUNTOS expresion:e
                     {:
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
                         RESULT = list;
                     :}
                     | LABEL DOS_PUNTOS expresion:e COMA lista_config_open:list
                     {:
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
                         RESULT = list;
                     :}
                     | LABEL DOS_PUNTOS expresion:e
                     {:
                         List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, e));
+                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
                         RESULT = list;
                     :}
                     ;
@@ -482,11 +502,11 @@ lista_config_open   ::= lista_config_open:list COMA atributo_open:atributo
 
 atributo_open       ::= WIDTH DOS_PUNTOS expresion:expresion
                     {:
-                        RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, expresion);
+                        RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, new NodoWidth(expresion, expresionleft, expresionright));
                     :}
                     | HEIGHT DOS_PUNTOS expresion:expresion
                     {:
-                        RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, expresion);
+                        RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(expresion, expresionleft, expresionright));
                     :}
                     | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
                     {:

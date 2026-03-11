@@ -21,6 +21,8 @@ public class AtributoConfig {
         this.nodoValor = nodoValor;
     }
 
+    //Metodo que permite obtener el tipo de configuracion
+
     public TipoConfiguracion getTipo() {
         return tipo;
     }

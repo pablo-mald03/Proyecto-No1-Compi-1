@@ -2,6 +2,9 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
@@ -18,7 +21,7 @@ import java.util.List;
 public class NodoOpenQuestion extends NodoQuestion {
 
     //Atributos
-    private NodoExpresion label;
+    private NodoLabel label;
 
     public NodoOpenQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
@@ -28,17 +31,21 @@ public class NodoOpenQuestion extends NodoQuestion {
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 
+        if(configuracion.isEmpty()){
+            return;
+        }
+
         for (AtributoConfig config : configuracion) {
             switch (config.getTipo()) {
 
                 case WIDTH:
-                    this.width = (NodoExpresion) config.getNodoValor();
+                    this.width = (NodoWidth) config.getNodoValor();
                     break;
                 case HEIGHT:
-                    this.height = (NodoExpresion) config.getNodoValor();
+                    this.height = (NodoHeight) config.getNodoValor();
                     break;
                 case LABEL:
-                    this.label = (NodoExpresion) config.getNodoValor();
+                    this.label = (NodoLabel) config.getNodoValor();
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
@@ -47,36 +54,6 @@ public class NodoOpenQuestion extends NodoQuestion {
             }
 
         }
-
-    }
-
-    //Metodo que permite procesar los estilos que vienen en la configuracion
-    private Estilos procesarEstilos(List<NodoEstilos> lista) {
-        NodoColor backgroundColor = null;
-        NodoColor color = null;
-        TipoLetra fontFamily = TipoLetra.MONO;
-        NodoExpresion textSize = null;
-
-        for (NodoEstilos nodo : lista) {
-
-            Object valorNodo = nodo.getValor();
-
-            switch (nodo.getTipo()) {
-                case BACKGROUND_COLOR:
-                    backgroundColor = (NodoColor) valorNodo;
-                    break;
-                case COLOR_TEXTO:
-                    color = (NodoColor) valorNodo;
-                    break;
-                case FONT_FAMILY:
-                    fontFamily = TipoLetra.valueOf ((String)valorNodo);
-                    break;
-                case TEXT_SIZE:
-                    textSize = (NodoExpresion) valorNodo;
-                    break;
-            }
-        }
-        return new Estilos(backgroundColor, color, fontFamily, textSize);
 
     }
 

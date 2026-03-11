@@ -239,8 +239,6 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 "ELSE"    {return symbol(sym.ELSE, yytext());}
 
-"ELSE IF"    {return symbol(sym.ELSE_IF, yytext());}
-
 "WHILE"    {return symbol(sym.WHILE, yytext());}
 
 "FOR"    {return symbol(sym.FOR, yytext());}
