@@ -265,6 +265,18 @@ non terminal List<NodoComponente> lista_elementos;
 non terminal NodoComponente elemento_seccion;
 non terminal List<Nodo> lista_expresiones;
 
+//---*--No terminales de configuracion de las tablas---*---
+non terminal List<AtributoConfig> cuerpo_table;
+non terminal List<AtributoConfig> lista_config_table;
+
+non terminal AtributoConfig atributo_table;
+non terminal NodoComponente table_declaration;
+
+non terminal List<List<NodoComponente>>  lista_filas;
+non terminal List<NodoComponente>  lista_celdas;
+
+
+
 
 
 /*======*******=====Presedencia de tipos==========*******===========*/
@@ -314,13 +326,117 @@ unidad_codigo       ::= instruccion:ins
                     {:
                         RESULT = sec;
                     :}
+                    | table_declaration:tab
+                    {:
+                        RESULT = tab;
+                    :}
                     | error
                     {:
                         RESULT = null;
                     :}
                     ;
 
-/*-----REGLAS DE PRODUCCION PARA DECLARACION DE SECCIONES DE CODIGO-----*/
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE TABLAS DE FORMULARIOS-----*/
+
+table_declaration       ::= TABLE CORCHETE_APERTURA cuerpo_table:cuerpo CORCHETE_CIERRE
+                        {:
+                            RESULT = new NodoTable(cuerpo, cuerpoleft, cuerporight);
+                        :}
+                        ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE TABLE------*/
+
+cuerpo_table          ::= lista_config_table:list
+                        {:
+                            RESULT = list;
+                        :}
+                        ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE TABLE------*/
+
+lista_config_table    ::= lista_config_table:list COMA atributo_table:atr
+                        {:
+                            list.add(atr);
+                            RESULT = list;
+                        :}
+                        | atributo_table:atr
+                        {:
+                            List<AtributoConfig> list = new ArrayList<>();
+                            list.add(atr);
+                            RESULT = list;
+                        :}
+                        ;
+
+
+
+ /*----Generacion de configuracion para los layouts de table-----*/
+
+atributo_table        ::= WIDTH DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, new NodoWidth(exp, expleft, expright));
+                        :}
+                        | HEIGHT DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
+                        :}
+                        | POINT_X DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.POINT_X, new NodoPointX(exp, expleft, expright));
+                        :}
+                        | POINT_Y DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.POINT_Y, new NodoPointY(exp, expleft, expright));
+                        :}
+                        | ELEMENTS DOS_PUNTOS LLAVE_APERTURA lista_filas:elementos LLAVE_CIERRE
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.ELEMENTS, elementos);
+                        :}
+                        | STYLES CORCHETE_APERTURA lista_estilos_basicos_layout:list CORCHETE_CIERRE
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.STYLES, list);
+                        :}
+                        ;
+
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE LAS FILAS DE TABLE------*/
+
+lista_filas         ::= lista_filas:list COMA CORCHETE_APERTURA lista_celdas:celda CORCHETE_CIERRE
+                    {:
+                        list.add(celda);
+                        RESULT = list; :}
+                    | CORCHETE_APERTURA lista_celdas:celda CORCHETE_CIERRE
+                    {:
+                        List<List<NodoComponente>> list = new ArrayList<>();
+                        list.add(celda);
+                        RESULT = list;
+                    :}
+                    ;
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE LAS COLUMNAS/CELDAS DE TABLE------*/
+
+lista_celdas        ::= lista_celdas:list COMA LLAVE_APERTURA elemento_seccion:element LLAVE_CIERRE
+                    {:
+                        list.add(element);
+                        RESULT = list;
+                    :}
+                    | LLAVE_APERTURA elemento_seccion:element LLAVE_CIERRE
+                    {:
+                        List<NodoComponente> list = new ArrayList<>();
+                        list.add(element);
+                        RESULT = list;
+                    :}
+                    ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE TABLAS DE FORMULARIOS-----*/
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE SECCIONES DE FORMULARIOS-----*/
+
 section_declaration     ::= SECTION CORCHETE_APERTURA cuerpo_section:cuerpo CORCHETE_CIERRE
                         {:
                             RESULT = new NodoSection(cuerpo, cuerpoleft, cuerporight);
@@ -406,7 +522,7 @@ lista_estilos_basicos_layout    ::= lista_estilos_basicos_layout:list COMA estil
                                 ;
 
 
- /*----Generacion de estilos para los layouts-----*/
+ /*----Generacion de estilos para los layouts de section-----*/
 
 estilo_individual_layout       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
                                 {:
@@ -459,6 +575,10 @@ elemento_seccion    ::= ID:id PUNTO DRAW PARENT_APERTURA lista_expresiones:param
                     | section_declaration:sec
                     {:
                         RESULT = sec;
+                    :}
+                    | table_declaration:tab
+                    {:
+                        RESULT = tab;
                     :}
                     | OPEN_QUESTION:quest CORCHETE_APERTURA cuerpo_open:listconfig CORCHETE_CIERRE
                     {:
