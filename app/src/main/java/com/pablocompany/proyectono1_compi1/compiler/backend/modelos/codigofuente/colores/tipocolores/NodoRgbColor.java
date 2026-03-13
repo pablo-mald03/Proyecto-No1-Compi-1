@@ -17,7 +17,8 @@ public class NodoRgbColor extends NodoColor{
     private NodoExpresion blue;
 
 
-    public NodoRgbColor(NodoExpresion red, NodoExpresion green, NodoExpresion blue) {
+    public NodoRgbColor(NodoExpresion red, NodoExpresion green, NodoExpresion blue, int linea, int columna) {
+        super(linea, columna);
         this.red = red;
         this.green = green;
         this.blue = blue;

@@ -16,7 +16,8 @@ public class NodoHslColor extends NodoColor {
     private NodoExpresion blue;
 
 
-    public NodoHslColor(NodoExpresion red, NodoExpresion green, NodoExpresion blue) {
+    public NodoHslColor(NodoExpresion red, NodoExpresion green, NodoExpresion blue, int linea, int columna) {
+        super(linea, columna);
         this.red = red;
         this.green = green;
         this.blue = blue;

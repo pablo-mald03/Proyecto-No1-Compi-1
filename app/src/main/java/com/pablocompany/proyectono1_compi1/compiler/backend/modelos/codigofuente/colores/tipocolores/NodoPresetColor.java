@@ -1,0 +1,47 @@
+package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores;
+
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+
+import java.util.List;
+
+//Clase que representa los colores que estan como preset del lenguaje
+public class NodoPresetColor extends NodoColor {
+
+    //Atributos
+    private TipoColor colorPreset;
+
+
+    public NodoPresetColor(String colorPreset, int linea, int columna) {
+        super(linea, columna);
+        try {
+            this.colorPreset = TipoColor.valueOf(colorPreset.toUpperCase());
+        }catch (Exception e){
+            this.colorPreset = TipoColor.NOT_FOUND;
+        }
+
+
+    }
+
+    /*Metodos getter de las expresiones*/
+
+    //Metodo que permite retornar el color en formato RGB (util en frontend)
+    @Override
+    public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        switch (colorPreset) {
+            case RED:    return new int[]{255, 0, 0};
+            case BLUE:   return new int[]{0, 0, 255};
+            case GREEN:  return new int[]{0, 128, 0};
+            case PURPLE: return new int[]{128, 0, 128};
+            case SKY:    return new int[]{135, 206, 235};
+            case YELLOW: return new int[]{255, 255, 0};
+            case BLACK:  return new int[]{0, 0, 0};
+            case WHITE:  return new int[]{255, 255, 255};
+            default:
+                listaErrores.add(new ErrorAnalisis("Not Found", "Semántico", "Preset de color no valido", this.getLinea(), this.getColumna()));
+                return null;
+        }
+    }
+}

@@ -11,7 +11,8 @@ public class NodoHexColor extends NodoColor {
 
     private String color;
 
-    public NodoHexColor(String color) {
+    public NodoHexColor(String color, int linea, int columna) {
+        super(linea, columna);
         this.color = color;
     }
 

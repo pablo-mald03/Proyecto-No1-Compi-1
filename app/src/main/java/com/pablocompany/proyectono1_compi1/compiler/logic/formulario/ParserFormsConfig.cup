@@ -6,6 +6,9 @@ import java_cup.runtime.*;
 import java.util.*;
 
 /*Imports de mis clases*/
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.operadoreslogicos.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales.comparacion.*;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.*;
@@ -168,7 +171,7 @@ parser code {:
 -----------------------------------------------------------*/
 
 /* Terminales: tokens que el parser nos retorna */
-terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
+terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO,
             UNARIO,SUMA, RESTA, MULTIPLICACION, DIVISION, POTENCIA, MODULO,
             PARENT_APERTURA, PARENT_CIERRE,
             IGUALDAD, DIFERENTE, MAYOR, MENOR, MAYOR_IGUAL, MENOR_IGUAL,
@@ -193,7 +196,7 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
 /*Created by Pablo*/
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 terminal String ID,COLOR_HEX,TEXTO_PLANO;
-terminal String TIPOGRAFIA,GROSOR_LINEA, CONFIG_DOCK;
+terminal String TIPOGRAFIA,GROSOR_LINEA, CONFIG_DOCK,COLOR_PRESET;
 terminal String EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
@@ -281,6 +284,11 @@ non terminal List<AtributoConfig> lista_config_text;
 non terminal AtributoConfig atributo_text_extra;
 non terminal List<AtributoConfig> cuerpo_text;
 
+//---*--No terminales de la generacion de condicionales---*---
+
+non terminal Nodo condicional;
+non terminal Nodo bloque_else;
+non terminal Nodo condicion;
 
 
 
@@ -322,6 +330,7 @@ lista_codigo        ::= lista_codigo:list unidad_codigo:uni
                     :}
                     ;
 
+/*Created by Pablo*/
 /*------Define la derivacion de todos los caminos para el reocnocimiento de codigo fuente--------*/
 
 unidad_codigo       ::= instruccion:ins
@@ -336,9 +345,82 @@ unidad_codigo       ::= instruccion:ins
                     {:
                         RESULT = tab;
                     :}
+                    | condicional:con
+                    {:
+                        RESULT = con;
+                    :}
                     | error
                     {:
                         RESULT = null;
+                    :}
+                    ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONALES EN EL CODIGO FUENTE-----*/
+condicional         ::= IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+                    {:
+                        RESULT = new NodoIf(con, cuerpo, null, conleft, conright);
+                    :}
+                    | IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE bloque_else:el
+                    {:
+                        RESULT = new NodoIf(con, cuerpo, el, conleft, conright);
+                    :}
+                    ;
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONALES EN EL CODIGO FUENTE-----*/
+
+bloque_else         ::= ELSE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+                    {:
+                        RESULT = new NodoElse(cuerpo, cuerpoleft, cuerporight);
+                    :}
+                    | ELSE condicional:ifAnidado
+                    {:
+                        RESULT = ifAnidado;
+                    :}
+                    ;
+
+/*Created by Pablo*/
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONES-----*/
+
+condicion       ::= condicion:condA AND:and condicion:condB
+                    {:
+                        RESULT = new NodoAnd(condA, condB,andleft, andright);
+                    :}
+                    | condicion:condA OR:or condicion:condB
+                    {:
+                        RESULT = new NodoOr(condA, condB,orleft, orright);
+                    :}
+                    | NOT:not condicion:condA
+                    {:
+                        RESULT = new NodoNot(condA, notleft, notright);
+                    :}
+                    | PARENT_APERTURA condicion:condA PARENT_CIERRE
+                    {:
+                        RESULT = condA;
+                    :}
+                    | expresion:expA IGUALDAD expresion:expB
+                    {:
+                        RESULT = new NodoIgualdad(expA, expB, expAleft, expAright);
+                    :}
+                    | expresion:expA DIFERENTE expresion:expB
+                    {:
+                        RESULT = new NodoDiferente(expA, expB, expAleft, expAright);
+                    :}
+                    | expresion:expA MAYOR expresion:expB
+                    {:
+                        RESULT = new NodoMayor(expA, expB, expAleft, expAright);
+                    :}
+                    | expresion:expA MENOR expresion:expB
+                    {:
+                        RESULT = new NodoMenor(expA, expB, expAleft, expAright);
+                    :}
+                    | expresion:expA MAYOR_IGUAL expresion:expB
+                    {:
+                        RESULT = new NodoMayorIgual(expA, expB, expAleft, expAright);
+                    :}
+                    | expresion:expA MENOR_IGUAL expresion:expB
+                    {:
+                        RESULT = new NodoMenorIgual(expA, expB, expAleft, expAright);
                     :}
                     ;
 
@@ -351,7 +433,7 @@ table_declaration       ::= TABLE CORCHETE_APERTURA cuerpo_table:cuerpo CORCHETE
                         :}
                         ;
 
-
+/*Created by Pablo*/
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE TABLE------*/
 
 cuerpo_table          ::= lista_config_table:list
@@ -377,7 +459,7 @@ lista_config_table    ::= lista_config_table:list COMA atributo_table:atr
                         ;
 
 
-
+/*Created by Pablo*/
  /*----Generacion de configuracion para los layouts de table-----*/
 
 atributo_table        ::= WIDTH DOS_PUNTOS expresion:exp
@@ -437,7 +519,7 @@ lista_celdas        ::= lista_celdas:list COMA LLAVE_APERTURA elemento_seccion:e
                     :}
                     ;
 
-
+/*Created by Pablo*/
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE TABLAS DE FORMULARIOS-----*/
 
 
@@ -651,6 +733,7 @@ lista_config_text       ::=  lista_config_text:list COMA atributo_text_extra:ext
                         :}
                         ;
 
+/*Created by Pablo*/
 /*-----Reglas de produccion para definir el cuerpo de configuracion de los textos---------*/
 
 atributo_text_extra         ::= WIDTH DOS_PUNTOS expresion:exp
@@ -723,7 +806,7 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     :}
                     ;
 
-
+/*Created by Pablo*/
 /*-----Reglas que permiten definir las configuraciones de las select questions-----*/
 
 /*--***---Produccion que permite definir las producciones de configuracion de una select question----***---*/
@@ -968,7 +1051,7 @@ cuerpo_drop         ::=
                     :}
                     ;
 
-
+/*Created by Pablo*/
 /*---Define la produccion para poder declarar ya sea request a la API o la lista de opciones----*/
 contenido_options       ::= OPTIONS DOS_PUNTOS LLAVE_APERTURA lista_opciones:opts LLAVE_CIERRE
                         {:
@@ -1096,7 +1179,7 @@ cuerpo_open         ::=
                     :}
                     ;
 
-
+/*Created by Pablo*/
 /*--***---Produccion que obliga a tener como obligatorio el label----***---*/
 
 lista_config_open   ::= lista_config_open:list COMA atributo_open:atributo
@@ -1134,7 +1217,7 @@ atributo_open       ::= WIDTH DOS_PUNTOS expresion:expresion
                     ;
 
 
-
+/*Created by Pablo*/
 /*-----Reglas que permiten definir los estilos-----*/
 
 lista_estilos_basicos ::= lista_estilos_basicos:list COMA estilo_individual:estilo
@@ -1178,20 +1261,24 @@ estilo_individual       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
 /*====Reglas que permiten definir los colores===*/
 color_valor     ::= COLOR_HEX:hex
                     {:
-                        RESULT = new NodoHexColor(hex);
+                        RESULT = new NodoHexColor(hex,hexleft,hexright);
                     :}
-                    | PARENT_APERTURA expresion:exp1 COMA expresion:exp2 COMA expresion:exp3 PARENT_CIERRE
+                    | PARENT_APERTURA:parent expresion:exp1 COMA expresion:exp2 COMA expresion:exp3 PARENT_CIERRE
                     {:
-                        RESULT = new NodoRgbColor(exp1, exp2, exp3);
+                        RESULT = new NodoRgbColor(exp1, exp2, exp3,exp1left, exp1right);
                     :}
-                    | MENOR expresion:exp1 COMA expresion:exp2 COMA expresion:exp3 MAYOR
+                    | MENOR:apertura expresion:exp1 COMA expresion:exp2 COMA expresion:exp3 MAYOR
                     {:
-                        RESULT = new NodoHslColor(exp1, exp2, exp3);
+                        RESULT = new NodoHslColor(exp1, exp2, exp3,exp1left, exp1right);
+                    :}
+                    | COLOR_PRESET:preset
+                    {:
+                        RESULT = new NodoPresetColor(preset.toString(), presetleft, presetright);
                     :}
                     ;
 
 
-
+/*Created by Pablo*/
  /*----Expresiones del lenguaje-----*/
 expresion ::=       expresion:exp1 SUMA expresion:exp2
                     {:
