@@ -30,9 +30,14 @@ public class NodoDropQuestion extends NodoQuestion {
     //Atributo que permite declarar la funcion de la API
     private Nodo funcionPokemon;
 
+    //Atributo que permite definir la respuesta correcta de la pregunta
+    private Nodo respuestaCorrecta;
+
     public NodoDropQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
-        //this.setConfiguraciones(config);
+        this.funcionPokemon = null;
+        this.respuestaCorrecta = null;
+        this.setConfiguraciones(config);
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
@@ -59,13 +64,16 @@ public class NodoDropQuestion extends NodoQuestion {
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
                     break;
-
+                case CORRECT:
+                    this.respuestaCorrecta = (Nodo) config.getNodoValor();
+                    break;
             }
-
         }
-
     }
 
+    /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/
+
+    //Metodo que permite ejecutar laa acciones dentro de la question
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         return null;

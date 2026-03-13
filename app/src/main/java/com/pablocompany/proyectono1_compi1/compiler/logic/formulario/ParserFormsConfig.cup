@@ -202,6 +202,14 @@ non terminal Nodo opcion_individual;
 non terminal NodoFuncionPokemon funcion_pokemon;
 non terminal NodoOptions contenido_options;
 
+//---*--No terminales de configuracion de multiple questions---*---
+non terminal List<AtributoConfig> cuerpo_multiple;
+non terminal List<AtributoConfig>  lista_config_multiple;
+non terminal AtributoConfig atributo_multiple;
+non terminal List<Nodo> lista_correctas;
+
+//---*--No terminales de configuracion de select questions---*---
+non terminal List<AtributoConfig> cuerpo_select;
 
 
 /*======*******=====Presedencia de tipos==========*******===========*/
@@ -273,12 +281,142 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
                     {:
                         RESULT = new NodoDropQuestion(TipoVariable.SPECIAL,id, list, idleft, idright);
                     :}
+                    | VAR_ESPECIAL ID:id IGUALACION SELECT_QUESTION CORCHETE_APERTURA cuerpo_select:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoSelectQuestion(TipoVariable.SPECIAL,id, list, idleft, idright);
+                    :}
+                    | VAR_ESPECIAL ID:id IGUALACION MULTIPLE_QUESTION CORCHETE_APERTURA cuerpo_multiple:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoMultipleQuestion(TipoVariable.SPECIAL,id, list, idleft, idright);
+                    :}
                     ;
 
 
-/*-----Reglas que permiten definir las configuraciones de las openQuestions-----*/
+/*-----Reglas que permiten definir las configuraciones de las select questions-----*/
+
+/*--***---Produccion que permite definir las producciones de configuracion de una select question----***---*/
+
+cuerpo_select         ::=
+                    contenido_options:opts
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list;
+                    :}
+                    | lista_config_drop:list1 COMA contenido_options:opts
+                    {:
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | contenido_options:opts COMA lista_config_drop:list1
+                    {:
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | lista_config_drop:list1 COMA contenido_options:opts COMA lista_config_drop:list2
+                    {:
+                        list1.addAll(list2);
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | error
+                    {:
+                        RESULT = new ArrayList<AtributoConfig>();
+                    :}
+                    ;
+
+
+/*-----Reglas que permiten definir las configuraciones de las multiple questions-----*/
 
 /*--***---Produccion que permite definir las producciones de configuracion de una drop question----***---*/
+
+cuerpo_multiple         ::=
+                    contenido_options:opts
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list;
+                    :}
+                    | lista_config_multiple:list1 COMA contenido_options:opts
+                    {:
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | lista_config_multiple:list1 COMA contenido_options:opts COMA lista_config_multiple:list2
+                    {:
+                        list1.addAll(list2);
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | contenido_options:opts COMA lista_config_multiple:list1
+                    {:
+                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
+                        RESULT = list1;
+                    :}
+                    | error
+                    {:
+                        RESULT = new ArrayList<AtributoConfig>();
+                    :}
+                    ;
+
+/*--***---Produccion que permite definir las opciones que se tendran en una multiple question----***---*/
+
+/*---Define la produccion para poder definir los atributos de configuracion denttro de la drop question----*/
+
+lista_config_multiple   ::= lista_config_multiple:list COMA atributo_multiple:atr
+                    {:
+                        list.add(atr);
+                        RESULT = list;
+                    :}
+                    | atributo_multiple:atr
+                    {:
+                        List<AtributoConfig> list = new ArrayList<>();
+                        list.add(atr);
+                        RESULT = list;
+                    :}
+                    | lista_config_multiple:list COMA error
+                    {:
+                        RESULT = list;
+                    :}
+                    ;
+
+/*----Define los atributos que puede tener la multiple question----*/
+
+atributo_multiple       ::= WIDTH DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, new NodoWidth(exp, expleft, expright));
+                        :}
+                        | HEIGHT DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
+                        :}
+                        | CORRECT DOS_PUNTOS LLAVE_APERTURA lista_correctas:list LLAVE_CIERRE
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.CORRECT, list);
+                        :}
+                        | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.STYLES, list);
+                        :}
+                        ;
+
+/*----Define el listado de opciones correctas dentro de la multiple question----*/
+lista_correctas     ::= lista_correctas:list COMA expresion:exp
+                    {:
+                        list.add(exp);
+                        RESULT = list;
+
+                    :}
+                    | expresion:exp
+                    {:
+                        List<Nodo> list = new ArrayList<>();
+                        list.add(exp);
+                        RESULT = list;
+                    :}
+                    ;
+
+
+/*--***---Produccion que permite definir las producciones de configuracion de una drop y select question----***---*/
 
 cuerpo_drop         ::=
                     lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts COMA lista_config_drop:list2
@@ -482,10 +620,6 @@ opcion_individual       ::= expresion:exp
                         {:
                             RESULT = exp;
                         :}
-                        | funcion_pokemon:funcion
-                        {:
-                            RESULT = funcion;
-                        :}
                         ;
 
 /*--****====--Regla de produccion que permite declarar la funcion de la API --====****--*/
@@ -496,6 +630,8 @@ funcion_pokemon     ::= WHO_IS_THAT_POKEMON PARENT_APERTURA NUMBER_REQUEST COMA 
                     :}
                     ;
 
+
+/*-----Reglas que permiten definir las configuraciones de las openQuestions-----*/
 
 /*--***---Produccion que permite definir las producciones de configuracion de una open question----***---*/
 
