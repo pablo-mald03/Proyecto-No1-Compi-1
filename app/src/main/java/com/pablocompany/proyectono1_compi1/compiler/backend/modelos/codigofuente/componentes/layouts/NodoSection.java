@@ -4,6 +4,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoElements;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOrientation;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointX;
@@ -23,13 +25,13 @@ import java.util.List;
 //Clase que define la seccion de un formulario y puede contener a mas componentes
 public class NodoSection extends NodoComponente {
 
-    private List<NodoComponente> elementos;
+    private NodoElements elementos;
     private NodoOrientation orientation;
     private NodoPointX pointX;
     private NodoPointY pointY;
 
     /*Variable que representa los tipos de vorden que hay*/
-    private TipoBorde borde;
+    private NodoBorder borde;
 
     public NodoSection(List<AtributoConfig> cuerpo, int linea, int columna) {
         super(null,null,null,linea, columna);
@@ -74,7 +76,7 @@ public class NodoSection extends NodoComponente {
                     this.pointY = (NodoPointY) config.getNodoValor();
                     break;
                 case ELEMENTS:
-                    this.elementos = (List<NodoComponente>) config.getNodoValor();
+                    this.elementos = (NodoElements) config.getNodoValor();
                     break;
                 case ORIENTATION:
                     this.orientation = (NodoOrientation) config.getNodoValor();
@@ -124,7 +126,7 @@ public class NodoSection extends NodoComponente {
                     textSize = (NodoExpresion) valorNodo;
                     break;
                 case BORDER:
-                    this.borde = TipoBorde.valueOf((String) valorNodo);
+                    this.borde = (NodoBorder) valorNodo;
                     break;
             }
         }

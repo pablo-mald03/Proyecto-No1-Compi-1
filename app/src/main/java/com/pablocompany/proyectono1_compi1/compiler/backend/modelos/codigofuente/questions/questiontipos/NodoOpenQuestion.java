@@ -23,6 +23,8 @@ public class NodoOpenQuestion extends NodoQuestion {
     //Atributos
     private NodoLabel label;
 
+    /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
+
     public NodoOpenQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
         this.setConfiguraciones(config);

@@ -29,6 +29,8 @@ public class NodoMultipleQuestion extends NodoQuestion {
     //Atributo que permite definir la respuesta correcta de la pregunta
     private List<Nodo> respuestasCorrectas;
 
+    /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
+
     public NodoMultipleQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
         this.funcionPokemon = null;

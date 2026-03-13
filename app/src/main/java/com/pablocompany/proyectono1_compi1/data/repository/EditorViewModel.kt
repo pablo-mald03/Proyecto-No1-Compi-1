@@ -99,7 +99,7 @@ class EditorViewModel(
                     sym.SUMA, sym.RESTA, sym.MULTIPLICACION, sym.DIVISION,
                     sym.POTENCIA, sym.MODULO -> Color(0xFF1AD305)
 
-                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING,sym.FOR,sym.IF,sym.ELSE,sym.WHILE,sym.DO,sym.IN -> Color(0xFF6602F1)
+                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING,sym.FOR,sym.IF,sym.ELSE,sym.WHILE,sym.DO,sym.IN, sym.TIPOGRAFIA, sym.NUMBER_REQUEST, sym.GROSOR_LINEA, sym.CONFIG_DOCK -> Color(0xFF6602F1)
 
                     sym.ENTERO, sym.DECIMAL -> Color(0xFF07E3DB)
 

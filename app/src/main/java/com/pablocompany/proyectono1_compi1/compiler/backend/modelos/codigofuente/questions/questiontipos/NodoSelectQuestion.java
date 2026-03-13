@@ -30,6 +30,8 @@ public class NodoSelectQuestion extends NodoQuestion {
     //Atributo que permite definir la respuesta correcta de la pregunta
     private Nodo respuestaCorrecta;
 
+    /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
+
     public NodoSelectQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
         this.setConfiguraciones(config);

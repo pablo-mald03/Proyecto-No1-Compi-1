@@ -54,6 +54,11 @@ parser code {:
             List<Integer> ids = expected_token_ids();
             List<String> list = new ArrayList<>();
 
+            if (ids.isEmpty()) {
+                    reportarErrorContextual(s);
+                    return;
+            }
+
             for (Integer id : ids) {
                 list.add(traductor(symbl_name_from_id(id)));
             }
@@ -86,6 +91,30 @@ parser code {:
                 s.right
                 ));
        }
+
+        /*Metodo de inferencia de errores sintacticos (como un preventivo cuando cup no virtualiza los caracteres expected)*/
+        private void reportarErrorContextual(Symbol s) {
+
+            String tokenEncontrado = (s.value != null) ? s.value.toString() : symbl_name_from_id(s.sym);
+
+            String mensaje = "Error de sintaxis cerca de '" + tokenEncontrado + "'. ";
+
+            if (tokenEncontrado.equals("styles")) {
+
+                mensaje += "Parece que olvidaste los corchetes o comas en la declaracion de estilos.";
+
+            } else if (tokenEncontrado.equals("elements")) {
+
+                mensaje += "Revisa que los elementos estén encerrados en llaves {} y separados por comas.";
+
+            } else {
+
+                mensaje += "Revisa la estructura de tu sección o configuración.";
+
+            }
+            syntaxErrorList.add(new ErrorAnalisis(tokenEncontrado, "Sintáctico", mensaje, s.left, s.right));
+
+        }
 
        //Metodo que permite retornar el texto de los errores que se esperan (Escalable)
        private String traductor(String nombre) {
@@ -395,9 +424,9 @@ estilo_individual_layout       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
                                 {:
                                     RESULT = new NodoEstilos(TipoEstilo.TEXT_SIZE, exp, expleft, expright);
                                 :}
-                                | BORDER DOS_PUNTOS GROSOR_LINEA:linea
+                                | BORDER:borde DOS_PUNTOS PARENT_APERTURA expresion:exp COMA GROSOR_LINEA:linea COMA color_valor:color PARENT_CIERRE
                                 {:
-                                    RESULT = new NodoEstilos(TipoEstilo.BORDER, linea.toString(), linealeft, linearight);
+                                    RESULT = new NodoEstilos(TipoEstilo.BORDER, new NodoBorder(exp,linea.toString(),color, linealeft, linearight),bordeleft,borderight);
                                 :}
                                 ;
 
@@ -431,7 +460,25 @@ elemento_seccion    ::= ID:id PUNTO DRAW PARENT_APERTURA lista_expresiones:param
                     {:
                         RESULT = sec;
                     :}
+                    | OPEN_QUESTION:quest CORCHETE_APERTURA cuerpo_open:listconfig CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoOpenQuestion(TipoVariable.SPECIAL,null, listconfig, questleft, questright);
+                    :}
+                    | DROP_QUESTION:quest CORCHETE_APERTURA cuerpo_drop:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoDropQuestion(TipoVariable.SPECIAL,null, list, questleft, questright);
+                    :}
+                    | SELECT_QUESTION:quest CORCHETE_APERTURA cuerpo_select:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoSelectQuestion(TipoVariable.SPECIAL,null, list, questleft, questright);
+                    :}
+                    | MULTIPLE_QUESTION:quest CORCHETE_APERTURA cuerpo_multiple:list CORCHETE_CIERRE
+                    {:
+                        RESULT = new NodoMultipleQuestion(TipoVariable.SPECIAL,null, list, questleft, questright);
+                    :}
                     ;
+
+
 
  /*--******---REGLA DE PRODUCCION PARA DECLARAR AUNA LISTA DE EXPRESIONES DENTRO DE LOS PARAMETROS DE UNA FUNCION DRAW---******--*/
 
