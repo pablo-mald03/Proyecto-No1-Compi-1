@@ -1,13 +1,13 @@
-package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts;
+package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointX;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointY;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.TipoConfiguracion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
@@ -17,25 +17,15 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 
 import java.util.List;
 
-//Clase que representa por completo la tabla de los formularios. Otro tipo de layout que existe
-public class NodoTable extends NodoComponente {
+//Clase que representa a los textos que se mostraran en el formulario para dar mensajes
+public class NodoText extends NodoComponente{
 
-    private List<List<NodoComponente>> filas;
+    //Atributos
+    private NodoExpresion contenido;
 
-    private NodoPointX pointX;
-    private NodoPointY pointY;
-
-
-    /*Variable que representa los tipos de vorden que hay*/
-    private NodoBorder borde;
-
-    public NodoTable(List<AtributoConfig> configs, int linea, int columna) {
-        // Inicializamos con nulls por ahora, luego el procesado los llena
+    public NodoText(List<AtributoConfig> configs, int linea, int columna) {
         super(null, null, null, linea, columna);
-        this.filas = null;
-        this.pointX = null;
-        this.pointY = null;
-        this.borde = null;
+        this.contenido = null;
         this.estilos = null;
         procesarConfiguracion(configs);
     }
@@ -63,66 +53,51 @@ public class NodoTable extends NodoComponente {
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
                     break;
-                case POINT_X:
-                    this.pointX = (NodoPointX) config.getNodoValor();
-                    break;
-                case POINT_Y:
-                    this.pointY = (NodoPointY) config.getNodoValor();
-                    break;
-                case ELEMENTS:
-                    this.filas = (List<List<NodoComponente>>) config.getNodoValor();
+                case CONTENT:
+                    this.contenido = (NodoExpresion) config.getNodoValor();
                     break;
             }
         }
-        /*Conteo de columnas y filas*/
-            /*int maxCols = 0;
-            for(List<NodoComponente> fila : filas) {
-            maxCols = Math.max(maxCols, fila.size());
-            }*/
     }
 
-
+    //Pendiente procesar los estilos del texto
     @Override
     protected Estilos procesarEstilos(List<NodoEstilos> lista) {
-        if (lista.isEmpty()) {
-            return null;
-        }
-
-        NodoColor backgroundColor = null;
-        NodoColor color = null;
-        TipoLetra fontFamily = TipoLetra.MONO;
-        NodoExpresion textSize = null;
-
-        for (NodoEstilos nodo : lista) {
-
-            if (nodo == null) {
-                continue;
+            if(lista.isEmpty()){
+                return null;
             }
 
-            Object valorNodo = nodo.getValor();
+            NodoColor backgroundColor = null;
+            NodoColor color = null;
+            TipoLetra fontFamily = TipoLetra.MONO;
+            NodoExpresion textSize = null;
 
-            switch (nodo.getTipo()) {
-                case BACKGROUND_COLOR:
-                    backgroundColor = (NodoColor) valorNodo;
-                    break;
-                case COLOR_TEXTO:
-                    color = (NodoColor) valorNodo;
-                    break;
-                case FONT_FAMILY:
-                    fontFamily = TipoLetra.valueOf((String) valorNodo);
-                    break;
-                case TEXT_SIZE:
-                    textSize = (NodoExpresion) valorNodo;
-                    break;
-                case BORDER:
-                    this.borde = (NodoBorder) valorNodo;
-                    break;
+            for (NodoEstilos nodo : lista) {
+
+                if(nodo ==null){
+                    continue;
+                }
+
+                Object valorNodo = nodo.getValor();
+
+                switch (nodo.getTipo()) {
+                    case BACKGROUND_COLOR:
+                        backgroundColor = (NodoColor) valorNodo;
+                        break;
+                    case COLOR_TEXTO:
+                        color = (NodoColor) valorNodo;
+                        break;
+                    case FONT_FAMILY:
+                        fontFamily = TipoLetra.valueOf((String) valorNodo);
+                        break;
+                    case TEXT_SIZE:
+                        textSize = (NodoExpresion) valorNodo;
+                        break;
+                }
             }
-        }
-        return new Estilos(backgroundColor, color, fontFamily, textSize);
+            return new Estilos(backgroundColor, color, fontFamily, textSize);
 
     }
-
 
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

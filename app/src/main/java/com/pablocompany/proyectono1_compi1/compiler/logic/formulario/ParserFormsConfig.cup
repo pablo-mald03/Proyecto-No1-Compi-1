@@ -275,6 +275,12 @@ non terminal NodoComponente table_declaration;
 non terminal List<List<NodoComponente>>  lista_filas;
 non terminal List<NodoComponente>  lista_celdas;
 
+//---*--No terminales de configuracion de los textos---*---
+non terminal NodoComponente text_declaration;
+non terminal List<AtributoConfig> lista_config_text;
+non terminal AtributoConfig atributo_text_extra;
+non terminal List<AtributoConfig> cuerpo_text;
+
 
 
 
@@ -580,6 +586,10 @@ elemento_seccion    ::= ID:id PUNTO DRAW PARENT_APERTURA lista_expresiones:param
                     {:
                         RESULT = tab;
                     :}
+                    |text_declaration:text
+                    {:
+                        RESULT = text;
+                    :}
                     | OPEN_QUESTION:quest CORCHETE_APERTURA cuerpo_open:listconfig CORCHETE_CIERRE
                     {:
                         RESULT = new NodoOpenQuestion(TipoVariable.SPECIAL,null, listconfig, questleft, questright);
@@ -597,6 +607,65 @@ elemento_seccion    ::= ID:id PUNTO DRAW PARENT_APERTURA lista_expresiones:param
                         RESULT = new NodoMultipleQuestion(TipoVariable.SPECIAL,null, list, questleft, questright);
                     :}
                     ;
+
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE TEXTOS DE FORMULARIOS-----*/
+text_declaration        ::= TEXT CORCHETE_APERTURA cuerpo_text:cuerpo CORCHETE_CIERRE
+                        {:
+                            RESULT = new NodoText(cuerpo, cuerpoleft, cuerporight);
+                        :}
+                        ;
+
+
+/*-----Reglas de produccion para definir el cuerpo del texto----------*/
+cuerpo_text         ::= CONTENT DOS_PUNTOS expresion:exp
+                        {:
+                            List<AtributoConfig> list = new ArrayList<>();
+                            list.add(new AtributoConfig(TipoConfiguracion.CONTENT, exp));
+                            RESULT = list;
+                        :}
+                        | CONTENT DOS_PUNTOS expresion:exp COMA lista_config_text:list
+                        {:
+                            list.add(new AtributoConfig(TipoConfiguracion.CONTENT, exp));
+                            RESULT = list;
+                        :}
+                        | lista_config_text:list COMA CONTENT DOS_PUNTOS expresion:exp
+                        {:
+                            list.add(new AtributoConfig(TipoConfiguracion.CONTENT, exp));
+                            RESULT = list;
+                        :}
+                        ;
+
+/*Produccion para la lista de atributos de configuracion que tienen los textos*/
+lista_config_text       ::=  lista_config_text:list COMA atributo_text_extra:extra
+                        {:
+                            list.add(extra);
+                            RESULT = list;
+                        :}
+                        | atributo_text_extra:extra
+                        {:
+                            List<AtributoConfig> list = new ArrayList<>();
+                            list.add(extra);
+                            RESULT = list;
+                        :}
+                        ;
+
+/*-----Reglas de produccion para definir el cuerpo de configuracion de los textos---------*/
+
+atributo_text_extra         ::= WIDTH DOS_PUNTOS expresion:exp
+                            {:
+                                RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, new NodoWidth(exp, expleft, expright));
+                            :}
+                            | HEIGHT DOS_PUNTOS expresion:exp
+                            {:
+                                RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
+                            :}
+                            | STYLES CORCHETE_APERTURA lista_estilos_basicos_layout:list CORCHETE_CIERRE
+                            {:
+                                RESULT = new AtributoConfig(TipoConfiguracion.STYLES, list);
+                            :}
+                            ;
 
 
 
