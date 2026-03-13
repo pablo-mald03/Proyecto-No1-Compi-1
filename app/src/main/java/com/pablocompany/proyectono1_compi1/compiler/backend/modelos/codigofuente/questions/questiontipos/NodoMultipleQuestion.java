@@ -19,7 +19,7 @@ import java.util.List;
 public class NodoMultipleQuestion extends NodoQuestion {
 
     //Atributos
-    private NodoLabel label;
+
     //Representa a la opciones que ofrece
     private NodoOptions opciones;
 
@@ -39,7 +39,16 @@ public class NodoMultipleQuestion extends NodoQuestion {
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 
+        if(configuracion.isEmpty()){
+            return;
+        }
+
         for (AtributoConfig config : configuracion) {
+
+            if(config ==null){
+                continue;
+            }
+
             switch (config.getTipo()) {
 
                 case WIDTH:
@@ -47,9 +56,6 @@ public class NodoMultipleQuestion extends NodoQuestion {
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
-                    break;
-                case LABEL:
-                    this.label = (NodoLabel) config.getNodoValor();
                     break;
                 case OPTIONS:
                     this.opciones = (NodoOptions) config.getNodoValor();

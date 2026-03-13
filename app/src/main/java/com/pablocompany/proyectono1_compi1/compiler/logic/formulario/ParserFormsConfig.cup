@@ -88,6 +88,16 @@ parser code {:
        //Metodo que permite retornar el texto de los errores que se esperan (Escalable)
        private String traductor(String nombre) {
            switch (nombre) {
+                case "IF":
+                    return "' IF '";
+                case "ELSE":
+                    return "' ELSE '";
+                case "FOR":
+                    return "' FOR '";
+                case "WHILE":
+                    return "' WHILE '";
+                case "DO":
+                    return "' DO '";
                 case "IGUALACION":
                     return "' = '";
                 case "CORCHETE_APERTURA":
@@ -658,6 +668,10 @@ cuerpo_open         ::=
                         list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
                         RESULT = list;
                     :}
+                    | error
+                    {:
+                        RESULT = new ArrayList<AtributoConfig>();
+                    :}
                     ;
 
 
@@ -739,6 +753,7 @@ estilo_individual       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
                         :}
                         ;
 
+/*====Reglas que permiten definir los colores===*/
 color_valor     ::= COLOR_HEX:hex
                     {:
                         RESULT = new NodoHexColor(hex);

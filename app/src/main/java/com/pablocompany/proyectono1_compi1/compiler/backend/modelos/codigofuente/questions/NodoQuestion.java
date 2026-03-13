@@ -41,12 +41,17 @@ public abstract class NodoQuestion extends Nodo {
         if(lista.isEmpty()){
             return null;
         }
+
         NodoColor backgroundColor = null;
         NodoColor color = null;
         TipoLetra fontFamily = TipoLetra.MONO;
         NodoExpresion textSize = null;
 
         for (NodoEstilos nodo : lista) {
+
+            if(nodo ==null){
+                continue;
+            }
 
             Object valorNodo = nodo.getValor();
 

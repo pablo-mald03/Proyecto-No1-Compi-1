@@ -43,7 +43,16 @@ public class NodoDropQuestion extends NodoQuestion {
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 
+        if(configuracion.isEmpty()){
+            return;
+        }
+
         for (AtributoConfig config : configuracion) {
+
+            if(config ==null){
+                continue;
+            }
+
             switch (config.getTipo()) {
 
                 case WIDTH:

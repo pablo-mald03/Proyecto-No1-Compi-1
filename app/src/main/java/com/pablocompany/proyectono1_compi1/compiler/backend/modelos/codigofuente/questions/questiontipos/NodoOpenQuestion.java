@@ -36,7 +36,12 @@ public class NodoOpenQuestion extends NodoQuestion {
         }
 
         for (AtributoConfig config : configuracion) {
+            if(config ==null){
+                continue;
+            }
+
             switch (config.getTipo()) {
+
 
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();

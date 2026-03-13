@@ -20,7 +20,7 @@ import java.util.List;
 public class NodoSelectQuestion extends NodoQuestion {
 
     //Atributos
-    private NodoLabel label;
+
     //Representa a la opciones que ofrece
     private NodoOptions opciones;
 
@@ -32,13 +32,22 @@ public class NodoSelectQuestion extends NodoQuestion {
 
     public NodoSelectQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
-        //this.setConfiguraciones(config);
+        this.setConfiguraciones(config);
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 
+        if(configuracion.isEmpty()){
+            return;
+        }
+
         for (AtributoConfig config : configuracion) {
+
+            if(config ==null){
+                continue;
+            }
+
             switch (config.getTipo()) {
 
                 case WIDTH:
@@ -46,9 +55,6 @@ public class NodoSelectQuestion extends NodoQuestion {
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
-                    break;
-                case LABEL:
-                    this.label = (NodoLabel) config.getNodoValor();
                     break;
                 case OPTIONS:
                     this.opciones = (NodoOptions) config.getNodoValor();
