@@ -232,6 +232,8 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 ":"    {return symbol(sym.DOS_PUNTOS, yytext());}
 
+";"     {return symbol(sym.PUNTO_COMA, yytext());}
+
 
 /*====***===APARTADO DE PALABRAS RESERVADAS DEL LENGUAJE====**====*/
 

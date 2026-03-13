@@ -8,92 +8,93 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int SELECT_QUESTION = 65;
-  public static final int COLOR_TEXTO = 54;
-  public static final int TEXT_SIZE = 56;
+  public static final int SELECT_QUESTION = 66;
+  public static final int COLOR_TEXTO = 55;
+  public static final int TEXT_SIZE = 57;
   public static final int DIVISION = 10;
   public static final int MENOR_IGUAL = 20;
   public static final int INICIO_CADENA = 30;
-  public static final int NUMBER_REQUEST = 69;
-  public static final int TABLE = 61;
+  public static final int NUMBER_REQUEST = 70;
+  public static final int TABLE = 62;
   public static final int NEWLINE = 4;
-  public static final int COLOR_HEX = 71;
+  public static final int COLOR_HEX = 72;
   public static final int POTENCIA = 11;
   public static final int MAYOR = 17;
   public static final int CORCHETE_APERTURA = 32;
-  public static final int DROP_QUESTION = 64;
+  public static final int DROP_QUESTION = 65;
   public static final int DIFERENTE = 16;
-  public static final int ELEMENTS = 50;
-  public static final int DRAW = 58;
+  public static final int ELEMENTS = 51;
+  public static final int DRAW = 59;
   public static final int VAR_STRING = 25;
-  public static final int OPEN_QUESTION = 63;
-  public static final int BACKGROUND_COLOR = 53;
+  public static final int OPEN_QUESTION = 64;
+  public static final int BACKGROUND_COLOR = 54;
   public static final int NOT = 23;
-  public static final int EMOJI_STAR = 81;
-  public static final int TEXT = 62;
+  public static final int EMOJI_STAR = 82;
+  public static final int TEXT = 63;
   public static final int ERROR = 2;
-  public static final int EMOJI_CAT = 83;
-  public static final int COLOR_PRESET = 76;
+  public static final int EMOJI_CAT = 84;
+  public static final int COLOR_PRESET = 77;
   public static final int DOS_PUNTOS = 43;
-  public static final int WIDTH = 44;
+  public static final int WIDTH = 45;
+  public static final int PUNTO_COMA = 44;
   public static final int IGUALDAD = 15;
-  public static final int STYLES = 51;
+  public static final int STYLES = 52;
   public static final int UNARIO = 6;
   public static final int LLAVE_CIERRE = 35;
   public static final int COMA = 29;
-  public static final int ENTERO = 85;
+  public static final int ENTERO = 86;
   public static final int MODULO = 12;
   public static final int WHILE = 38;
-  public static final int DECIMAL = 84;
-  public static final int EMOJI_SERIOUS = 79;
+  public static final int DECIMAL = 85;
+  public static final int EMOJI_SERIOUS = 80;
   public static final int VAR_NUMERO = 24;
   public static final int FIN_CADENA = 31;
   public static final int VAR_ESPECIAL = 26;
-  public static final int EMOJI_MULTI_STAR = 82;
+  public static final int EMOJI_MULTI_STAR = 83;
   public static final int DO = 40;
   public static final int FOR = 39;
   public static final int COMODIN = 28;
-  public static final int ORIENTATION = 49;
+  public static final int ORIENTATION = 50;
   public static final int ELSE = 37;
-  public static final int MULTIPLE_QUESTION = 66;
+  public static final int MULTIPLE_QUESTION = 67;
   public static final int MENOR = 18;
-  public static final int CONFIG_DOCK = 75;
+  public static final int CONFIG_DOCK = 76;
   public static final int PARENT_CIERRE = 14;
-  public static final int TEXTO_PLANO = 72;
-  public static final int CORRECT = 67;
-  public static final int CONTENT = 52;
+  public static final int TEXTO_PLANO = 73;
+  public static final int CORRECT = 68;
+  public static final int CONTENT = 53;
   public static final int EOF = 0;
   public static final int PUNTO = 42;
   public static final int SUMA = 7;
-  public static final int EMOJI_SMILE = 77;
-  public static final int LABEL = 46;
+  public static final int EMOJI_SMILE = 78;
+  public static final int LABEL = 47;
   public static final int COMENTARIO_TEXTO = 5;
   public static final int LLAVE_APERTURA = 34;
-  public static final int GROSOR_LINEA = 74;
-  public static final int EMOJI_HEART = 80;
+  public static final int GROSOR_LINEA = 75;
+  public static final int EMOJI_HEART = 81;
   public static final int IN = 41;
   public static final int OR = 22;
   public static final int error = 1;
   public static final int RESTA = 8;
   public static final int WHITESPACE = 3;
-  public static final int POINT_Y = 48;
+  public static final int POINT_Y = 49;
   public static final int IF = 36;
-  public static final int POINT_X = 47;
-  public static final int ID = 70;
+  public static final int POINT_X = 48;
+  public static final int ID = 71;
   public static final int PARENT_APERTURA = 13;
   public static final int IGUALACION = 27;
-  public static final int TIPOGRAFIA = 73;
+  public static final int TIPOGRAFIA = 74;
   public static final int MULTIPLICACION = 9;
-  public static final int BORDER = 57;
-  public static final int HEIGHT = 45;
-  public static final int FONT_FAMILY = 55;
-  public static final int EMOJI_SAD = 78;
-  public static final int OPTIONS = 68;
+  public static final int BORDER = 58;
+  public static final int HEIGHT = 46;
+  public static final int FONT_FAMILY = 56;
+  public static final int EMOJI_SAD = 79;
+  public static final int OPTIONS = 69;
   public static final int AND = 21;
   public static final int CORCHETE_CIERRE = 33;
-  public static final int WHO_IS_THAT_POKEMON = 59;
+  public static final int WHO_IS_THAT_POKEMON = 60;
   public static final int MAYOR_IGUAL = 19;
-  public static final int SECTION = 60;
+  public static final int SECTION = 61;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -139,6 +140,7 @@ public class sym {
   "IN",
   "PUNTO",
   "DOS_PUNTOS",
+  "PUNTO_COMA",
   "WIDTH",
   "HEIGHT",
   "LABEL",
