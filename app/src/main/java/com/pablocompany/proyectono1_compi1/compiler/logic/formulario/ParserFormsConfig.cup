@@ -21,6 +21,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questiontipos.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.*;
 
 /*------------------------------------------------------
                         CUP
@@ -149,11 +151,11 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
             LLAVE_APERTURA, LLAVE_CIERRE,
             IF, ELSE, WHILE, FOR, DO, IN,
             PUNTO, DOS_PUNTOS,
-            WIDTH, HEIGHT, LABEL, POINT_X, POINT_Y, ORIENTATION,
+            WIDTH, HEIGHT, LABEL, POINT_X, POINT_Y,ORIENTATION,
             ELEMENTS,
             STYLES, CONTENT,
             BACKGROUND_COLOR, COLOR_TEXTO, FONT_FAMILY, TEXT_SIZE,BORDER,
-            DRAW, WHO_IS_THAT_POKEMON, CONFIG_DOCK,
+            DRAW, WHO_IS_THAT_POKEMON,
             SECTION, TABLE, TEXT,
             OPEN_QUESTION, DROP_QUESTION, SELECT_QUESTION, MULTIPLE_QUESTION,
             CORRECT, OPTIONS, NUMBER_REQUEST
@@ -162,7 +164,7 @@ terminal    ERROR, WHITESPACE, NEWLINE,COMENTARIO_TEXTO, COLOR_PRESET,
 /*Created by Pablo*/
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 terminal String ID,COLOR_HEX,TEXTO_PLANO;
-terminal String TIPOGRAFIA,GROSOR_LINEA;
+terminal String TIPOGRAFIA,GROSOR_LINEA, CONFIG_DOCK;
 terminal String EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
@@ -177,6 +179,7 @@ non terminal NodoCodigo formulario;
 
 //---*--Inicio del codigo fuente---*---
 non terminal List<Nodo> lista_codigo;
+non terminal Nodo unidad_codigo;
 
 //---*--Declaracion de variables---*---
 non terminal Nodo instruccion;
@@ -221,6 +224,19 @@ non terminal List<Nodo> lista_correctas;
 //---*--No terminales de configuracion de select questions---*---
 non terminal List<AtributoConfig> cuerpo_select;
 
+//---*--No terminales de configuracion de las sections---*---
+
+non terminal List<NodoEstilos> lista_estilos_basicos_layout;
+non terminal NodoEstilos estilo_individual_layout;
+non terminal List<AtributoConfig> lista_config_section;
+non terminal AtributoConfig atributo_section;
+non terminal  List<AtributoConfig> cuerpo_section;
+non terminal NodoSection section_declaration;
+non terminal List<NodoComponente> lista_elementos;
+non terminal NodoComponente elemento_seccion;
+non terminal List<Nodo> lista_expresiones;
+
+
 
 /*======*******=====Presedencia de tipos==========*******===========*/
 
@@ -244,23 +260,193 @@ formulario          ::= lista_codigo:list
                     {: RESULT = new NodoCodigo(list); :}
                     ;
 
-lista_codigo        ::= lista_codigo:list instruccion:ins
+/*Define la derivacion principal para el reocnocimiento de codigo fuente*/
+
+lista_codigo        ::= lista_codigo:list unidad_codigo:uni
                     {:
-                        list.add(ins);
+                        list.add(uni);
                         RESULT = list;
                     :}
-                    | instruccion:ins
+                    | unidad_codigo:uni
                     {:
                         List<Nodo> list = new ArrayList<>();
-                        list.add(ins);
-                        RESULT = list;
-                    :}
-                    | lista_codigo:list error
-                    {:
+                        list.add(uni);
                         RESULT = list;
                     :}
                     ;
 
+/*------Define la derivacion de todos los caminos para el reocnocimiento de codigo fuente--------*/
+
+unidad_codigo       ::= instruccion:ins
+                    {:
+                        RESULT = ins;
+                    :}
+                    | section_declaration:sec
+                    {:
+                        RESULT = sec;
+                    :}
+                    | error
+                    {:
+                        RESULT = null;
+                    :}
+                    ;
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE SECCIONES DE CODIGO-----*/
+section_declaration     ::= SECTION CORCHETE_APERTURA cuerpo_section:cuerpo CORCHETE_CIERRE
+                        {:
+                            RESULT = new NodoSection(cuerpo, cuerpoleft, cuerporight);
+                        :}
+                        ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE SECCION------*/
+
+cuerpo_section          ::= lista_config_section:list
+                        {:
+                            RESULT = list;
+                        :}
+                        ;
+
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE CUERPO DE SECCION------*/
+
+lista_config_section    ::= lista_config_section:list COMA atributo_section:atr
+                        {:
+                            list.add(atr);
+                            RESULT = list;
+                        :}
+                        | atributo_section:atr
+                        {:
+                            List<AtributoConfig> list = new ArrayList<>();
+                            list.add(atr);
+                            RESULT = list;
+                        :}
+                        ;
+
+/*-----REGLAS DE PRODUCCION PARA DECLARACION DE LA CONFIGURACION DE LA SECCION------*/
+
+atributo_section        ::= WIDTH DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.WIDTH, new NodoWidth(exp, expleft, expright));
+                        :}
+                        | HEIGHT DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
+                        :}
+                        | POINT_X DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.POINT_X, new NodoPointX(exp, expleft, expright));
+                        :}
+                        | POINT_Y DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.POINT_Y, new NodoPointY(exp, expleft, expright));
+                        :}
+                        | ORIENTATION DOS_PUNTOS CONFIG_DOCK:orientacion
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.ORIENTATION, new NodoOrientation(orientacion.toString(), orientacionleft, orientacionright));
+                        :}
+                        | ELEMENTS DOS_PUNTOS LLAVE_APERTURA lista_elementos:elementos LLAVE_CIERRE
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.ELEMENTS, new NodoElements(elementos, elementosleft, elementosright));
+                        :}
+                        | STYLES CORCHETE_APERTURA lista_estilos_basicos_layout:list CORCHETE_CIERRE
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.STYLES, list);
+                        :}
+                        ;
+
+
+
+/*-----Reglas que permiten definir los estilos de los layouts-----*/
+
+lista_estilos_basicos_layout    ::= lista_estilos_basicos_layout:list COMA estilo_individual_layout:estilo
+                                {:
+                                    list.add(estilo);
+                                    RESULT = list;
+                                :}
+                                |estilo_individual_layout:estilo
+                                {:
+                                    List<NodoEstilos> list = new ArrayList<>();
+                                    list.add(estilo);
+                                    RESULT = list;
+                                :}
+                                | lista_estilos_basicos_layout:list COMA error
+                                {:
+                                    RESULT = list;
+                                :}
+                                ;
+
+
+ /*----Generacion de estilos para los layouts-----*/
+
+estilo_individual_layout       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
+                                {:
+                                    RESULT = new NodoEstilos(TipoEstilo.BACKGROUND_COLOR, color, colorleft, colorright);
+                                :}
+                                | COLOR_TEXTO DOS_PUNTOS color_valor:color
+                                {:
+                                    RESULT = new NodoEstilos(TipoEstilo.COLOR_TEXTO, color, colorleft, colorright);
+                                :}
+                                | FONT_FAMILY DOS_PUNTOS TIPOGRAFIA:tipo
+                                {:
+                                    RESULT = new NodoEstilos(TipoEstilo.FONT_FAMILY, tipo.toString() , tipoleft, tiporight);
+                                :}
+                                | TEXT_SIZE DOS_PUNTOS expresion:exp
+                                {:
+                                    RESULT = new NodoEstilos(TipoEstilo.TEXT_SIZE, exp, expleft, expright);
+                                :}
+                                | BORDER DOS_PUNTOS GROSOR_LINEA:linea
+                                {:
+                                    RESULT = new NodoEstilos(TipoEstilo.BORDER, linea.toString(), linealeft, linearight);
+                                :}
+                                ;
+
+
+/*--******---REGLA DE PRODUCCION PARA DECLARACION DE VARIABLES---******--*/
+
+lista_elementos     ::= lista_elementos:list COMA elemento_seccion:element
+                    {:
+                        list.add(element);
+                        RESULT = list;
+                    :}
+                    | elemento_seccion:element
+                    {:
+                        List<NodoComponente> list = new ArrayList<>();
+                        list.add(element);
+                        RESULT = list;
+                    :}
+                    ;
+
+/*--******---REGLA DE PRODUCCION PARA DECLARACION DE ELEMENTOS QUE PUEDE LLEVAR LA SECTION---******--*/
+
+elemento_seccion    ::= ID:id PUNTO DRAW PARENT_APERTURA lista_expresiones:params PARENT_CIERRE
+                    {:
+                        RESULT = new NodoDraw(id, params, idleft, idright);
+                    :}
+                    | ID:id PUNTO DRAW PARENT_APERTURA PARENT_CIERRE
+                    {:
+                        RESULT = new NodoDraw(id,new ArrayList<Nodo>(), idleft, idright);
+                    :}
+                    | section_declaration:sec
+                    {:
+                        RESULT = sec;
+                    :}
+                    ;
+
+ /*--******---REGLA DE PRODUCCION PARA DECLARAR AUNA LISTA DE EXPRESIONES DENTRO DE LOS PARAMETROS DE UNA FUNCION DRAW---******--*/
+
+lista_expresiones       ::= lista_expresiones:list COMA expresion:exp
+                        {:
+                            list.add(exp);
+                            RESULT = list;
+                        :}
+                        | expresion:exp
+                        {:
+                            List<Nodo> list = new ArrayList<>();
+                            list.add(exp);
+                            RESULT = list;
+                        :}
+                        ;
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE VAIRABLES-----*/
 instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
@@ -733,7 +919,7 @@ lista_estilos_basicos ::= lista_estilos_basicos:list COMA estilo_individual:esti
                     ;
 
 
- /*----Generacion de preguntas con la variable special-----*/
+ /*----Generacion de estilos con las preguntas-----*/
 
 estilo_individual       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
                         {:

@@ -8,29 +8,29 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.formulario;
 /** CUP generated class containing symbol constants. */
 public class sym {
   /* terminals */
-  public static final int SELECT_QUESTION = 67;
+  public static final int SELECT_QUESTION = 66;
   public static final int COLOR_TEXTO = 55;
   public static final int TEXT_SIZE = 57;
   public static final int DIVISION = 11;
   public static final int MENOR_IGUAL = 21;
   public static final int INICIO_CADENA = 31;
-  public static final int NUMBER_REQUEST = 71;
-  public static final int TABLE = 63;
+  public static final int NUMBER_REQUEST = 70;
+  public static final int TABLE = 62;
   public static final int NEWLINE = 4;
-  public static final int COLOR_HEX = 73;
+  public static final int COLOR_HEX = 72;
   public static final int POTENCIA = 12;
   public static final int MAYOR = 18;
   public static final int CORCHETE_APERTURA = 33;
-  public static final int DROP_QUESTION = 66;
+  public static final int DROP_QUESTION = 65;
   public static final int DIFERENTE = 17;
   public static final int ELEMENTS = 51;
   public static final int DRAW = 59;
   public static final int VAR_STRING = 26;
-  public static final int OPEN_QUESTION = 65;
+  public static final int OPEN_QUESTION = 64;
   public static final int BACKGROUND_COLOR = 54;
   public static final int NOT = 24;
   public static final int EMOJI_STAR = 81;
-  public static final int TEXT = 64;
+  public static final int TEXT = 63;
   public static final int ERROR = 2;
   public static final int EMOJI_CAT = 83;
   public static final int COLOR_PRESET = 6;
@@ -55,12 +55,12 @@ public class sym {
   public static final int COMODIN = 29;
   public static final int ORIENTATION = 50;
   public static final int ELSE = 38;
-  public static final int MULTIPLE_QUESTION = 68;
+  public static final int MULTIPLE_QUESTION = 67;
   public static final int MENOR = 19;
-  public static final int CONFIG_DOCK = 61;
+  public static final int CONFIG_DOCK = 76;
   public static final int PARENT_CIERRE = 15;
-  public static final int TEXTO_PLANO = 74;
-  public static final int CORRECT = 69;
+  public static final int TEXTO_PLANO = 73;
+  public static final int CORRECT = 68;
   public static final int CONTENT = 53;
   public static final int EOF = 0;
   public static final int PUNTO = 43;
@@ -69,7 +69,7 @@ public class sym {
   public static final int LABEL = 47;
   public static final int COMENTARIO_TEXTO = 5;
   public static final int LLAVE_APERTURA = 35;
-  public static final int GROSOR_LINEA = 76;
+  public static final int GROSOR_LINEA = 75;
   public static final int EMOJI_HEART = 80;
   public static final int IN = 42;
   public static final int OR = 23;
@@ -79,21 +79,21 @@ public class sym {
   public static final int POINT_Y = 49;
   public static final int IF = 37;
   public static final int POINT_X = 48;
-  public static final int ID = 72;
+  public static final int ID = 71;
   public static final int PARENT_APERTURA = 14;
   public static final int IGUALACION = 28;
-  public static final int TIPOGRAFIA = 75;
+  public static final int TIPOGRAFIA = 74;
   public static final int MULTIPLICACION = 10;
   public static final int BORDER = 58;
   public static final int HEIGHT = 46;
   public static final int FONT_FAMILY = 56;
   public static final int EMOJI_SAD = 78;
-  public static final int OPTIONS = 70;
+  public static final int OPTIONS = 69;
   public static final int AND = 22;
   public static final int CORCHETE_CIERRE = 34;
   public static final int WHO_IS_THAT_POKEMON = 60;
   public static final int MAYOR_IGUAL = 20;
-  public static final int SECTION = 62;
+  public static final int SECTION = 61;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -156,7 +156,6 @@ public class sym {
   "BORDER",
   "DRAW",
   "WHO_IS_THAT_POKEMON",
-  "CONFIG_DOCK",
   "SECTION",
   "TABLE",
   "TEXT",
@@ -172,6 +171,7 @@ public class sym {
   "TEXTO_PLANO",
   "TIPOGRAFIA",
   "GROSOR_LINEA",
+  "CONFIG_DOCK",
   "EMOJI_SMILE",
   "EMOJI_SAD",
   "EMOJI_SERIOUS",

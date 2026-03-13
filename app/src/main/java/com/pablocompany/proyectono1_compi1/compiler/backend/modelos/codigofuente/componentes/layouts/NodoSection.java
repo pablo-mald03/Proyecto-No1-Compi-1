@@ -1,0 +1,145 @@
+package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts;
+
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOrientation;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointX;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointY;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoBorde;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+
+import java.util.List;
+
+//Clase que define la seccion de un formulario y puede contener a mas componentes
+public class NodoSection extends NodoComponente {
+
+    private List<NodoComponente> elementos;
+    private NodoOrientation orientation;
+    private NodoPointX pointX;
+    private NodoPointY pointY;
+
+    /*Variable que representa los tipos de vorden que hay*/
+    private TipoBorde borde;
+
+    public NodoSection(List<AtributoConfig> cuerpo, int linea, int columna) {
+        super(null,null,null,linea, columna);
+        this.elementos = null;
+        this.orientation = null;
+        this.pointX = null;
+        this.pointY = null;
+        this.borde = null;
+        this.estilos = null;
+        this.setConfiguraciones(cuerpo);
+
+    }
+
+    //Metodo que permite setear los valores que vienen en la configuracion
+    private void setConfiguraciones(List<AtributoConfig> configuracion) {
+
+        if(configuracion.isEmpty()){
+            return;
+        }
+
+        for (AtributoConfig config : configuracion) {
+
+            if(config ==null){
+                continue;
+            }
+
+            switch (config.getTipo()) {
+
+                case WIDTH:
+                    this.width = (NodoWidth) config.getNodoValor();
+                    break;
+                case HEIGHT:
+                    this.height = (NodoHeight) config.getNodoValor();
+                    break;
+                case STYLES:
+                    this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    break;
+                case POINT_X:
+                    this.pointX = (NodoPointX) config.getNodoValor();
+                    break;
+                case POINT_Y:
+                    this.pointY = (NodoPointY) config.getNodoValor();
+                    break;
+                case ELEMENTS:
+                    this.elementos = (List<NodoComponente>) config.getNodoValor();
+                    break;
+                case ORIENTATION:
+                    this.orientation = (NodoOrientation) config.getNodoValor();
+                    break;
+            }
+        }
+
+        //Predeterminado
+        if(this.orientation == null){
+            this.orientation = new NodoOrientation("VERTICAL",0,0);
+        }
+
+    }
+
+    //Metodo utilizado para implementar estilos de la section
+    @Override
+    protected  Estilos procesarEstilos(List<NodoEstilos> lista) {
+
+        if(lista.isEmpty()){
+            return null;
+        }
+
+        NodoColor backgroundColor = null;
+        NodoColor color = null;
+        TipoLetra fontFamily = TipoLetra.MONO;
+        NodoExpresion textSize = null;
+
+        for (NodoEstilos nodo : lista) {
+
+            if(nodo ==null){
+                continue;
+            }
+
+            Object valorNodo = nodo.getValor();
+
+            switch (nodo.getTipo()) {
+                case BACKGROUND_COLOR:
+                    backgroundColor = (NodoColor) valorNodo;
+                    break;
+                case COLOR_TEXTO:
+                    color = (NodoColor) valorNodo;
+                    break;
+                case FONT_FAMILY:
+                    fontFamily = TipoLetra.valueOf((String) valorNodo);
+                    break;
+                case TEXT_SIZE:
+                    textSize = (NodoExpresion) valorNodo;
+                    break;
+                case BORDER:
+                    this.borde = TipoBorde.valueOf((String) valorNodo);
+                    break;
+            }
+        }
+        return new Estilos(backgroundColor, color, fontFamily, textSize);
+
+    }
+
+    @Override
+    public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
+
+    @Override
+    public String getString() {
+        return "";
+    }
+}
+/*created by Pablo*/

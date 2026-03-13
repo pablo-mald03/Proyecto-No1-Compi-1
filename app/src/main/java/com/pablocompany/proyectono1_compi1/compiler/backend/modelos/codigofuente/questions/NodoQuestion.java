@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
@@ -14,29 +15,23 @@ import java.util.List;
 
 /*Created by Pablo*/
 //Superclase que representa toda la jeraquia de preguntas que puede haber en el formulario
-public abstract class NodoQuestion extends Nodo {
+public abstract class NodoQuestion extends NodoComponente {
 
+    //Atributos que definen la pregunta
     protected TipoVariable tipoVariable;
 
+    //Atributo que representa el nombre de la variable (Puede ser nulleable)
     protected String id;
 
-    protected NodoWidth width;
-    protected NodoHeight height;
-
-    //Atibuto especial que trae toda su configuracion de estilos
-    protected Estilos estilos;
-
     public NodoQuestion(TipoVariable tipo, String id,NodoWidth width, NodoHeight height,Estilos estilos, int linea, int columna) {
-        super(linea, columna);
+        super(width,height,estilos,linea, columna);
         this.tipoVariable = tipo;
-        this.height = height;
-        this.width = width;
         this.id = id;
-        this.estilos = estilos;
     }
 
     //Metodo que permite procesar los estilos que vienen en la configuracion
-    protected Estilos procesarEstilos(List<NodoEstilos> lista) {
+    @Override
+    protected  Estilos procesarEstilos(List<NodoEstilos> lista) {
 
         if(lista.isEmpty()){
             return null;
@@ -74,5 +69,5 @@ public abstract class NodoQuestion extends Nodo {
 
     }
 
-
+    /*Created by Pablo*/
 }
