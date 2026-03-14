@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pablocompany.proyectono1_compi1.compiler.backend.gestores.GestorCodigoCompilado
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.NodoCodigo
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.LexerForms
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.ParserForms
@@ -99,7 +100,9 @@ class EditorViewModel(
                     sym.SUMA, sym.RESTA, sym.MULTIPLICACION, sym.DIVISION,
                     sym.POTENCIA, sym.MODULO -> Color(0xFF1AD305)
 
-                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING,sym.FOR,sym.IF,sym.ELSE,sym.WHILE,sym.DO,sym.IN, sym.TIPOGRAFIA, sym.NUMBER_REQUEST, sym.GROSOR_LINEA, sym.CONFIG_DOCK -> Color(0xFF6602F1)
+                    sym.VAR_ESPECIAL, sym.VAR_NUMERO, sym.VAR_STRING, sym.FOR, sym.IF, sym.ELSE, sym.WHILE, sym.DO, sym.IN, sym.TIPOGRAFIA, sym.NUMBER_REQUEST, sym.GROSOR_LINEA, sym.CONFIG_DOCK -> Color(
+                        0xFF6602F1
+                    )
 
                     sym.ENTERO, sym.DECIMAL -> Color(0xFF07E3DB)
 
@@ -111,6 +114,7 @@ class EditorViewModel(
 
                     sym.PARENT_CIERRE, sym.PARENT_APERTURA, sym.CORCHETE_CIERRE,
                     sym.CORCHETE_APERTURA, sym.LLAVE_APERTURA, sym.LLAVE_CIERRE -> Color(0xFF073EE3)
+
                     sym.COMENTARIO_TEXTO -> Color(0xFF7E7D7D)
 
 
@@ -153,24 +157,28 @@ class EditorViewModel(
         isModified = true
 
         if (oldText != newValue.text) {
-            highlightedCode = if (newText.length > oldText.length && oldAnnotated.text.isNotEmpty()) {
-                buildAnnotatedString {
-                    append(newText)
-                    oldAnnotated.spanStyles.forEach { style ->
-                        if (style.end <= newText.length) {
-                            addStyle(style.item, style.start, style.end)
+            highlightedCode =
+                if (newText.length > oldText.length && oldAnnotated.text.isNotEmpty()) {
+                    buildAnnotatedString {
+                        append(newText)
+                        oldAnnotated.spanStyles.forEach { style ->
+                            if (style.end <= newText.length) {
+                                addStyle(style.item, style.start, style.end)
+                            }
                         }
                     }
+                } else {
+                    AnnotatedString(newText)
                 }
-            } else {
-                AnnotatedString(newText)
-            }
             recalcularHighlightDebounced()
         }
     }
 
     //Metodo que permite parchear automaticamente
-    private fun patchAnnotatedString(old: AnnotatedString, newValue: TextFieldValue): AnnotatedString {
+    private fun patchAnnotatedString(
+        old: AnnotatedString,
+        newValue: TextFieldValue
+    ): AnnotatedString {
         if (old.text.length == newValue.text.length) return old
 
         return buildAnnotatedString {
@@ -256,19 +264,29 @@ class EditorViewModel(
 
         val (erroresParser, ast) = analizarSintactico(texto)
 
-        val erroresTotales = resultadoLexico.errores + erroresParser
+        val erroresTotales = mutableListOf<ErrorAnalisis>()
+        erroresTotales.addAll(resultadoLexico.errores)
+        erroresTotales.addAll(erroresParser)
 
-        if (erroresTotales.isNotEmpty()) {
+        if (ast == null) {
             return Pair(erroresTotales, null)
         }
 
-        Log.d("AST", "===== AST GENERADO =====")
-        Log.d("AST1", ast?.toString() ?: "AST NULL")
+        //Instanciacion del gestor de codigo compilado (PATRON EXPERTO)
+        val gestorCodigoCompilado = GestorCodigoCompilado(ast, erroresTotales)
 
-        // TEMPORAL
-        val codigoGenerado = texto
+        // CODIGO FINAL (PATRON EXPERTO)
+        val codigoGenerado = gestorCodigoCompilado.obtenerCodigoCompilado();
+
+        val erroresFinales = gestorCodigoCompilado.getListadoErrores()
+
+
+        if (erroresFinales.isNotEmpty()) {
+            return Pair(erroresFinales, null)
+        }
 
         return Pair(emptyList(), codigoGenerado)
+
     }
 
     //Metodo que permite ejecutar el analisis formal del parser
@@ -278,7 +296,7 @@ class EditorViewModel(
 
             val reader = StringReader(texto)
 
-            val lexer = LexerForms(reader,true)
+            val lexer = LexerForms(reader, true)
 
             val parser = ParserForms(lexer)
 
@@ -305,7 +323,6 @@ class EditorViewModel(
             Pair(errores, null)
         }
     }
-
 
 
     //METODO QUE GENERA EL PRE-COMPILADO PARA ACTUALIZAR LA PREVISUALIZACION
