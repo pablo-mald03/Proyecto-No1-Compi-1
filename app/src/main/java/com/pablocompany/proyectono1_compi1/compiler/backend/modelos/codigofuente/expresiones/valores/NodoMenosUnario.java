@@ -17,10 +17,27 @@ public class NodoMenosUnario extends NodoExpresion {
     }
 
 
-    //Metodo que permite validar semantica del lenguaje generado
+    //Metodo que permite validar semantica del operador unario (Solo permite a los numericos)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
+
+        if (tipoExpresion == TipoVariable.NUMBER || tipoExpresion == TipoVariable.COMODIN) {
+            return tipoExpresion;
+        }
+
+        if (tipoExpresion != TipoVariable.ERROR) {
+            listaErrores.add(new ErrorAnalisis(
+                    this.getString(),
+                    "Semántico",
+                    "No se puede aplicar el operador unario '-' a un tipo: \"" + tipoExpresion.getTipo()+"\"",
+                    getLinea(),
+                    getColumna()
+            ));
+        }
+
+        return TipoVariable.ERROR;
     }
 
     //Metodo que permite retornar el valor del operador UNARIO

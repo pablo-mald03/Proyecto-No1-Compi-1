@@ -6,7 +6,11 @@ public enum TipoVariable {
 
     NUMBER("number"),
     STRING("string"),
-    SPECIAL("special");
+    SPECIAL("special"),
+    COMODIN("?"),
+
+    ERROR("error");
+
 
     private final String tipo;
 

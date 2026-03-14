@@ -12,7 +12,6 @@ public class NodoEmoji extends NodoFragmento {
     //Atributos
     private TipoEmoji tipo;
     private String valorTexto;
-
     private int cantidad = 1;
 
     public NodoEmoji(TipoEmoji tipo, String valorTexto, int linea, int columna) {
@@ -24,10 +23,10 @@ public class NodoEmoji extends NodoFragmento {
 
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del valor que tiene la cadena
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        return TipoVariable.STRING;
     }
 
     //Metodo propio de la clase polimorfica (La ER utilizada no tiene ningun efecto en tiempo de PARSEO)
@@ -61,7 +60,7 @@ public class NodoEmoji extends NodoFragmento {
         return cantidad;
     }
 
-    //Se retorna a si mismo para poderlo reconocerlo por su superClase NodoCadena
+    //Se retorna a si mismo para poderlo reconocerlo por su superClase NodoCadena (PENDIENTE)
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 

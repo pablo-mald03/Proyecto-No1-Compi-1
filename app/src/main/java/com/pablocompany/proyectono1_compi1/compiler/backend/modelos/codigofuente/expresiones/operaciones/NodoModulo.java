@@ -18,9 +18,18 @@ public class NodoModulo extends NodoExpresion {
         this.derecha = derecha;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del lenguaje generado par el modulo
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        TipoVariable tipoIzquierda = izquierda.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoDerecha = derecha.validarSemantica(tabla, listaErrores);
+
+        /*if (tipoIzquierda != TipoVariable.NUMBER || tipoDerecha != TipoVariable.NUMBER) {
+            listaErrores.add(new ErrorAnalisis("%", "Semántico", "Modulo solo aplica a números", getLinea(), getColumna()));
+            return TipoVariable.NUMBER;
+        }*/
+
         return null;
     }
 
@@ -53,3 +62,4 @@ public class NodoModulo extends NodoExpresion {
         return izquierda.getString() + " % " + derecha.getString();
     }
 }
+/*Created by Pablo*/

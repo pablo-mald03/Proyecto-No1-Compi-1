@@ -17,10 +17,10 @@ public class NodoTexto extends NodoFragmento{
         this.contenido = contenido;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del texto contenido
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        return TipoVariable.STRING;
     }
 
     //Metodo que permite ejecutarse propio de la jerarquia pero en este caso retorna solo su propio valor object

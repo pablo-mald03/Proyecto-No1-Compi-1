@@ -25,8 +25,8 @@ public class NodoAccesoVariable extends NodoExpresion {
 
         Simbolo simbolo = tabla.buscar(this.id);
         if (simbolo == null) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico", "Variable no declarada", getLinea(), getColumna()));
-            return null;
+            listaErrores.add(new ErrorAnalisis(id, "Semántico", "Variable \""+this.id+"\" no declarada", getLinea(), getColumna()));
+            return TipoVariable.ERROR;
         }
 
         return simbolo.getTipo();
@@ -54,6 +54,6 @@ public class NodoAccesoVariable extends NodoExpresion {
     //Metodo que permite obtener el valor como cadena de texto
     @Override
     public String getString() {
-        return id;
+        return this.id;
     }
 }

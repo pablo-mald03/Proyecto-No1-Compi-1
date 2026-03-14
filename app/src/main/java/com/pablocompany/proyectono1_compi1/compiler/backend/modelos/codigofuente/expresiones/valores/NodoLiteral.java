@@ -21,7 +21,15 @@ public class NodoLiteral extends NodoExpresion {
     //Metodo que permite validar semantica del lenguaje generado
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        if (this.valor instanceof Number) {
+            return TipoVariable.NUMBER;
+        }
+
+        if (this.valor instanceof String) {
+            return TipoVariable.STRING;
+        }
+        return TipoVariable.ERROR;
     }
 
     //Metodo que permite contar los comodines que tiene la expresion

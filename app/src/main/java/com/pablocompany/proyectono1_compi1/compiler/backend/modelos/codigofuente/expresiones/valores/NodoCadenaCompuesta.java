@@ -22,6 +22,14 @@ public class NodoCadenaCompuesta extends NodoExpresion {
     //Metodo que permite validar semantica del lenguaje generado
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        for (NodoFragmento f : fragmentos) {
+            TipoVariable tipo = f.validarSemantica(tabla, listaErrores);
+
+            if (tipo == TipoVariable.ERROR) {
+                return TipoVariable.ERROR;
+            }
+        }
         return null;
     }
 
