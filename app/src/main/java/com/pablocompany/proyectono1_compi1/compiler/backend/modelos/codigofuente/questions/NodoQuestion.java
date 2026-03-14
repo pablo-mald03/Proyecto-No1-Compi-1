@@ -69,5 +69,8 @@ public abstract class NodoQuestion extends NodoComponente {
 
     }
 
+    //Metodo que permite validar si tiene comodines la question
+    public abstract int contarComodines();
+
     /*Created by Pablo*/
 }

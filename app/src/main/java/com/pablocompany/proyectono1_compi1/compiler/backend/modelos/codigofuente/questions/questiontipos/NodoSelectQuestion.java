@@ -138,6 +138,12 @@ public class NodoSelectQuestion extends NodoQuestion {
         return TipoVariable.SPECIAL;
     }
 
+    //Metodo que permite validar si tiene comodines la question (PENDIENTE)
+    @Override
+    public int contarComodines(){
+        return 0;
+    }
+
     /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/
 
     //Metodo que permite ejecutar laa acciones dentro de la question

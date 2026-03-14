@@ -29,6 +29,13 @@ public class NodoAnd extends Nodo {
             return TipoVariable.ERROR;
         }
 
+        if (tipoA == TipoVariable.COMODIN || tipoB == TipoVariable.COMODIN) {
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                    "Los operadores logicos \"AND\" no permiten tipos \"comodin\".",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
         if (tipoA == TipoVariable.BOOLEAN_OR || tipoB == TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("AND", "Semantico",
                     "No se permite mezclar operadores AND y OR en una condicion.",
@@ -69,9 +76,10 @@ public class NodoAnd extends Nodo {
         return (numB > 0) ? 1.0 : 0.0;
     }
 
+    //Metodo que permite retornar el valor de la expresion
     @Override
     public String getString() {
-        return "&&";
+        return this.condicionA.getString() + " && " + this.condicionB.getString();
     }
 }
 /*Created by Pablo*/

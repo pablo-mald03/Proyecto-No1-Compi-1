@@ -34,7 +34,7 @@ public class NodoDraw extends NodoComponente {
         Simbolo simbolo = tabla.buscar(id);
 
         if (simbolo == null) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
                     "La pregunta tipo special \"" + id + "\" no ha sido declarada.",
                     getLinea(), getColumna()));
             return TipoVariable.ERROR;
@@ -42,16 +42,22 @@ public class NodoDraw extends NodoComponente {
 
         if(simbolo.getTipo() != TipoVariable.SPECIAL){
 
-            listaErrores.add(new ErrorAnalisis(id, "Semántico",
-                    "La función \"draw\" solo puede usarse con tipos special. \"" + id + "\" es: " + simbolo.getTipo().getTipo(),
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                    "La función \"draw\" solo puede usarse con tipos special. \"" + id + "\" es: " + simbolo.getTipo().toString(),
                     getLinea(), getColumna()));
-
+            return TipoVariable.ERROR;
         }
 
         //Se validan los parametros dentro
         if (parametros != null) {
             for (Nodo param : parametros) {
-                param.validarSemantica(tabla, listaErrores);
+                TipoVariable tipoRetornado = param.validarSemantica(tabla, listaErrores);
+
+                if (tipoRetornado == TipoVariable.COMODIN) {
+                    listaErrores.add(new ErrorAnalisis(param.getString(), "Semantico",
+                            "La funcion \"draw\" solo puede contener expresiones como parametros . \"" + param.getString() + "\" es: \"comodin\"",
+                            param.getLinea(), param.getColumna()));
+                }
             }
         }
 

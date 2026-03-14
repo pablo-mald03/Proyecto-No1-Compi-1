@@ -45,7 +45,9 @@ public class NodoCadenaCompuesta extends NodoExpresion {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (NodoFragmento f : fragmentos) {
+
             stringBuilder.append(f.getString());
+
         }
         return stringBuilder.toString();
     }
@@ -53,6 +55,13 @@ public class NodoCadenaCompuesta extends NodoExpresion {
     //Permite retornar el valor del texto
     @Override
     public String getString() {
-        return ejecutar(null,null).toString();
+
+        StringBuilder builder = new StringBuilder();
+        if (fragmentos != null) {
+            for (NodoFragmento f : fragmentos) {
+                builder.append(f.getString());
+            }
+        }
+        return builder.toString();
     }
 }

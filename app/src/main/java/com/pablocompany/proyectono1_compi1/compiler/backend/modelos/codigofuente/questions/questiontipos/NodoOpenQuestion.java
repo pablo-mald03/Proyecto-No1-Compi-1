@@ -105,6 +105,12 @@ public class NodoOpenQuestion extends NodoQuestion {
         return TipoVariable.SPECIAL;
     }
 
+    //Metodo que permite validar si tiene comodines la question (PENDIENTE)
+    @Override
+    public int contarComodines(){
+        return 0;
+    }
+
     //Metodo que permite ejecutar las acciones que tenga la pregunta
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

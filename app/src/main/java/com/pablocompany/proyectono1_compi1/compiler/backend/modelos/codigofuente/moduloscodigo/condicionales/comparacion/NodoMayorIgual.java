@@ -30,8 +30,12 @@ public class NodoMayorIgual extends Nodo {
         }
 
         if (tipoA == TipoVariable.COMODIN || tipoB == TipoVariable.COMODIN) {
-            return TipoVariable.COMODIN;
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                    "Las operaciones de comparacion no permiten tipos \"comodin\".",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
         }
+
         if (tipoA == tipoB) {
             return TipoVariable.NUMBER;
         }
@@ -73,8 +77,9 @@ public class NodoMayorIgual extends Nodo {
         return 0.0;
     }
 
+    //Metodo que permite obtener el valor de la expresion
     @Override
     public String getString() {
-        return ">=";
+        return  this.expresionA.getString()+" >= " + this.expresionB.getString();
     }
 }

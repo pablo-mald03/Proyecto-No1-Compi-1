@@ -39,6 +39,13 @@ public class NodoAsignacion extends Nodo {
 
         TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
 
+        if (tipoExpresion == TipoVariable.COMODIN) {
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                    "No se puede asignar un valor \"comodin\" a una variable \"number\" o \"string\".",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
         if (tipoExpresion != TipoVariable.ERROR) {
             if (variable.getTipo() != tipoExpresion) {
                 listaErrores.add(new ErrorAnalisis(id, "Semantico",

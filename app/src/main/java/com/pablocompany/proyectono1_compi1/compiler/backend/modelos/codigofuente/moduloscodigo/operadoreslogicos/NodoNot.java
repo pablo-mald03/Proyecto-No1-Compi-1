@@ -27,6 +27,13 @@ public class NodoNot extends Nodo {
             return TipoVariable.ERROR;
         }
 
+        if (tipoCondicion == TipoVariable.COMODIN) {
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                    "El operador \"NOT\" no permite tipos \"comodin\".",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
         if (tipoCondicion != TipoVariable.BOOLEAN_AND &&
                 tipoCondicion != TipoVariable.BOOLEAN_OR &&
                 tipoCondicion != TipoVariable.NUMBER) {
@@ -66,7 +73,7 @@ public class NodoNot extends Nodo {
 
     @Override
     public String getString() {
-        return "~";
+        return "~" + this.condicion.getString();
     }
 }
 /*Created by Pablo*/

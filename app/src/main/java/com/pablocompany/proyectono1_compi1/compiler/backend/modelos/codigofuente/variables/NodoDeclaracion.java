@@ -50,11 +50,19 @@ public class NodoDeclaracion extends Nodo {
         if (expresion != null) {
             TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
 
-            if (tipoExpresion != TipoVariable.ERROR && tipoExpresion != TipoVariable.COMODIN) {
+            if (tipoExpresion == TipoVariable.COMODIN) {
+                listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                        "No se puede asignar un valor \"comodin\" a una variable \"number\" o \"string\".",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+
+            if (tipoExpresion != TipoVariable.ERROR) {
                 if (this.tipo != tipoExpresion) {
-                    listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                    listaErrores.add(new ErrorAnalisis(id, "Semantico",
                             "Tipo incompatible: Se esperaba " +  tipoExpresion + " pero se declaro como \"" + this.tipo+"\"",
                             getLinea(), getColumna()));
+                    return TipoVariable.ERROR;
                 }
             }
         }
