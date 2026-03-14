@@ -11,27 +11,46 @@ import java.util.List;
 //Clase que representa al operador de comparacion mayor que
 public class NodoMayor extends Nodo {
     //Atributos
-    Nodo expA;
-    Nodo expB;
+    Nodo expresionA;
+    Nodo expresionB;
 
     public NodoMayor( Nodo expA, Nodo expB,int linea, int columna) {
         super(linea, columna);
-        this.expA = expA;
-        this.expB = expB;
+        this.expresionA = expA;
+        this.expresionB = expB;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de Mayor que (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        TipoVariable tipoA = (expresionA != null) ? expresionA.validarSemantica(tabla, listaErrores) : TipoVariable.ERROR;
+        TipoVariable tipoB = (expresionB != null) ? expresionB.validarSemantica(tabla, listaErrores) : TipoVariable.ERROR;
+
+        if (tipoA == TipoVariable.ERROR || tipoB == TipoVariable.ERROR) {
+            return TipoVariable.ERROR;
+        }
+
+        if (tipoA == TipoVariable.COMODIN || tipoB == TipoVariable.COMODIN) {
+            return TipoVariable.COMODIN;
+        }
+        if (tipoA == tipoB) {
+            return TipoVariable.NUMBER;
+        }
+
+        listaErrores.add(new ErrorAnalisis("Mayor que", "Semantico",
+                "No se puede comparar el tipo: \"" + tipoA.getTipo() + "\" con el tipo: \"" + tipoB.getTipo()+"\"",
+                getLinea(), getColumna()));
+
+        return TipoVariable.ERROR;
+
     }
 
 
     //Expresion que permite evaluar el operador logico mayor
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        Object valorA = expA.ejecutar(tabla, listaErrores);
-        Object valorB = expB.ejecutar(tabla, listaErrores);
+        Object valorA = expresionA.ejecutar(tabla, listaErrores);
+        Object valorB = expresionB.ejecutar(tabla, listaErrores);
 
         if (valorA instanceof Number && valorB instanceof Number) {
 

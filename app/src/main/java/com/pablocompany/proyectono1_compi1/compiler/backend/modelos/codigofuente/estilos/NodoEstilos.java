@@ -27,18 +27,7 @@ public class NodoEstilos extends Nodo {
         if (valor instanceof Nodo) {
             return ((Nodo) valor).validarSemantica(tabla, listaErrores);
         }
-
-        switch (this.tipoEstilo) {
-            case TEXT_SIZE:
-                if (!(valor instanceof TipoLetra)) {
-                    registrarError(listaErrores, "El estilo \"text size\" requiere un valor valido.");
-                    return TipoVariable.ERROR;
-                }
-                return TipoVariable.VOID;
-            default:
-                return TipoVariable.VOID;
-        }
-
+        return TipoVariable.VOID;
     }
 
     //Reporta el error semantico de estilos

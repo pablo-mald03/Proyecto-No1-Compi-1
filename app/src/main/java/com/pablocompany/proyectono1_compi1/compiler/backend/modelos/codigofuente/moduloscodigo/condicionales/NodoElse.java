@@ -28,7 +28,17 @@ public class NodoElse extends Nodo {
     //Metodo que permite validar semantica del lenguaje generado
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        /*Tabla que permite validar variables locales*/
+        TablaSimbolos tablaHija = new TablaSimbolos(tabla);
+
+        if (cuerpo != null) {
+            for (Nodo n : cuerpo) {
+                if (n != null) {
+                    n.validarSemantica(tablaHija, listaErrores);
+                }
+            }
+        }
+        return TipoVariable.VOID;
     }
 
     //Clase que permite ejecutar por completo el codigo que tiene dentro el caso contrario else

@@ -8,6 +8,8 @@ public enum TipoVariable {
     STRING("string"),
     SPECIAL("special"),
     COMODIN("?"),
+    BOOLEAN_AND("AND"),
+    BOOLEAN_OR("OR"),
     VOID("void"),
     ERROR("error");
 

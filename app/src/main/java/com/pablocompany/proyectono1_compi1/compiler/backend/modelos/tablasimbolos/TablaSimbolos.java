@@ -1,6 +1,9 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos;
 
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+
 import java.util.HashMap;
+import java.util.List;
 
 /*Created by Pablo*/
 //Clase que permite manejar las tablas de simbolos (Patron experto)
@@ -53,6 +56,27 @@ public class TablaSimbolos {
         return simboloEncontrado;
 
     }
+
+    //Metodo que permite reasignar un valor a la variable
+    public void asignar(String id, Object nuevoValor, List<ErrorAnalisis> errores) {
+
+        if (tabla.containsKey(id)) {
+            Simbolo simbolo = tabla.get(id);
+            simbolo.setValor(nuevoValor);
+            return;
+        }
+        if (this.padre != null) {
+            this.padre.asignar(id, nuevoValor, errores);
+        }
+        else {
+            //Preventivo (imposible)
+            errores.add(new ErrorAnalisis("Asignacion", "Semantico",
+                    "No se encontro la variable \"" + id + "\" en el programa.",
+                    -1, -1));
+
+        }
+    }
+
 
 
     /*Created by Pablo*/

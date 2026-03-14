@@ -18,10 +18,26 @@ public class NodoNot extends Nodo {
         this.condicion = condicion;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del operador logico NOT (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        TipoVariable tipoCondicion = condicion.validarSemantica(tabla, listaErrores);
+
+        if (tipoCondicion == TipoVariable.ERROR) {
+            return TipoVariable.ERROR;
+        }
+
+        if (tipoCondicion != TipoVariable.BOOLEAN_AND &&
+                tipoCondicion != TipoVariable.BOOLEAN_OR &&
+                tipoCondicion != TipoVariable.NUMBER) {
+
+            listaErrores.add(new ErrorAnalisis("NOT", "Semantico",
+                    "El operador NOT solo puede operar sobre condiciones lógicas.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        return tipoCondicion;
     }
 
     //Metodo que permite retornar la condicion logica que se maneja dentro del OR

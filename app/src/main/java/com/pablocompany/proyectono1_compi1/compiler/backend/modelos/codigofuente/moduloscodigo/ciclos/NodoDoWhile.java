@@ -21,10 +21,30 @@ public class NodoDoWhile extends Nodo {
         this.codigo = codigo;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado
+    //Metodo que permite validar semantica del ciclo do while (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        /*Tabla que permite validar variables locales*/
+        TablaSimbolos tablaHija = new TablaSimbolos(tabla);
+
+        if (codigo != null) {
+            for (Nodo n : codigo) {
+                if (n != null) {
+                    n.validarSemantica(tablaHija, listaErrores);
+                }
+            }
+        }
+
+        TipoVariable tipoCond = condicion.validarSemantica(tabla, listaErrores);
+
+        if (tipoCond != TipoVariable.NUMBER && tipoCond != TipoVariable.COMODIN && tipoCond != TipoVariable.ERROR) {
+            listaErrores.add(new ErrorAnalisis("DO-WHILE", "Semantico",
+                    "La condición del ciclo DO-WHILE debe ser numerica o logica.",
+                    getLinea(), getColumna()));
+        }
+
+        return TipoVariable.VOID;
     }
 
 

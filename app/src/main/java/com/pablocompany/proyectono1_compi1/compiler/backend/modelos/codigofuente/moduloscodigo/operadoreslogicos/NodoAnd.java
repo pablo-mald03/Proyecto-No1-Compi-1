@@ -19,10 +19,33 @@ public class NodoAnd extends Nodo {
         this.condicionB = condicionB;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del operador logico AND (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        TipoVariable tipoA = condicionA.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoB = condicionB.validarSemantica(tabla, listaErrores);
+
+        if (tipoA == TipoVariable.ERROR || tipoB == TipoVariable.ERROR) {
+            return TipoVariable.ERROR;
+        }
+
+        if (tipoA == TipoVariable.BOOLEAN_OR || tipoB == TipoVariable.BOOLEAN_OR) {
+            listaErrores.add(new ErrorAnalisis("AND", "Semantico",
+                    "No se permite mezclar operadores AND y OR sin parentesis explicitos.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        if (tipoA != TipoVariable.BOOLEAN_AND && tipoA != TipoVariable.NUMBER &&
+                tipoB != TipoVariable.BOOLEAN_AND && tipoB != TipoVariable.NUMBER) {
+
+            listaErrores.add(new ErrorAnalisis("AND", "Semantico",
+                    "El operador AND solo puede operar sobre condiciones lógicas o comparaciones.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.BOOLEAN_AND;
     }
 
     //Metodo que permite retornar la condicion logica que se maneja dentro

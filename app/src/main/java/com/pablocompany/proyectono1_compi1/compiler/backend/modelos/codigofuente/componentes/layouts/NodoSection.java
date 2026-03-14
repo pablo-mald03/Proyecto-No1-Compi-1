@@ -45,10 +45,40 @@ public class NodoSection extends NodoComponente {
 
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de la seccion (PATRON EXPERTO)
+    /*Simplemente es un llamado a lo que ya esta creado*/
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        if (this.elementos != null) {
+            this.elementos.validarSemantica(tabla, listaErrores);
+        }
+
+        if (this.pointX != null) {
+            TipoVariable tipoX = this.pointX.validarSemantica(tabla, listaErrores);
+            if (tipoX != TipoVariable.NUMBER) {
+                listaErrores.add(new ErrorAnalisis("SECTION", "Semantico",
+                        "El valor de PointX debe ser tipo \"number\".", getLinea(), getColumna()));
+            }
+        }
+
+        if (this.pointY != null) {
+            TipoVariable tipoY = this.pointY.validarSemantica(tabla, listaErrores);
+            if (tipoY != TipoVariable.NUMBER) {
+                listaErrores.add(new ErrorAnalisis("SECTION", "Semantico",
+                        "El valor de PointY debe ser un \"number\".", getLinea(), getColumna()));
+            }
+        }
+
+        if(this.estilos != null){
+            this.estilos.validarSemantica(tabla, listaErrores);
+        }
+
+        if (this.borde != null) {
+            this.borde.validarSemantica(tabla, listaErrores);
+        }
+
+        return TipoVariable.VOID;
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
