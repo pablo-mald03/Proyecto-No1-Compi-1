@@ -18,19 +18,29 @@ public class NodoModulo extends NodoExpresion {
         this.derecha = derecha;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado par el modulo
+    //Metodo que permite validar semantica de la operacion modulo (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        TipoVariable tipoIzquierda = (izquierda != null) ? izquierda.validarSemantica(tabla, listaErrores) : TipoVariable.ERROR;
+        TipoVariable tipoDerecha = (derecha != null) ? derecha.validarSemantica(tabla, listaErrores) : TipoVariable.ERROR;
 
-        TipoVariable tipoIzquierda = izquierda.validarSemantica(tabla, listaErrores);
-        TipoVariable tipoDerecha = derecha.validarSemantica(tabla, listaErrores);
-
-        /*if (tipoIzquierda != TipoVariable.NUMBER || tipoDerecha != TipoVariable.NUMBER) {
-            listaErrores.add(new ErrorAnalisis("%", "Semántico", "Modulo solo aplica a números", getLinea(), getColumna()));
+        if (tipoIzquierda == TipoVariable.NUMBER && tipoDerecha == TipoVariable.NUMBER) {
             return TipoVariable.NUMBER;
-        }*/
+        }
 
-        return null;
+        if (tipoIzquierda == TipoVariable.COMODIN || tipoDerecha == TipoVariable.COMODIN) {
+            return TipoVariable.COMODIN;
+        }
+
+        if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
+            listaErrores.add(new ErrorAnalisis(
+                    "Modulo", "Semántico",
+                    "El modulo no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() +"\"",
+                    getLinea(), getColumna()
+            ));
+        }
+
+        return TipoVariable.ERROR;
     }
 
     //Metodo propio que permite contar la cantidad de comodines que tiene la expresion

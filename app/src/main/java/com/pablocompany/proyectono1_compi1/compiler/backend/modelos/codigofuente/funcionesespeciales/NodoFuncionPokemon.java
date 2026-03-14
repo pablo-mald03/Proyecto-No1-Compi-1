@@ -41,7 +41,7 @@ public class NodoFuncionPokemon extends Nodo {
             }
         }
 
-        return TipoVariable.SPECIAL;
+        return TipoVariable.VOID;
     }
 
     //Metodo que permite ejecutar el request de a la API para poder obtener los pokemon

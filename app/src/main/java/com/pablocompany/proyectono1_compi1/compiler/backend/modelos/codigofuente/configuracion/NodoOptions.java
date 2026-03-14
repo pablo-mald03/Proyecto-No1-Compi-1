@@ -22,7 +22,29 @@ public class NodoOptions extends Nodo {
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (this.opciones == null || this.opciones.isEmpty()) {
+            listaErrores.add(new ErrorAnalisis("options", "Semántico",
+                    "El atributo de opciones no puede estar vacío.", getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        for (Nodo nodo : this.opciones) {
+            if (nodo == null) continue;
+
+            TipoVariable tipoActual = nodo.validarSemantica(tabla, listaErrores);
+
+            if (tipoActual == TipoVariable.ERROR || tipoActual == TipoVariable.COMODIN) {
+                continue;
+            }
+
+            if (tipoActual != TipoVariable.STRING) {
+                listaErrores.add(new ErrorAnalisis("options", "Semantico",
+                        "Las opciones solo aceptan tipo \"string\". Se encontro con una expresion tipo: \"" +
+                                tipoActual.getTipo() +"\"", getLinea(), getColumna()));
+            }
+        }
+
+        return TipoVariable.STRING;
     }
 
     //Metodo que permite ejecutar la lista de opciones de expresion que esta dentro del nodo de configuracion

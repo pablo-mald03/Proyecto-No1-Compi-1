@@ -21,10 +21,29 @@ public class NodoEstilos extends Nodo {
         this.valor = valor;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de los estilos (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (valor instanceof Nodo) {
+            return ((Nodo) valor).validarSemantica(tabla, listaErrores);
+        }
+
+        switch (this.tipoEstilo) {
+            case TEXT_SIZE:
+                if (!(valor instanceof TipoLetra)) {
+                    registrarError(listaErrores, "El estilo \"text size\" requiere un valor valido.");
+                    return TipoVariable.ERROR;
+                }
+                return TipoVariable.VOID;
+            default:
+                return TipoVariable.VOID;
+        }
+
+    }
+
+    //Reporta el error semantico de estilos
+    private void registrarError(List<ErrorAnalisis> lista, String mensaje) {
+        lista.add(new ErrorAnalisis("styles", "Semantico", mensaje, getLinea(), getColumna()));
     }
 
     // Getters para que el NodoOpenQuestion pueda leerlos

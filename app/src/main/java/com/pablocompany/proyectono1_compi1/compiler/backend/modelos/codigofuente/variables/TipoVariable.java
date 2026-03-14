@@ -8,7 +8,7 @@ public enum TipoVariable {
     STRING("string"),
     SPECIAL("special"),
     COMODIN("?"),
-
+    VOID("void"),
     ERROR("error");
 
 

@@ -19,10 +19,33 @@ public class NodoSuma extends NodoExpresion {
         this.derecha = derecha;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado
+    //Metodo que permite validar semantica de la operacion suma (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        TipoVariable tipoIzquierda = (izquierda != null) ? izquierda.validarSemantica(tabla, listaErrores) : TipoVariable.ERROR;
+        TipoVariable tipoDerecha = (derecha != null) ? derecha.validarSemantica(tabla, listaErrores) : TipoVariable.ERROR;
+
+        if (tipoIzquierda == TipoVariable.NUMBER && tipoDerecha == TipoVariable.NUMBER) {
+            return TipoVariable.NUMBER;
+        }
+
+        if (tipoIzquierda == TipoVariable.COMODIN || tipoDerecha == TipoVariable.COMODIN) {
+            return TipoVariable.COMODIN;
+        }
+
+        if (tipoIzquierda == TipoVariable.STRING || tipoDerecha == TipoVariable.STRING) {
+            return TipoVariable.STRING;
+        }
+
+        if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
+            listaErrores.add(new ErrorAnalisis(
+                    "Suma", "Semántico",
+                    "La suma no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() + "\"",
+                    getLinea(), getColumna()
+            ));
+        }
+
+        return TipoVariable.ERROR;
     }
 
     //Metodo propio que permite contar la cantidad de comodines que tiene la expresion

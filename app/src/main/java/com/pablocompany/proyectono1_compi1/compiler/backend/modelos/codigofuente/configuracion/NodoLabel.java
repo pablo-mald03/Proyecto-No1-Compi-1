@@ -27,7 +27,7 @@ public class NodoLabel extends Nodo {
         TipoVariable tipoVariable = expresion.validarSemantica(tabla, listaErrores);
 
         if (tipoVariable != TipoVariable.STRING && tipoVariable != TipoVariable.COMODIN && tipoVariable != TipoVariable.ERROR) {
-            listaErrores.add(new ErrorAnalisis("label", "Semántico", "El label solo debe contener cadenas de texto", getLinea(), getColumna()));
+            listaErrores.add(new ErrorAnalisis("label", "Semantico", "El label solo debe contener cadenas de texto", getLinea(), getColumna()));
         }
 
         return tipoVariable;

@@ -23,7 +23,14 @@ public class NodoOrientation extends Nodo {
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (this.orientacion == null) {
+            listaErrores.add(new ErrorAnalisis("orientation", "Semántico",
+                    "La orientacion es invalida o no ha sido definida correctamente.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.VOID;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion (PENDIENTE)

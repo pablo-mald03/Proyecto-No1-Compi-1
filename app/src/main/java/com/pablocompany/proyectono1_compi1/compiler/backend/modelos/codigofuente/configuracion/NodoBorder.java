@@ -26,10 +26,29 @@ public class NodoBorder extends Nodo {
         this.grosor = grosor;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del borde (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (grosor != null) {
+            TipoVariable tipoGrosor = grosor.validarSemantica(tabla, listaErrores);
+            if (tipoGrosor != TipoVariable.NUMBER && tipoGrosor != TipoVariable.COMODIN && tipoGrosor != TipoVariable.ERROR) {
+                listaErrores.add(new ErrorAnalisis(
+                        "border", "Semantico",
+                        "El grosor del borde debe ser numerico. Se encontro con una expresion tipo: \"" + tipoGrosor.getTipo()+ "\"",
+                        getLinea(), getColumna()
+                ));
+            }
+        }
+
+        if (color == null) {
+            listaErrores.add(new ErrorAnalisis(
+                    "COLOR", "Semántico",
+                    "El color del borde no debe estar vacio." ,
+                    getLinea(), getColumna()
+            ));
+        }
+
+        return TipoVariable.VOID;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion (PENDIENTE)

@@ -19,10 +19,30 @@ public class NodoPointY extends Nodo {
         this.expresion = expresion;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de la posicion en y (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (this.expresion == null) {
+            listaErrores.add(new ErrorAnalisis("pointY", "Semantico",
+                    "El valor de la coordenada \"Y\" es obligatorio.", getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
+
+        // Validamos que el resultado sea un número
+        if (tipoExpresion != TipoVariable.NUMBER &&
+                tipoExpresion != TipoVariable.COMODIN &&
+                tipoExpresion != TipoVariable.ERROR) {
+
+            listaErrores.add(new ErrorAnalisis("pointY", "Semantico",
+                    "La coordenada \"X\" debe ser numerica. Se encontro con una expresion tipo: \"" + tipoExpresion.getTipo() + "\"",
+                    getLinea(), getColumna()));
+
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.NUMBER;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion

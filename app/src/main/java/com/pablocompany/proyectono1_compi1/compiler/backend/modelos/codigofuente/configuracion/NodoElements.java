@@ -20,10 +20,20 @@ public class NodoElements extends Nodo {
         this.expresion = expresion;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de los elementos (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (this.expresion != null) {
+
+            for (NodoComponente nodo : this.expresion) {
+                if (nodo != null) {
+
+                   nodo.validarSemantica(tabla, listaErrores);
+                }
+            }
+        }
+
+        return TipoVariable.VOID;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion de layouts PENDIENTE

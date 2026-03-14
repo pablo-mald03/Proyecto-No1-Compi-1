@@ -18,10 +18,29 @@ public class NodoCorrect extends Nodo {
         this.expresion = expresion;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de las respuestas correctas (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (expresion == null) {
+            listaErrores.add(new ErrorAnalisis("CORRECT", "Semantico",
+                    "La respuesta correcta no puede estar vacía.", getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
+
+        if (tipoExpresion != TipoVariable.NUMBER &&
+                tipoExpresion != TipoVariable.COMODIN &&
+                tipoExpresion != TipoVariable.ERROR) {
+
+            listaErrores.add(new ErrorAnalisis("correct", "Semantico",
+                    "La respuesta correcta debe ser un numero. Se encontro con una expreion tipo: \"" + tipoExpresion.getTipo() +"\"",
+                    getLinea(), getColumna()));
+
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.NUMBER;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion

@@ -55,7 +55,7 @@ public class NodoDeclaracion extends Nodo {
             TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
 
             if (tipoExpresion != TipoVariable.ERROR && tipoExpresion != TipoVariable.COMODIN) {
-                if (this.tipo != tipoExpresion) {
+                if (this.tipo != null && this.tipo != tipoExpresion) {
                     listaErrores.add(new ErrorAnalisis(
                             id,
                             "Semántico",
