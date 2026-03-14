@@ -27,48 +27,39 @@ public class NodoDeclaracion extends Nodo {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
-        //Valores iniciales de la variable (Solicitado)
-
-        Object valorInicial = null;
-        if (this.tipo == TipoVariable.NUMBER) {
-            valorInicial = 0.0;
-        } else if (this.tipo == TipoVariable.STRING) {
-            valorInicial = "";
+        if (this.tipo == null) {
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                    "La variable \"" + id + "\" no tiene un tipo definido.", getLinea(), getColumna()));
+            return TipoVariable.ERROR;
         }
 
-        Simbolo nuevoSimbolo = new Simbolo(id, this.tipo, valorInicial, getLinea(), getColumna());
 
+        //Valores iniciales de la variable (Solicitado)
+        Object valorInicial = (this.tipo == TipoVariable.NUMBER) ? 0.0 : "";
+
+        Simbolo nuevoSimbolo = new Simbolo(id, this.tipo, valorInicial, getLinea(), getColumna());
         boolean insertado = tabla.insertar(nuevoSimbolo);
 
         if (!insertado) {
-            listaErrores.add(new ErrorAnalisis(
-                    id,
-                    "Semántico",
-                    "La variable \"" + id + "\" ya ha sido definida en este ámbito.",
-                    getLinea(),
-                    getColumna()
-            ));
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                    "La variable \"" + id + "\" ya ha sido definida en el ambito.", getLinea(), getColumna()));
+            return TipoVariable.ERROR;
         }
 
-        if (expresion != null) {
 
+        if (expresion != null) {
             TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
 
             if (tipoExpresion != TipoVariable.ERROR && tipoExpresion != TipoVariable.COMODIN) {
-                if (this.tipo != null && this.tipo != tipoExpresion) {
-                    listaErrores.add(new ErrorAnalisis(
-                            id,
-                            "Semántico",
-                            "Tipo incompatible en la inicialización: se esperaba: " + this.tipo.getTipo() +
-                                    " pero se es \"" + tipoExpresion.getTipo() + "\"",
-                            getLinea(),
-                            getColumna()
-                    ));
+                if (this.tipo != tipoExpresion) {
+                    listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                            "Tipo incompatible: Se esperaba " +  tipoExpresion + " pero se declaro como \"" + this.tipo+"\"",
+                            getLinea(), getColumna()));
                 }
             }
         }
 
-        return this.tipo != null ? this.tipo : TipoVariable.ERROR;
+        return this.tipo;
     }
 
     //Metodo que permite ejecutar el nodo (Validacion de variables y declaraciones)

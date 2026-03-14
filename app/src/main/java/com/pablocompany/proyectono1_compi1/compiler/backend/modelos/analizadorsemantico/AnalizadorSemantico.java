@@ -25,14 +25,22 @@ public class AnalizadorSemantico {
     public String codigoCompilado(){
 
         StringBuilder stringBuilder = new StringBuilder();
-
-
         TablaSimbolos tablaSimbolos = new TablaSimbolos();
+
+        if (this.astParser == null) {
+            return "";
+        }
+
         for (Nodo nodo : astParser) {
+
+            if (nodo == null) {
+                continue;
+            }
+
             nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
         }
 
-        return null;
+        return stringBuilder.toString();
     }
 
     //Retorna la lista de errores semanticos

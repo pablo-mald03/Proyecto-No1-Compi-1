@@ -35,9 +35,9 @@ public class NodoWhile extends Nodo {
         TablaSimbolos tablaHija = new TablaSimbolos(tabla);
 
         if (codigo != null) {
-            for (Nodo n : codigo) {
-                if (n != null) {
-                    n.validarSemantica(tablaHija, listaErrores);
+            for (Nodo nodo : codigo) {
+                if (nodo != null) {
+                    nodo.validarSemantica(tablaHija, listaErrores);
                 }
             }
         }

@@ -33,14 +33,14 @@ public class NodoOptions extends Nodo {
 
             TipoVariable tipoActual = nodo.validarSemantica(tabla, listaErrores);
 
-            if (tipoActual == TipoVariable.ERROR || tipoActual == TipoVariable.COMODIN) {
+            if (tipoActual == null || tipoActual == TipoVariable.ERROR || tipoActual == TipoVariable.COMODIN) {
                 continue;
             }
 
             if (tipoActual != TipoVariable.STRING) {
                 listaErrores.add(new ErrorAnalisis("options", "Semantico",
                         "Las opciones solo aceptan tipo \"string\". Se encontro con una expresion tipo: \"" +
-                                tipoActual.getTipo() +"\"", getLinea(), getColumna()));
+                                tipoActual + "\"", getLinea(), getColumna()));
             }
         }
 

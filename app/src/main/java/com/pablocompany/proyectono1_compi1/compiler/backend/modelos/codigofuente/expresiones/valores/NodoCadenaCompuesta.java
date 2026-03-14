@@ -30,7 +30,7 @@ public class NodoCadenaCompuesta extends NodoExpresion {
                 return TipoVariable.ERROR;
             }
         }
-        return null;
+        return TipoVariable.STRING;
     }
 
     //No pueden contener comodines

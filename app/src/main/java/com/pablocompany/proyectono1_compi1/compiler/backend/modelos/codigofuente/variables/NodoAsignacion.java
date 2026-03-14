@@ -8,7 +8,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que permite generar solo las asignaciones a la variable
-public class NodoAsignacion extends Nodo{
+public class NodoAsignacion extends Nodo {
 
     //Atributos
     private String id;
@@ -29,30 +29,23 @@ public class NodoAsignacion extends Nodo{
         if (variable == null) {
             listaErrores.add(new ErrorAnalisis(
                     this.id,
-                    "Semántico",
+                    "Semantico",
                     "La variable \"" + this.id + "\" no ha sido declarada. No se le puede asignar un valor.",
                     getLinea(),
                     getColumna()
             ));
-
-            expresion.validarSemantica(tabla, listaErrores);
             return TipoVariable.ERROR;
         }
 
         TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
 
         if (tipoExpresion != TipoVariable.ERROR) {
-
-            listaErrores.add(new ErrorAnalisis(
-                    id,
-                    "Semántico",
-                    "Tipos incompatibles. No se puede asignar " + tipoExpresion.getTipo() +
-                            " a la variable \"" + id + "\" que es: " + variable.getTipo().getTipo(),
-                    getLinea(),
-                    getColumna()
-            ));
-            return TipoVariable.ERROR;
-
+            if (variable.getTipo() != tipoExpresion) {
+                listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                        "Tipos incompatibles. No se puede asignar " + tipoExpresion + " a " + variable.getTipo(),
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
         }
 
         return variable.getTipo();
@@ -74,7 +67,7 @@ public class NodoAsignacion extends Nodo{
         if (variable.getTipo() == TipoVariable.NUMBER && !(nuevoValor instanceof Double || nuevoValor instanceof Integer)) {
             listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es number", super.getLinea(), super.getColumna()));
             return null;
-        }else if (variable.getTipo() == TipoVariable.STRING && !(nuevoValor instanceof String)) {
+        } else if (variable.getTipo() == TipoVariable.STRING && !(nuevoValor instanceof String)) {
             listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es string", super.getLinea(), super.getColumna()));
             return null;
         }

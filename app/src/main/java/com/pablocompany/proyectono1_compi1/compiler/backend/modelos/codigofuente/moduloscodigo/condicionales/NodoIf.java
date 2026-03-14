@@ -36,16 +36,29 @@ public class NodoIf extends Nodo {
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         TipoVariable tipoCond = condicion.validarSemantica(tabla, listaErrores);
 
-        if (tipoCond != TipoVariable.NUMBER && tipoCond != TipoVariable.COMODIN && tipoCond != TipoVariable.ERROR) {
+        if (tipoCond != TipoVariable.NUMBER
+                && tipoCond != TipoVariable.COMODIN
+                && tipoCond != TipoVariable.ERROR
+                && tipoCond != TipoVariable.BOOLEAN_AND
+                && tipoCond != TipoVariable.BOOLEAN_OR  ) {
             listaErrores.add(new ErrorAnalisis("IF", "Semantico",
                     "La condicion del IF debe ser una expresion logica o numerica.", getLinea(), getColumna()));
         }
         /*Tabla que permite validar variables locales*/
         TablaSimbolos tablaHija = new TablaSimbolos(tabla);
 
-        for (Nodo n : codigo) {
-            n.validarSemantica(tablaHija, listaErrores);
+        if (codigo != null) {
+
+            for (Nodo nodo : codigo) {
+
+                if (nodo == null) {
+                    continue;
+                }
+                nodo.validarSemantica(tablaHija, listaErrores);
+            }
+
         }
+
 
         if (nodoElse != null) {
             nodoElse.validarSemantica(tabla, listaErrores);

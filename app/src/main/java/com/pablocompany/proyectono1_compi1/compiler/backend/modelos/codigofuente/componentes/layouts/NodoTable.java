@@ -44,7 +44,47 @@ public class NodoTable extends NodoComponente {
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (this.pointX != null) {
+            TipoVariable tipoX = this.pointX.validarSemantica(tabla, listaErrores);
+            if (tipoX != TipoVariable.NUMBER) {
+                listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
+                        "El valor de PointX debe ser tipo \"number\".", getLinea(), getColumna()));
+            }
+        }
+
+        if (this.pointY != null) {
+            TipoVariable tipoY = this.pointY.validarSemantica(tabla, listaErrores);
+            if (tipoY != TipoVariable.NUMBER) {
+                listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
+                        "El valor de PointY debe ser un \"number\".", getLinea(), getColumna()));
+            }
+        }
+
+        if (estilos != null) {
+            estilos.validarSemantica(tabla, listaErrores);
+        }
+        if (borde != null) {
+            borde.validarSemantica(tabla, listaErrores);
+        }
+
+        if (filas != null) {
+
+            for (List<NodoComponente> fila : filas) {
+                if (fila == null) {
+                    continue;
+                }
+                for (NodoComponente componente : fila) {
+                    if (componente == null) {
+                        continue;
+                    }
+
+                    componente.validarSemantica(tabla, listaErrores);
+                }
+            }
+
+        }
+
+        return TipoVariable.VOID;
     }
 
     //Metodo que permite procesar la configuracion de los textos

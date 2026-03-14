@@ -70,8 +70,12 @@ public class NodoForClasico extends Nodo {
         }
 
         condicion.validarSemantica(tablaFor, listaErrores);
-        for (Nodo n : codigo) {
-            n.validarSemantica(tablaFor, listaErrores);
+        for (Nodo nodo : codigo) {
+            if (nodo == null) {
+                continue;
+            }
+
+            nodo.validarSemantica(tablaFor, listaErrores);
         }
 
         return TipoVariable.VOID;

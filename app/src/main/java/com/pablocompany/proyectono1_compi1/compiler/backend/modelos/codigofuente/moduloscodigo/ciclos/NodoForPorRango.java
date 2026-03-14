@@ -66,6 +66,10 @@ public class NodoForPorRango extends Nodo {
         }
 
         for(Nodo nodo : codigo) {
+            if (nodo == null) {
+                continue;
+            }
+
             nodo.validarSemantica(tablaFor, listaErrores);
         }
 

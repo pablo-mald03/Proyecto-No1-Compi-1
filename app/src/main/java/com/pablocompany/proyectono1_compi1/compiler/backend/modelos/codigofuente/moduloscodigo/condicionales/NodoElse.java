@@ -20,6 +20,7 @@ public class NodoElse extends Nodo {
 
     //Atributos
     private List<Nodo> cuerpo;
+
     public NodoElse(List<Nodo> cuerpo, int linea, int columna) {
         super(linea, columna);
         this.cuerpo = cuerpo;
@@ -32,10 +33,14 @@ public class NodoElse extends Nodo {
         TablaSimbolos tablaHija = new TablaSimbolos(tabla);
 
         if (cuerpo != null) {
-            for (Nodo n : cuerpo) {
-                if (n != null) {
-                    n.validarSemantica(tablaHija, listaErrores);
+            for (Nodo nodo : cuerpo) {
+
+                if (nodo == null) {
+                    continue;
                 }
+
+                nodo.validarSemantica(tablaHija, listaErrores);
+
             }
         }
         return TipoVariable.VOID;
@@ -46,7 +51,7 @@ public class NodoElse extends Nodo {
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         //Solo invoca
-        for(Nodo nodo : cuerpo){
+        for (Nodo nodo : cuerpo) {
             nodo.ejecutar(tabla, listaErrores);
         }
 
