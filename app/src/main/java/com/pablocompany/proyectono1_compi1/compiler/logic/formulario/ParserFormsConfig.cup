@@ -300,6 +300,10 @@ non terminal Nodo ciclo_while;
 //---*--No terminales de la generacion del ciclo do while---*---
 non terminal Nodo ciclo_do_while;
 
+//---*--No terminales de la generacion del codigo que puede ir dentro de las estructuras de control---*---
+non terminal List<Nodo> lista_codigo_bloque;
+non terminal Nodo unidad_codigo_bloque;
+non terminal Nodo instruccion_bloque;
 
 
 /*======*******=====Presedencia de tipos==========*******===========*/
@@ -381,11 +385,11 @@ unidad_codigo       ::= instruccion:ins
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DEL CICLO FOR-----*/
 ciclo_for          ::= FOR:forCiclo PARENT_APERTURA ID:id1 IGUALACION expresion:exp1 PUNTO_COMA condicion:cond PUNTO_COMA ID:id2 IGUALACION expresion:exp2
-                        PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+                        PARENT_CIERRE LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE
                     {:
                         RESULT = new NodoForClasico(id1,exp1, cond,id2,exp2, cuerpo, forCicloleft, forCicloright);
                     :}
-                    | FOR:forCiclo PARENT_APERTURA ID:id IN expresion:exp1 PUNTO PUNTO expresion:exp2 PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+                    | FOR:forCiclo PARENT_APERTURA ID:id IN expresion:exp1 PUNTO PUNTO expresion:exp2 PARENT_CIERRE LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE
                     {:
                         RESULT = new NodoForPorRango(id,exp1,exp2,cuerpo, forCicloleft, forCicloright);
                     :}
@@ -394,7 +398,7 @@ ciclo_for          ::= FOR:forCiclo PARENT_APERTURA ID:id1 IGUALACION expresion:
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DEL CICLO WHILE-----*/
 
-ciclo_while             ::= WHILE:whileCiclo PARENT_APERTURA condicion:cond PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+ciclo_while             ::= WHILE:whileCiclo PARENT_APERTURA condicion:cond PARENT_CIERRE LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE
                         {:
                             RESULT = new NodoWhile(cond, cuerpo, whileCicloleft, whileCicloright);
                         :}
@@ -402,7 +406,7 @@ ciclo_while             ::= WHILE:whileCiclo PARENT_APERTURA condicion:cond PARE
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DEL CICLO DO WHILE-----*/
 
-ciclo_do_while         ::= DO LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE WHILE:whileCiclo PARENT_APERTURA condicion:cond PARENT_CIERRE
+ciclo_do_while         ::= DO LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE WHILE:whileCiclo PARENT_APERTURA condicion:cond PARENT_CIERRE
                         {:
                             RESULT = new NodoDoWhile(cond, cuerpo, whileCicloleft, whileCicloright);
                         :}
@@ -411,11 +415,11 @@ ciclo_do_while         ::= DO LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE WH
 
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONALES EN EL CODIGO FUENTE-----*/
-condicional         ::= IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+condicional         ::= IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE
                     {:
                         RESULT = new NodoIf(con, cuerpo, null, conleft, conright);
                     :}
-                    | IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE bloque_else:el
+                    | IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE bloque_else:el
                     {:
                         RESULT = new NodoIf(con, cuerpo, el, conleft, conright);
                     :}
@@ -423,7 +427,7 @@ condicional         ::= IF PARENT_APERTURA condicion:con PARENT_CIERRE LLAVE_APE
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONALES EN EL CODIGO FUENTE-----*/
 
-bloque_else         ::= ELSE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
+bloque_else         ::= ELSE LLAVE_APERTURA lista_codigo_bloque:cuerpo LLAVE_CIERRE
                     {:
                         RESULT = new NodoElse(cuerpo, cuerpoleft, cuerporight);
                     :}
@@ -432,6 +436,71 @@ bloque_else         ::= ELSE LLAVE_APERTURA lista_codigo:cuerpo LLAVE_CIERRE
                         RESULT = ifAnidado;
                     :}
                     ;
+
+
+
+/*-----REGLAS DE PRODUCCION PARA LAS ACCIONES QUE PUEDEN HACER LAS CODICIONES Y CICLOS DENTRO DE ELLOS-----*/
+
+/*Define la derivacion principal para el reocnocimiento de codigo fuente dentro de ciclos y condicionales*/
+
+lista_codigo_bloque        ::= lista_codigo_bloque :list unidad_codigo_bloque:uni
+                            {:
+                                list.add(uni);
+                                RESULT = list;
+                            :}
+                            | unidad_codigo_bloque:uni
+                            {:
+                                List<Nodo> list = new ArrayList<>();
+                                list.add(uni);
+                                RESULT = list;
+                            :}
+                            ;
+
+
+/*-----Define la derivacion principal de intrucciones para el reocnocimiento de codigo fuente dentro de ciclos y condicionales-----*/
+
+unidad_codigo_bloque       ::= instruccion_bloque:ins
+                            {:
+                                RESULT = ins;
+                            :}
+                            | section_declaration:sec
+                            {:
+                                RESULT = sec;
+                            :}
+                            | table_declaration:tab
+                            {:
+                                RESULT = tab;
+                            :}
+                            | condicional:con
+                            {:
+                                RESULT = con;
+                            :}
+                            | ciclo_for:forCicloleft
+                            {:
+                                RESULT = forCicloleft;
+                            :}
+                            | ciclo_while:whileCiclo
+                            {:
+                                RESULT = whileCiclo;
+                            :}
+                            | ciclo_do_while:doCiclo
+                            {:
+                                RESULT = doCiclo;
+                            :}
+                            | error
+                            {:
+                                RESULT = null;
+                            :}
+                            ;
+
+/*-----Unica instruccion que se puede hacer dentro de un ciclo----*/
+
+instruccion_bloque         ::= ID:id IGUALACION expresion:expresion
+                            {:
+                                RESULT = new NodoAsignacion(id, expresion, idleft, idright);
+                            :}
+                            ;
+
 
 /*Created by Pablo*/
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONES-----*/

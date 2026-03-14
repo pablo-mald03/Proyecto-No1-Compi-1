@@ -15,7 +15,7 @@ public class NodoDoWhile extends Nodo {
     private Nodo condicion;
     private List<Nodo> codigo;
 
-    public NodoDoWhile( Nodo condicion, List<Nodo> codigo, int linea, int columna) {
+    public NodoDoWhile(Nodo condicion, List<Nodo> codigo, int linea, int columna) {
         super(linea, columna);
         this.condicion = condicion;
         this.codigo = codigo;
@@ -25,24 +25,21 @@ public class NodoDoWhile extends Nodo {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
-        /*Tabla que permite validar variables locales*/
-        TablaSimbolos tablaHija = new TablaSimbolos(tabla);
-
         if (codigo != null) {
-            for (Nodo n : codigo) {
-                if (n != null) {
-                    n.validarSemantica(tablaHija, listaErrores);
+            for (Nodo nodo : codigo) {
+                if (nodo != null) {
+                    nodo.validarSemantica(tabla, listaErrores);
                 }
             }
         }
 
-        TipoVariable tipoCond = condicion.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoCondicion = condicion.validarSemantica(tabla, listaErrores);
 
-        if (tipoCond != TipoVariable.NUMBER
-                && tipoCond != TipoVariable.COMODIN
-                && tipoCond != TipoVariable.ERROR
-                && tipoCond != TipoVariable.BOOLEAN_AND
-                && tipoCond != TipoVariable.BOOLEAN_OR) {
+        if (tipoCondicion != TipoVariable.NUMBER
+                && tipoCondicion != TipoVariable.COMODIN
+                && tipoCondicion != TipoVariable.ERROR
+                && tipoCondicion != TipoVariable.BOOLEAN_AND
+                && tipoCondicion != TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("DO-WHILE", "Semantico",
                     "La condición del ciclo DO-WHILE debe ser numerica o logica.",
                     getLinea(), getColumna()));
@@ -52,10 +49,29 @@ public class NodoDoWhile extends Nodo {
     }
 
 
-    //Pendiente definir el metodo ejecutar
-
+    //Metodo que permite ejecutar el ciclo do while (PATRON EXPERTO)
+    /*
+    *Solo pasa a un ciclo do while normal  de paso se hace infinito si la condicion nunca se cumple (PENDIENTE DEFNIR RETORNO)
+    * */
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        do {
+
+            if (codigo != null) {
+                for (Nodo nodo : codigo) {
+                    if (nodo != null) {
+                        nodo.ejecutar(tabla, listaErrores);
+                    }
+                }
+            }
+
+            Object valorCondicion = condicion.ejecutar(tabla, listaErrores);
+
+            if(!(valorCondicion instanceof  Number) || ((Number) valorCondicion).doubleValue() <= 0.0){
+                break;
+            }
+        } while (true);
 
         return null;
     }

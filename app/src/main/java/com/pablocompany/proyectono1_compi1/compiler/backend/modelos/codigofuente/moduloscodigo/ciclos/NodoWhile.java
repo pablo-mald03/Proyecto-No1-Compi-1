@@ -24,24 +24,22 @@ public class NodoWhile extends Nodo {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         /*Tabla que permite validar variables locales*/
-        TipoVariable tipoCond = condicion.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoCondicion = condicion.validarSemantica(tabla, listaErrores);
 
-        if (tipoCond != TipoVariable.NUMBER
-                && tipoCond != TipoVariable.COMODIN
-                && tipoCond != TipoVariable.ERROR
-                && tipoCond != TipoVariable.BOOLEAN_AND
-                && tipoCond != TipoVariable.BOOLEAN_OR) {
+        if (tipoCondicion != TipoVariable.NUMBER
+                && tipoCondicion != TipoVariable.COMODIN
+                && tipoCondicion != TipoVariable.ERROR
+                && tipoCondicion != TipoVariable.BOOLEAN_AND
+                && tipoCondicion != TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("WHILE", "Semantico",
                     "La condición del ciclo WHILE debe ser una expresion numerica o logica.",
                     getLinea(), getColumna()));
         }
 
-        TablaSimbolos tablaHija = new TablaSimbolos(tabla);
-
         if (codigo != null) {
             for (Nodo nodo : codigo) {
                 if (nodo != null) {
-                    nodo.validarSemantica(tablaHija, listaErrores);
+                    nodo.validarSemantica(tabla, listaErrores);
                 }
             }
         }
@@ -50,10 +48,29 @@ public class NodoWhile extends Nodo {
 
     }
 
-    //Pendiente definir el metodo ejecutar
-
+    //Metodo que permite ejecutar el ciclo while (PATRON EXPERTO)
+    /*
+    *Solo se convierte a un ciclo while normal (PENDIENTE DEFNIR RETORNO)
+    */
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+
+        while(true){
+            Object valorCondicion = condicion.ejecutar(tabla, listaErrores);
+
+            if(!(valorCondicion instanceof  Number) || ((Number) valorCondicion).doubleValue() <= 0.0){
+                break;
+            }
+
+            if (codigo != null) {
+                for (Nodo nodo : codigo) {
+                    if (nodo != null) {
+                        nodo.ejecutar(tabla, listaErrores);
+                    }
+                }
+            }
+        }
 
         return null;
     }

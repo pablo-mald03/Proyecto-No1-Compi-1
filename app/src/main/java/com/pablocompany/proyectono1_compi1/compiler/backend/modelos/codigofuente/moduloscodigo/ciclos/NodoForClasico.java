@@ -34,16 +34,13 @@ public class NodoForClasico extends Nodo {
     //Metodo que permite validar semantica del ciclo for (PATRON EXPERTO)
     /*
     *
-    * Es importante destacar que esto es un juego de referencias en el stack de las funciones. ya que media vez muere la funcion
-    * en el respectivo stack. La tabla de simbolos muere tambien.
+    * Es importante destacar que esto lo unico que hace es verificar si el iterador existe fuera del ciclo
     *
-    * Lo que me da como resultado que la variable local (A no ser de que este en ambito global) DESAPAREZCA AL MORIR EL STACK DE LA FUNCION
+    * Lo que me da como resultado que la variable local (A no ser de que este en ambito global) QUE PERMANECE Y SERA SOBREESCRITA SIEMPRE QUE SE LLAME
+    * PERO ESTO SOLO PASA CON LA CONDICION DEL FOR.
     * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-
-        /*Inserta a la tabla de simbolos local*/
-        TablaSimbolos tablaFor = new TablaSimbolos(tabla);
 
         /*Tabla que permite validar variables*/
         Simbolo simboloExistente = tabla.buscar(idInicial);
@@ -56,11 +53,11 @@ public class NodoForClasico extends Nodo {
                 return TipoVariable.ERROR;
             }
         } else {
-            tablaFor.insertar(new Simbolo(idInicial, TipoVariable.NUMBER, 0.0, getLinea(), getColumna()));
+            tabla.insertar(new Simbolo(idInicial, TipoVariable.NUMBER, 0.0, getLinea(), getColumna()));
         }
 
-        TipoVariable tipoAsig = expresionIgualacion.validarSemantica(tablaFor, listaErrores);
-        TipoVariable tipoIter = expresionIterador.validarSemantica(tablaFor, listaErrores);
+        TipoVariable tipoAsig = expresionIgualacion.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoIter = expresionIterador.validarSemantica(tabla, listaErrores);
 
         if (tipoAsig != TipoVariable.NUMBER || tipoIter != TipoVariable.NUMBER) {
             listaErrores.add(new ErrorAnalisis("FOR", "Semantico",
@@ -69,13 +66,13 @@ public class NodoForClasico extends Nodo {
             return TipoVariable.ERROR;
         }
 
-        condicion.validarSemantica(tablaFor, listaErrores);
+        condicion.validarSemantica(tabla, listaErrores);
         for (Nodo nodo : codigo) {
             if (nodo == null) {
                 continue;
             }
 
-            nodo.validarSemantica(tablaFor, listaErrores);
+            nodo.validarSemantica(tabla, listaErrores);
         }
 
         return TipoVariable.VOID;
@@ -86,31 +83,30 @@ public class NodoForClasico extends Nodo {
     //Metodo que permite ejecutar el ciclo for (PATRON EXPERTO)
     /*
      *
-     * Es importante destacar que se aplica la misma tecnica (debido a que esto es una ejecucion despues de haber hecho el analisis semantico
-     * La garantia es que SI EL ITERADOR SERA LOCAL. Morira al salir del stack tambien
+     * Es importante destacar que se aplica la misma tecnica (debido a que esto es una ejecucion despues de haber hecho el analisis semantico)
+     * La garantia es que el iterador ya existe o ya fue declarado anteriormente en la tabla de simbolos ya solo se utiliza y queda
+     * para siempre en el ambito general (no se manejan ambitos internos)
      *
      * */
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        //Tabla de simbolos local (variables dentro del for)
-        TablaSimbolos tablaFor = new TablaSimbolos(tabla);
 
         Object valorInicial = expresionIgualacion.ejecutar(tabla, listaErrores);
-        tablaFor.insertar(new Simbolo(idInicial, TipoVariable.NUMBER, valorInicial, getLinea(), getColumna()));
+        tabla.asignar(idInicial, valorInicial,listaErrores);
 
         while(true){
 
-            Object condidicionFor = condicion.ejecutar(tablaFor, listaErrores);
+            Object condidicionFor = condicion.ejecutar(tabla, listaErrores);
             if(!(condidicionFor instanceof  Number) || ((Number) condidicionFor).doubleValue() <= 0.0){
                 break;
             }
 
             for(Nodo nodo : codigo) {
-                nodo.ejecutar(tablaFor, listaErrores);
+                nodo.ejecutar(tabla, listaErrores);
             }
 
-            Object valorIterador = expresionIterador.ejecutar(tablaFor, listaErrores);
-            tablaFor.asignar(idIterador, valorIterador, listaErrores);
+            Object valorIterador = expresionIterador.ejecutar(tabla, listaErrores);
+            tabla.asignar(idIterador, valorIterador, listaErrores);
 
         }
         return null;
