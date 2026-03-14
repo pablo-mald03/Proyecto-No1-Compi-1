@@ -1385,6 +1385,13 @@ expresion ::=       expresion:exp1 SUMA expresion:exp2
                     {:
                         RESULT = new NodoCadenaCompuesta(list, listleft, listright);
                     :}
+                    | INICIO_CADENA:inCad FIN_CADENA
+                    {:
+                        List<NodoFragmento> listEmpty = new ArrayList<>();
+                        NodoTexto vacio = new NodoTexto("", inCadleft, inCadright);
+                        listEmpty.add(vacio);
+                        RESULT = new NodoCadenaCompuesta(listEmpty, inCadleft, inCadright);
+                    :}
                     ;
 
 //----*----Representa las cadenas con fragmentos de texto y emojis----*----

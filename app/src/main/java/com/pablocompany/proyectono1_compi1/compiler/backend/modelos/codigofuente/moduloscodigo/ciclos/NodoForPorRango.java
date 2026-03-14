@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -24,6 +25,12 @@ public class NodoForPorRango extends Nodo {
         this.rangoInicial = rangoInicial;
         this.rangoFinal = rangoFinal;
         this.codigo = codigo;
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
     }
 
 

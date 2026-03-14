@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -16,6 +17,12 @@ public class NodoWidth extends Nodo {
     public NodoWidth(NodoExpresion expresion, int linea, int columna) {
         super(linea, columna);
         this.expresion = expresion;
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion

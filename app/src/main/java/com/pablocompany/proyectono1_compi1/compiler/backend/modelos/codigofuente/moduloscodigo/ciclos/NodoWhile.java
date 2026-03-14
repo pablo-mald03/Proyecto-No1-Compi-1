@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.ciclos;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -19,6 +20,11 @@ public class NodoWhile extends Nodo {
         this.codigo = codigo;
     }
 
+    //Metodo que permite validar semantica del lenguaje generado
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
 
     //Pendiente definir el metodo ejecutar
 

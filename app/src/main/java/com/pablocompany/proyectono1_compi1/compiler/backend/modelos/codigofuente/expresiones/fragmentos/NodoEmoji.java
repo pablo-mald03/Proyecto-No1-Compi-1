@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -21,6 +22,12 @@ public class NodoEmoji extends NodoFragmento {
 
         this.reconocerEmoji(tipo);
 
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
     }
 
     //Metodo propio de la clase polimorfica (La ER utilizada no tiene ningun efecto en tiempo de PARSEO)

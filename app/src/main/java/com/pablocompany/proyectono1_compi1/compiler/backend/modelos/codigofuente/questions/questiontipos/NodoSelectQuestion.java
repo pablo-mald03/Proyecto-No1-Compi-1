@@ -76,6 +76,12 @@ public class NodoSelectQuestion extends NodoQuestion {
 
     }
 
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
+
     /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/
 
     //Metodo que permite ejecutar laa acciones dentro de la question

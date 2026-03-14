@@ -21,6 +21,12 @@ public class NodoAsignacion extends Nodo{
 
     }
 
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
+
     //Metodo que permite ejecutar el nodo (Validacion de variables y declaraciones)
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

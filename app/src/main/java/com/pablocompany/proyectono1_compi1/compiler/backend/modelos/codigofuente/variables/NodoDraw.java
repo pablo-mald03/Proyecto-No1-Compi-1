@@ -26,6 +26,12 @@ public class NodoDraw extends NodoComponente {
         this.id = id;
     }
 
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
+
     /*PENDIENTE CREAR LA LOGICA DE VALIDACION DE DATOS*/
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

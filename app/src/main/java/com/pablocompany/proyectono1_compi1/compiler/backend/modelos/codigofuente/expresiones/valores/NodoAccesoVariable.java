@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -17,6 +18,20 @@ public class NodoAccesoVariable extends NodoExpresion {
         super(linea, columna);
         this.id = id;
     }
+
+    /*Nodo que permite validar la semantica del lenguaje generado*/
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        Simbolo simbolo = tabla.buscar(this.id);
+        if (simbolo == null) {
+            listaErrores.add(new ErrorAnalisis(id, "Semántico", "Variable no declarada", getLinea(), getColumna()));
+            return null;
+        }
+
+        return simbolo.getTipo();
+    }
+
 
     //Metodo que permite contar los comodines que tiene la expresion
     @Override

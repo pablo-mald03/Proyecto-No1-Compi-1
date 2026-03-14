@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -28,6 +29,12 @@ public class NodoIf extends Nodo{
         this.condicion = condicion;
         this.codigo = codigo;
         this.nodoElse = nodoElse;
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
     }
 
     //Clase que permite ejecutar por completo el codigo que tiene dentro el condicional

@@ -63,6 +63,11 @@ public class NodoOpenQuestion extends NodoQuestion {
 
     }
 
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
 
     //Metodo que permite ejecutar las acciones que tenga la pregunta
     @Override

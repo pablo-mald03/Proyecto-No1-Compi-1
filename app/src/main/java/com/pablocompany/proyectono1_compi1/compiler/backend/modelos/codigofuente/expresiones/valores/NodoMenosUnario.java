@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -15,6 +16,14 @@ public class NodoMenosUnario extends NodoExpresion {
         this.expresion = exp;
     }
 
+
+    //Metodo que permite validar semantica del lenguaje generado
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
+
+    //Metodo que permite retornar el valor del operador UNARIO
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         Object valor = expresion.ejecutar(tabla, listaErrores);

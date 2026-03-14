@@ -38,6 +38,12 @@ public class NodoMultipleQuestion extends NodoQuestion {
         this.setConfiguraciones(config);
     }
 
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
+    }
+
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 

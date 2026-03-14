@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -29,6 +30,9 @@ public abstract class Nodo {
     public abstract Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
 
     public abstract String getString();
+
+    //Metodo que permite validar la semantica del lenguaje generado
+    public abstract TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
 
 }
 

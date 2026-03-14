@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -15,6 +16,12 @@ public class NodoLiteral extends NodoExpresion {
     public NodoLiteral(Object valor, int linea, int columna) {
         super(linea, columna);
         this.valor = valor;
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
     }
 
     //Metodo que permite contar los comodines que tiene la expresion

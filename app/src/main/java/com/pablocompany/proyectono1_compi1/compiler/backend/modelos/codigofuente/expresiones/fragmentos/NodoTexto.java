@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -14,6 +15,12 @@ public class NodoTexto extends NodoFragmento{
     public NodoTexto(String contenido,int linea, int columna) {
         super(linea, columna);
         this.contenido = contenido;
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return null;
     }
 
     //Metodo que permite ejecutarse propio de la jerarquia pero en este caso retorna solo su propio valor object
