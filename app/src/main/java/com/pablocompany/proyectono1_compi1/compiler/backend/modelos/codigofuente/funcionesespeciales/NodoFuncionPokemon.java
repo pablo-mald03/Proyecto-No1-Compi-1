@@ -21,10 +21,27 @@ public class NodoFuncionPokemon extends Nodo {
         this.offset = offset;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado
+    //Metodo que permite validar semantica de la funcion pokemon para poder hacer el request (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        if (this.offset != null) {
+            TipoVariable tipoOffset = offset.validarSemantica(tabla, listaErrores);
+            if (tipoOffset != TipoVariable.NUMBER && tipoOffset != TipoVariable.COMODIN && tipoOffset != TipoVariable.ERROR) {
+                listaErrores.add(new ErrorAnalisis("who_is_that_pokemon", "Semántico",
+                        "El parámetro \"offset\" debe ser una expresion numerica.", getLinea(), getColumna()));
+            }
+        }
+
+        if (this.limit != null) {
+            TipoVariable tipoLimit = limit.validarSemantica(tabla, listaErrores);
+            if (tipoLimit != TipoVariable.NUMBER && tipoLimit != TipoVariable.COMODIN && tipoLimit != TipoVariable.ERROR) {
+                listaErrores.add(new ErrorAnalisis("who_is_that_pokemon", "Semántico",
+                        "El parámetro \"limit\" debe ser una expresion numerica.", getLinea(), getColumna()));
+            }
+        }
+
+        return TipoVariable.SPECIAL;
     }
 
     //Metodo que permite ejecutar el request de a la API para poder obtener los pokemon
@@ -35,6 +52,6 @@ public class NodoFuncionPokemon extends Nodo {
 
     @Override
     public String getString() {
-        return "";
+        return "wh";
     }
 }

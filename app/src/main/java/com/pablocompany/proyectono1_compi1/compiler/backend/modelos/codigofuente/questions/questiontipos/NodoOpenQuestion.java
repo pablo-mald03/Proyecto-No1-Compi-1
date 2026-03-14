@@ -12,6 +12,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questionrecursos.TipoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -38,7 +39,7 @@ public class NodoOpenQuestion extends NodoQuestion {
         }
 
         for (AtributoConfig config : configuracion) {
-            if(config ==null){
+            if (config == null) {
                 continue;
             }
 
@@ -63,10 +64,45 @@ public class NodoOpenQuestion extends NodoQuestion {
 
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de la pregunta tipo Open (PATRON EXPERTO)
+    /*
+     * Comentarios de validacion detallados porque es importante saber en que momento se valida cada cosa
+     *
+     * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        /*--Validacion de config---*/
+        if (this.width != null) {
+            width.validarSemantica(tabla, listaErrores);
+        }
+        if (this.height != null) {
+            height.validarSemantica(tabla, listaErrores);
+        }
+        if (this.estilos != null && estilos.getTextSize() != null) {
+
+            estilos.getTextSize().validarSemantica(tabla, listaErrores);
+        }
+
+        if(this.label != null){
+            this.label.validarSemantica(tabla,listaErrores);
+        }else{
+
+            //Solo es preventivo
+            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                    "El atributo \"label\" es obligatorio en la pregunta OPEN_QUESTION.", getLinea(), getColumna()));
+
+        }
+
+        if (id != null) {
+            Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
+            if (!tabla.insertar(simbolo)) {
+                listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                        "La variable \"" + id + "\" ya ha sido definida.", getLinea(), getColumna()));
+            }
+        }
+
+        return TipoVariable.SPECIAL;
     }
 
     //Metodo que permite ejecutar las acciones que tenga la pregunta

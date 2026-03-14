@@ -4,6 +4,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -26,10 +27,35 @@ public class NodoDraw extends NodoComponente {
         this.id = id;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de que solo se puedan agregar comodines a funciones special
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        Simbolo simbolo = tabla.buscar(id);
+
+        if (simbolo == null) {
+            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                    "La pregunta tipo special \"" + id + "\" no ha sido declarada.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        if(simbolo.getTipo() != TipoVariable.SPECIAL){
+
+            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                    "La función \"draw\" solo puede usarse con tipos special. \"" + id + "\" es: " + simbolo.getTipo().getTipo(),
+                    getLinea(), getColumna()));
+
+        }
+
+        //Se validan los parametros dentro
+        if (parametros != null) {
+            for (Nodo param : parametros) {
+                param.validarSemantica(tabla, listaErrores);
+            }
+        }
+
+        return TipoVariable.SPECIAL;
     }
 
     /*PENDIENTE CREAR LA LOGICA DE VALIDACION DE DATOS*/

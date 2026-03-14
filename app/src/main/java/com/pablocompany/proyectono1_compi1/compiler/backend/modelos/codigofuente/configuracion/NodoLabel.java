@@ -20,10 +20,17 @@ public class NodoLabel extends Nodo {
         this.expresion = expresion;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica del label asignado (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        TipoVariable tipoVariable = expresion.validarSemantica(tabla, listaErrores);
+
+        if (tipoVariable != TipoVariable.STRING && tipoVariable != TipoVariable.COMODIN && tipoVariable != TipoVariable.ERROR) {
+            listaErrores.add(new ErrorAnalisis("label", "Semántico", "El label solo debe contener cadenas de texto", getLinea(), getColumna()));
+        }
+
+        return tipoVariable;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion

@@ -29,7 +29,7 @@ public class AnalizadorSemantico {
 
         TablaSimbolos tablaSimbolos = new TablaSimbolos();
         for (Nodo nodo : astParser) {
-            nodo.ejecutar(tablaSimbolos, this.listadoErroresTotal);
+            nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
         }
 
         return null;

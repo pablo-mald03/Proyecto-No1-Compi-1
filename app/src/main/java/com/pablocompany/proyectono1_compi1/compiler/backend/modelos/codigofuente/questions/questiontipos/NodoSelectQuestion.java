@@ -11,6 +11,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales.NodoFuncionPokemon;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -76,10 +77,65 @@ public class NodoSelectQuestion extends NodoQuestion {
 
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de la pregunta tipo select (PATRON EXPERTO)
+    /*
+    * Comentarios de validacion detallados porque es importante saber en que momento se valida cada cosa
+    *
+    * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        /*--Validacion de config---*/
+        if(this.width != null){
+            width.validarSemantica(tabla,listaErrores);
+        }
+        if(this.height != null){
+            height.validarSemantica(tabla,listaErrores);
+        }
+        if(this.estilos != null){
+
+            if (estilos.getTextSize() != null) {
+                estilos.getTextSize().validarSemantica(tabla, listaErrores);
+            }
+        }
+
+        /*--Validacion de opciones--*/
+        if (this.opciones == null && this.funcionPokemon == null) {
+            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                    "La pregunta SELECT_QUESTION debe tener opciones definidas.", getLinea(), getColumna()));
+        }
+
+        if (this.opciones != null && this.funcionPokemon != null) {
+            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                    "La pregunta SELECT_QUESTION debe tener solo la lista de opciones o solo la funcion who_is_that_pokemon.", getLinea(), getColumna()));
+        }
+
+        if (this.opciones != null) {
+            this.opciones.validarSemantica(tabla, listaErrores);
+        }
+
+        /*---Validacion de la respuesta correcta---*/
+
+        if(respuestaCorrecta != null){
+            respuestaCorrecta.validarSemantica(tabla,listaErrores);
+        }
+
+        /*---Validacion de la funcion para el request a la api de pokemon---*/
+
+        if (this.funcionPokemon != null) {
+            this.funcionPokemon.validarSemantica(tabla, listaErrores);
+        }
+
+        /*---Registrar y validar existencia---*/
+        if (id != null) {
+            Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
+
+            if (!tabla.insertar(simbolo)) {
+                listaErrores.add(new ErrorAnalisis(id, "Semántico",
+                        "La variable \"" + id + "\" ya ha sido definida.", getLinea(), getColumna()));
+            }
+        }
+        return TipoVariable.SPECIAL;
     }
 
     /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/
@@ -92,6 +148,6 @@ public class NodoSelectQuestion extends NodoQuestion {
 
     @Override
     public String getString() {
-        return "";
+        return "SELECT_QUESTION";
     }
 }

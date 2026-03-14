@@ -21,10 +21,41 @@ public class NodoAsignacion extends Nodo{
 
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica de una asignacion de algun valor a una variable
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        Simbolo variable = tabla.buscar(id);
+
+        if (variable == null) {
+            listaErrores.add(new ErrorAnalisis(
+                    this.id,
+                    "Semántico",
+                    "La variable \"" + this.id + "\" no ha sido declarada. No se le puede asignar un valor.",
+                    getLinea(),
+                    getColumna()
+            ));
+
+            expresion.validarSemantica(tabla, listaErrores);
+            return TipoVariable.ERROR;
+        }
+
+        TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
+
+        if (tipoExpresion != TipoVariable.ERROR) {
+
+            listaErrores.add(new ErrorAnalisis(
+                    id,
+                    "Semántico",
+                    "Tipos incompatibles. No se puede asignar " + tipoExpresion.getTipo() +
+                            " a la variable \"" + id + "\" que es: " + variable.getTipo().getTipo(),
+                    getLinea(),
+                    getColumna()
+            ));
+            return TipoVariable.ERROR;
+
+        }
+
+        return variable.getTipo();
     }
 
     //Metodo que permite ejecutar el nodo (Validacion de variables y declaraciones)

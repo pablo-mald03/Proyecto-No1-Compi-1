@@ -13,9 +13,7 @@ public class NodoDeclaracion extends Nodo {
 
     //Atributos
     TipoVariable tipo;
-
     String id;
-
     Nodo expresion;
 
     public NodoDeclaracion(TipoVariable tipo, String id, Nodo expresion, int linea, int columna) {
@@ -25,10 +23,52 @@ public class NodoDeclaracion extends Nodo {
         this.tipo = tipo;
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite validar semantica al declarar una variable (Se agrega al contexto)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        //Valores iniciales de la variable (Solicitado)
+
+        Object valorInicial = null;
+        if (this.tipo == TipoVariable.NUMBER) {
+            valorInicial = 0.0;
+        } else if (this.tipo == TipoVariable.STRING) {
+            valorInicial = "";
+        }
+
+        Simbolo nuevoSimbolo = new Simbolo(id, this.tipo, valorInicial, getLinea(), getColumna());
+
+        boolean insertado = tabla.insertar(nuevoSimbolo);
+
+        if (!insertado) {
+            listaErrores.add(new ErrorAnalisis(
+                    id,
+                    "Semántico",
+                    "La variable \"" + id + "\" ya ha sido definida en este ámbito.",
+                    getLinea(),
+                    getColumna()
+            ));
+        }
+
+        if (expresion != null) {
+
+            TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
+
+            if (tipoExpresion != TipoVariable.ERROR && tipoExpresion != TipoVariable.COMODIN) {
+                if (this.tipo != tipoExpresion) {
+                    listaErrores.add(new ErrorAnalisis(
+                            id,
+                            "Semántico",
+                            "Tipo incompatible en la inicialización: se esperaba: " + this.tipo.getTipo() +
+                                    " pero se es \"" + tipoExpresion.getTipo() + "\"",
+                            getLinea(),
+                            getColumna()
+                    ));
+                }
+            }
+        }
+
+        return this.tipo != null ? this.tipo : TipoVariable.ERROR;
     }
 
     //Metodo que permite ejecutar el nodo (Validacion de variables y declaraciones)
