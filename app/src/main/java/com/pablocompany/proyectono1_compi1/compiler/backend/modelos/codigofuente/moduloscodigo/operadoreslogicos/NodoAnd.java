@@ -31,7 +31,7 @@ public class NodoAnd extends Nodo {
 
         if (tipoA == TipoVariable.BOOLEAN_OR || tipoB == TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("AND", "Semantico",
-                    "No se permite mezclar operadores AND y OR sin parentesis explicitos.",
+                    "No se permite mezclar operadores AND y OR en una condicion.",
                     getLinea(), getColumna()));
             return TipoVariable.ERROR;
         }

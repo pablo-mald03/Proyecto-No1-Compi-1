@@ -38,7 +38,11 @@ public class NodoDoWhile extends Nodo {
 
         TipoVariable tipoCond = condicion.validarSemantica(tabla, listaErrores);
 
-        if (tipoCond != TipoVariable.NUMBER && tipoCond != TipoVariable.COMODIN && tipoCond != TipoVariable.ERROR) {
+        if (tipoCond != TipoVariable.NUMBER
+                && tipoCond != TipoVariable.COMODIN
+                && tipoCond != TipoVariable.ERROR
+                && tipoCond != TipoVariable.BOOLEAN_AND
+                && tipoCond != TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("DO-WHILE", "Semantico",
                     "La condición del ciclo DO-WHILE debe ser numerica o logica.",
                     getLinea(), getColumna()));

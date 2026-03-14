@@ -26,7 +26,11 @@ public class NodoWhile extends Nodo {
         /*Tabla que permite validar variables locales*/
         TipoVariable tipoCond = condicion.validarSemantica(tabla, listaErrores);
 
-        if (tipoCond != TipoVariable.NUMBER && tipoCond != TipoVariable.COMODIN && tipoCond != TipoVariable.ERROR) {
+        if (tipoCond != TipoVariable.NUMBER
+                && tipoCond != TipoVariable.COMODIN
+                && tipoCond != TipoVariable.ERROR
+                && tipoCond != TipoVariable.BOOLEAN_AND
+                && tipoCond != TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("WHILE", "Semantico",
                     "La condición del ciclo WHILE debe ser una expresion numerica o logica.",
                     getLinea(), getColumna()));
