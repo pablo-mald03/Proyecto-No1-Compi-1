@@ -20,16 +20,22 @@ public class NodoHeight extends Nodo implements ValidadorDatosForms {
         this.expresion = expresion;
     }
 
-
+    //Metodo que permite validar semantica de la altura (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
-        if(!esLayout){
-            return this.validarSemantica(tabla,listaErrores);
+        TipoVariable tipoResult = this.validarSemantica(tabla, listaErrores);
+
+        if (esLayout) {
+            if (tipoResult == TipoVariable.COMODIN) {
+                listaErrores.add(new ErrorAnalisis("height", "Semantico",
+                        "La propiedad \"height\" en un layout \"SECTION\" o \"TABLE\" no permite el uso de \"comodines\".",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
         }
 
-
-        return null;
+        return tipoResult;
     }
 
     //Metodo que permite validar semantica de la altura (PATRON EXPERTO)

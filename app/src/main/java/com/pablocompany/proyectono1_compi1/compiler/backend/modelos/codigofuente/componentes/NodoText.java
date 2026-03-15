@@ -6,6 +6,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointX;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointY;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.TipoConfiguracion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
@@ -19,7 +20,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa a los textos que se mostraran en el formulario para dar mensajes
-public class NodoText extends NodoComponente{
+public class NodoText extends NodoComponente {
 
     //Atributos
     private NodoExpresion contenido;
@@ -70,44 +71,39 @@ public class NodoText extends NodoComponente{
     //Pendiente procesar los estilos del texto
     @Override
     protected Estilos procesarEstilos(List<NodoEstilos> lista) {
-            if(lista.isEmpty()){
-                return null;
+        if (lista.isEmpty()) {
+            return null;
+        }
+
+        NodoColor backgroundColor = null;
+        NodoColor color = null;
+        NodoTipoLetra fontFamily = null;
+        NodoExpresion textSize = null;
+
+        for (NodoEstilos nodo : lista) {
+
+            if (nodo == null) {
+                continue;
             }
 
-            NodoColor backgroundColor = null;
-            NodoColor color = null;
-            TipoLetra fontFamily = TipoLetra.MONO;
-            NodoExpresion textSize = null;
+            Object valorNodo = nodo.getValor();
 
-            for (NodoEstilos nodo : lista) {
-
-                if(nodo ==null){
-                    continue;
-                }
-
-                Object valorNodo = nodo.getValor();
-
-                switch (nodo.getTipo()) {
-                    case BACKGROUND_COLOR:
-                        backgroundColor = (NodoColor) valorNodo;
-                        break;
-                    case COLOR_TEXTO:
-                        color = (NodoColor) valorNodo;
-                        break;
-                    case FONT_FAMILY:
-                        try{
-                            fontFamily = TipoLetra.valueOf((String) valorNodo);
-                        }catch (Exception e){
-                            fontFamily = TipoLetra.NOT_FOUND;
-                        }
-
-                        break;
-                    case TEXT_SIZE:
-                        textSize = (NodoExpresion) valorNodo;
-                        break;
-                }
+            switch (nodo.getTipo()) {
+                case BACKGROUND_COLOR:
+                    backgroundColor = (NodoColor) valorNodo;
+                    break;
+                case COLOR_TEXTO:
+                    color = (NodoColor) valorNodo;
+                    break;
+                case FONT_FAMILY:
+                    fontFamily = (NodoTipoLetra) valorNodo;
+                    break;
+                case TEXT_SIZE:
+                    textSize = (NodoExpresion) valorNodo;
+                    break;
             }
-            return new Estilos(backgroundColor, color, fontFamily, textSize);
+        }
+        return new Estilos(backgroundColor, color, fontFamily, textSize);
 
     }
 

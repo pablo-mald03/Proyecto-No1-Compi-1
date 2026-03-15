@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -9,7 +10,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa el ancho de configuracion de una pregunta o layout
-public class NodoWidth extends Nodo {
+public class NodoWidth extends Nodo implements ValidadorDatosForms {
 
     //Atributos
     private NodoExpresion expresion;
@@ -19,11 +20,28 @@ public class NodoWidth extends Nodo {
         this.expresion = expresion;
     }
 
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        TipoVariable tipoResult = this.validarSemantica(tabla, listaErrores);
+
+        if (esLayout) {
+            if (tipoResult == TipoVariable.COMODIN) {
+                listaErrores.add(new ErrorAnalisis("width", "Semantico",
+                        "La propiedad \"width\" en un layout \"SECTION\" o \"TABLE\" no permite el uso de \"comodines\".",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        }
+
+        return tipoResult;
+    }
+
     //Metodo que permite validar semantica del ancho (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (this.expresion == null) {
-            listaErrores.add(new ErrorAnalisis("height", "Semantico",
+            listaErrores.add(new ErrorAnalisis("width", "Semantico",
                     "El valor del ancho es obligatorio.", getLinea(), getColumna()));
             return TipoVariable.ERROR;
         }
@@ -35,7 +53,7 @@ public class NodoWidth extends Nodo {
                 tipoExpresion != TipoVariable.ERROR) {
 
             listaErrores.add(new ErrorAnalisis("width", "Semantico",
-                    "La propiedad \"width\" debe ser numerica. Pero se encontro con una expreion tipo: \"" + tipoExpresion.getTipo()+"\"",
+                    "La propiedad \"width\" debe ser \"numerica\". Pero se encontro con una expreion tipo: \"" + tipoExpresion.getTipo()+"\"",
                     getLinea(), getColumna()));
 
             return TipoVariable.ERROR;

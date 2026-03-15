@@ -8,6 +8,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointX;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointY;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
@@ -64,10 +65,9 @@ public class NodoTable extends NodoComponente implements ValidadorDatosForms {
         }
 
         //Bifurcacion de logica
-        if(this.estilos != null){
-            this.estilos.validarSemantica(tabla, listaErrores,true);
+        if (this.estilos != null) {
+            this.estilos.validarSemantica(tabla, listaErrores, true);
         }
-
 
         if (this.borde != null) {
             this.borde.validarSemantica(tabla, listaErrores);
@@ -96,7 +96,7 @@ public class NodoTable extends NodoComponente implements ValidadorDatosForms {
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return  this.validarSemantica(tabla,listaErrores,true);
+        return this.validarSemantica(tabla, listaErrores, true);
     }
 
     //Metodo que permite procesar la configuracion de los textos
@@ -149,7 +149,7 @@ public class NodoTable extends NodoComponente implements ValidadorDatosForms {
 
         NodoColor backgroundColor = null;
         NodoColor color = null;
-        TipoLetra fontFamily = TipoLetra.MONO;
+        NodoTipoLetra fontFamily = null;
         NodoExpresion textSize = null;
 
         for (NodoEstilos nodo : lista) {
@@ -168,13 +168,7 @@ public class NodoTable extends NodoComponente implements ValidadorDatosForms {
                     color = (NodoColor) valorNodo;
                     break;
                 case FONT_FAMILY:
-
-                    try{
-                        fontFamily = TipoLetra.valueOf((String) valorNodo);
-                    }catch (Exception e){
-                        fontFamily = TipoLetra.NOT_FOUND;
-                    }
-
+                    fontFamily = (NodoTipoLetra) valorNodo;
                     break;
                 case TEXT_SIZE:
                     textSize = (NodoExpresion) valorNodo;

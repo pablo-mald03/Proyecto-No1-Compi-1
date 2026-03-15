@@ -745,7 +745,7 @@ estilo_individual_layout       ::= BACKGROUND_COLOR DOS_PUNTOS color_valor:color
                                 :}
                                 | FONT_FAMILY DOS_PUNTOS TIPOGRAFIA:tipo
                                 {:
-                                    RESULT = new NodoEstilos(TipoEstilo.FONT_FAMILY, tipo.toString() , tipoleft, tiporight);
+                                    RESULT = new NodoEstilos(TipoEstilo.FONT_FAMILY, new NodoTipoLetra(tipo.toString(), tipoleft, tiporight) , tipoleft, tiporight);
                                 :}
                                 | TEXT_SIZE DOS_PUNTOS expresion:exp
                                 {:

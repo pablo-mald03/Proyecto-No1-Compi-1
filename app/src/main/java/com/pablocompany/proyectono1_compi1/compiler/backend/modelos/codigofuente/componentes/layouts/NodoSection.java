@@ -11,6 +11,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOrientation;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointX;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoPointY;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
@@ -147,7 +148,7 @@ public class NodoSection extends NodoComponente implements ValidadorDatosForms {
 
         NodoColor backgroundColor = null;
         NodoColor color = null;
-        TipoLetra fontFamily = TipoLetra.MONO;
+        NodoTipoLetra fontFamily = null;
         NodoExpresion textSize = null;
 
         for (NodoEstilos nodo : lista) {
@@ -166,12 +167,7 @@ public class NodoSection extends NodoComponente implements ValidadorDatosForms {
                     color = (NodoColor) valorNodo;
                     break;
                 case FONT_FAMILY:
-                    try{
-                        fontFamily = TipoLetra.valueOf((String) valorNodo);
-                    }catch (Exception e){
-                        fontFamily = TipoLetra.NOT_FOUND;
-                    }
-
+                    fontFamily = (NodoTipoLetra) valorNodo;
                     break;
                 case TEXT_SIZE:
                     textSize = (NodoExpresion) valorNodo;

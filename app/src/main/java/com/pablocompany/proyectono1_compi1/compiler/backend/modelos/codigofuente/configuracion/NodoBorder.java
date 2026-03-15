@@ -21,7 +21,12 @@ public class NodoBorder extends Nodo {
 
     public NodoBorder( NodoExpresion grosor, String tipoBorde, NodoColor color, int linea, int columna) {
         super(linea, columna);
-        this.tipoBorde = TipoBorde.valueOf(tipoBorde.toUpperCase());
+
+        try {
+            this.tipoBorde = TipoBorde.valueOf(tipoBorde.toUpperCase());
+        }catch (Exception ex){
+            this.tipoBorde = TipoBorde.NOT_FOUND;
+        }
         this.color = color;
         this.grosor = grosor;
     }
@@ -29,6 +34,15 @@ public class NodoBorder extends Nodo {
     //Metodo que permite validar semantica del borde (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        if (this.tipoBorde == TipoBorde.NOT_FOUND) {
+            listaErrores.add(new ErrorAnalisis(
+                    "border", "Semantico",
+                    "El estilo del borde proporcionado no es valido.",
+                    getLinea(), getColumna()
+            ));
+        }
+
         if (grosor != null) {
             TipoVariable tipoGrosor = grosor.validarSemantica(tabla, listaErrores);
             if (tipoGrosor != TipoVariable.NUMBER && tipoGrosor != TipoVariable.ERROR) {

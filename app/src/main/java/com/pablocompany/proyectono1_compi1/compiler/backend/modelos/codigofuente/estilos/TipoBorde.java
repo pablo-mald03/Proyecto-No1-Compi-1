@@ -3,7 +3,8 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 public enum TipoBorde {
     LINE,
     DOTTED,
-    DOUBLE
+    DOUBLE,
+    NOT_FOUND
 }
 /*Created by Pablo*/
 

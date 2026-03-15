@@ -23,7 +23,7 @@ public class NodoOptions extends Nodo {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (this.opciones == null || this.opciones.isEmpty()) {
-            listaErrores.add(new ErrorAnalisis("options", "Semántico",
+            listaErrores.add(new ErrorAnalisis("options", "Semantico",
                     "El atributo de opciones no puede estar vacío.", getLinea(), getColumna()));
             return TipoVariable.ERROR;
         }

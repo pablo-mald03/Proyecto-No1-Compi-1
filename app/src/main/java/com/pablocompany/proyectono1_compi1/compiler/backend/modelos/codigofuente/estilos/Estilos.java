@@ -3,6 +3,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.TipoOrientacion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -16,10 +17,10 @@ public class Estilos implements ValidadorDatosForms {
     //Atributos
     private NodoColor backgroundColor;
     private NodoColor color;
-    private TipoLetra fontFamily;
+    private NodoTipoLetra fontFamily;
     private NodoExpresion textSize;
 
-    public Estilos(NodoColor backgroundColor, NodoColor color, TipoLetra fontFamily, NodoExpresion textSize) {
+    public Estilos(NodoColor backgroundColor, NodoColor color, NodoTipoLetra fontFamily, NodoExpresion textSize) {
         this.backgroundColor = backgroundColor;
         this.color = color;
         this.fontFamily = fontFamily;
@@ -30,6 +31,9 @@ public class Estilos implements ValidadorDatosForms {
     /*Rechaza comodines en SECTIONS Y TABLES*/
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        this.validarFuente(tabla,listaErrores);
+
         if(esLayout){
             return validarSemantica(tabla, listaErrores);
         }
@@ -59,6 +63,8 @@ public class Estilos implements ValidadorDatosForms {
     //Metodo que sirve para anlizar la expresion que esta dentro de los estilos
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
+        this.validarFuente(tabla,listaErrores);
+
         if (this.textSize != null) {
             TipoVariable tipoSize = this.textSize.validarSemantica(tabla, listaErrores);
             if (tipoSize != TipoVariable.NUMBER) {
@@ -80,11 +86,9 @@ public class Estilos implements ValidadorDatosForms {
     }
 
     //Metodo que permite validar la fuente de los estilos (Delegacion de metodo)
-    private void validarFuente(List<ErrorAnalisis> listaErrores) {
-        if (this.fontFamily == TipoLetra.NOT_FOUND) {
-            listaErrores.add(new ErrorAnalisis("font-family", "Semántico",
-                    "La tipografía proporcionada no es válida o no está soportada por el sistema.",
-                    0, 0));
+    private void validarFuente(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        if (this.fontFamily != null) {
+            this.fontFamily.validarSemantica(tabla,listaErrores);
         }
     }
 
@@ -105,11 +109,11 @@ public class Estilos implements ValidadorDatosForms {
         this.color = color;
     }
 
-    public TipoLetra getFontFamily() {
+    public NodoTipoLetra getFontFamily() {
         return fontFamily;
     }
 
-    public void setFontFamily(TipoLetra fontFamily) {
+    public void setFontFamily(NodoTipoLetra fontFamily) {
         this.fontFamily = fontFamily;
     }
 
