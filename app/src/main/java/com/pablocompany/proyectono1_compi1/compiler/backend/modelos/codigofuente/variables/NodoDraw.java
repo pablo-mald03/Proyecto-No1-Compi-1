@@ -78,40 +78,35 @@ public class NodoDraw extends NodoComponente {
 
         Simbolo variable = tabla.buscar(id);
 
-        if (variable != null) {
-            Object pregunta = variable.getValor();
+        if (variable == null || !(variable.getValor() instanceof NodoQuestion)) {
+            /*Caso imposible casi*/
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                    "La variable: \"" + id + "\" no ha sido definida aun \".draw()\".",
+                    getLinea(), getColumna()));
+            return null;
+        }
 
-            if (pregunta instanceof NodoQuestion) {
+        NodoQuestion nodoQuestion = (NodoQuestion) variable.getValor();
+        int comodines = nodoQuestion.contarComodines();
+        int totalParametros = this.parametros.size();
 
-                NodoQuestion nodoQuestion = (NodoQuestion) pregunta;
+        if (comodines != totalParametros) {
+            String mensaje;
 
-                int comodines = nodoQuestion.contarComodines();
-
-                if (comodines > this.parametros.size()) {
-                    listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
-                            "La pregunta definida como: \"" + id + "\" tiene mas \"comodines\" que los parametros pasados en \".draw()\".",
-                            getLinea(), getColumna()));
-                    return null;
-                }
-
-                if(comodines == 0 && !this.parametros.isEmpty()){
-                    listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
-                            "La pregunta definida como: \"" + id + "\" no tiene comodines para sustituir con los valores pasados por parametro.",
-                            getLinea(), getColumna()));
-                    return null;
-
-                }
-
-                if (comodines < this.parametros.size()) {
-                    listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
-                            "La pregunta definida como: \"" + id + "\" tiene mas parametros pasados en \".draw()\" que \"comodines\".",
-                            getLinea(), getColumna()));
-                    return null;
-                }
-
-                nodoQuestion.inyectarParametros(this.parametros,listaErrores);
-                return null;
+            if (comodines == 0) {
+                mensaje = "La pregunta \"" + id + "\" no tiene comodines para sustituir con los valores pasados por parametro.";
+            } else if (totalParametros < comodines) {
+                mensaje = "Faltan parametros para la pregunta \"" + id + "\". Se esperan " + comodines + " y se pasaron \"" + totalParametros + "\" parametros.";
+            } else {
+                mensaje = "Demasiados parametros para la pregunta \"" + id + "\". Se esperan " + comodines + " y se pasaron \"" + totalParametros + "\".";
             }
+
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semántico", mensaje, getLinea(), getColumna()));
+            return null;
+        }
+
+        if (comodines > 0) {
+            nodoQuestion.inyectarParametros(this.parametros, listaErrores);
         }
 
         return null;

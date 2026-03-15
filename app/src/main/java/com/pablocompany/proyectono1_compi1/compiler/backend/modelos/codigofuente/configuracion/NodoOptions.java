@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -51,6 +52,20 @@ public class NodoOptions extends Nodo {
     public List<Nodo> getOpciones() {
         return this.opciones;
     }
+
+    /*--Metodo delegado para poder setear los valores nuevos de las opciones--*/
+    public int setOpciones(List<NodoComodin> comodines, int iterador) {
+        for (int i = 0; i < this.opciones.size(); i++) {
+            if (this.opciones.get(i) instanceof NodoExpresion) {
+                NodoComodin comodin = (NodoComodin) this.opciones.get(i);
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
+        }
+
+        return iterador;
+    }
+
 
 
     //Metodo que permite ejecutar la lista de opciones de expresion que esta dentro del nodo de configuracion

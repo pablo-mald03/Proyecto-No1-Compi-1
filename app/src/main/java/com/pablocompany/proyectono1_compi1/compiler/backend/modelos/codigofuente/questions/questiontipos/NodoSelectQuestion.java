@@ -5,6 +5,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoRgbColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoCorrect;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOptions;
@@ -151,8 +152,8 @@ public class NodoSelectQuestion extends NodoQuestion {
         return TipoVariable.SPECIAL;
     }
 
-    //Metodo que permite validar si tiene comodines la question (PENDIENTE)
-    //Metodo que permite validar si tiene comodines la multiple question
+
+    //Metodo que permite validar si tiene comodines la select question
     @Override
     public int contarComodines() {
         return contarComodinesPregunta();
@@ -167,8 +168,8 @@ public class NodoSelectQuestion extends NodoQuestion {
         }
 
         if (this.respuestaCorrecta != null) {
-            if (this.respuestaCorrecta instanceof NodoExpresion) {
-                NodoExpresion expresion = (NodoExpresion) this.respuestaCorrecta;
+            if (this.respuestaCorrecta instanceof NodoCorrect) {
+                NodoCorrect expresion = (NodoCorrect) this.respuestaCorrecta;
                 contador += expresion.contarComodines();
             }
         }
@@ -199,7 +200,71 @@ public class NodoSelectQuestion extends NodoQuestion {
     /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
     public void inyectarParametros(List<Nodo> parametros, List<ErrorAnalisis> listaErrores) {
 
-        List<Nodo> parametrosPregunta = new ArrayList<>();
+        List<NodoComodin> parametrosPregunta = obtenerParametrosComodines();
+
+        if ( parametrosPregunta.isEmpty()){
+            return;
+        }
+
+        for(int i = 0; i < parametrosPregunta.size(); i++) {
+
+            NodoComodin comodin = parametrosPregunta.get(i);
+            Nodo parametro = parametros.get(i);
+
+            if(parametro instanceof NodoExpresion){
+                NodoExpresion comodinParametro = (NodoExpresion) parametro;
+                comodin.darValorIncognita(comodinParametro);
+            }
+        }
+        setearParametros(parametrosPregunta);
+
+    }
+
+    /*---Metodo utilizado para retornar la lista de parametros comodin en la pregunta----*/
+    private void setearParametros(List<NodoComodin> parametrosPregunta) {
+
+        int iterador = 0;
+
+        if (this.width != null) {
+           iterador = this.width.setExpresion(parametrosPregunta.get(iterador), iterador);
+        }
+
+        if (this.height != null) {
+            iterador = this.height.setExpresion(parametrosPregunta.get(iterador), iterador);
+        }
+
+        if (this.funcionPokemon != null && this.funcionPokemon instanceof NodoFuncionPokemon) {
+            iterador = ((NodoFuncionPokemon) this.funcionPokemon).setOffset(parametrosPregunta.get(iterador), iterador);
+
+            iterador = ((NodoFuncionPokemon) this.funcionPokemon).setLimit(parametrosPregunta.get(iterador), iterador);
+        }
+
+        if (this.opciones != null) {
+           iterador =  this.opciones.setOpciones(parametrosPregunta, iterador);
+        }
+
+        if (this.estilos != null) {
+
+            if (this.estilos.getBackgroundColor() != null) {
+                iterador = this.estilos.setBackgroundColor(parametrosPregunta, iterador);
+
+            }
+
+            if (this.estilos.getColor() != null) {
+                iterador = this.estilos.setColor(parametrosPregunta, iterador);
+            }
+
+            if (this.estilos.getTextSize() != null) {
+                iterador = this.estilos.setTextSize(parametrosPregunta.get(iterador), iterador);
+            }
+        }
+
+    }
+
+    /*---Metodo utilizado para retornar la lista de parametros comodin en la pregunta----*/
+    private List<NodoComodin> obtenerParametrosComodines() {
+
+        List<NodoComodin> parametrosPregunta = new ArrayList<>();
 
         if (this.width != null) {
             NodoComodin comodin = extraerValor(this.width.getExpresion());
@@ -224,11 +289,11 @@ public class NodoSelectQuestion extends NodoQuestion {
             NodoComodin comodinOffset = extraerValor(offset);
             NodoComodin comodinLimit = extraerValor(limit);
 
-            if(comodinOffset != null && comodinOffset.getExpresion() == null){
+            if (comodinOffset != null && comodinOffset.getExpresion() == null) {
                 parametrosPregunta.add(comodinOffset);
             }
 
-            if(comodinLimit != null && comodinLimit.getExpresion() == null){
+            if (comodinLimit != null && comodinLimit.getExpresion() == null) {
                 parametrosPregunta.add(comodinLimit);
             }
         }
@@ -244,52 +309,75 @@ public class NodoSelectQuestion extends NodoQuestion {
             }
         }
 
-        if(this.estilos != null){
+        if (this.estilos != null) {
 
-            if(this.estilos.getBackgroundColor() != null){
+            if (this.estilos.getBackgroundColor() != null) {
                 NodoColor color = this.estilos.getBackgroundColor();
 
-                if(color instanceof NodoRgbColor){
+                List<NodoComodin> comodinesColor = obtenerParametrosComodinesColor(color);
 
-                    NodoRgbColor rgbColor = (NodoRgbColor) color;
-                    NodoComodin comodinRed = extraerValor(rgbColor.getRed());
-                    NodoComodin comodinGreen = extraerValor(rgbColor.getGreen());
-                    NodoComodin comodinBlue = extraerValor(rgbColor.getBlue());
-
-                    if(comodinRed != null && comodinRed.getExpresion() == null) {
-                        parametrosPregunta.add(comodinRed);
-                    }
-                    if(comodinGreen != null && comodinGreen.getExpresion() == null ) {
-                        parametrosPregunta.add(comodinGreen);
-                    }
-                    if(comodinBlue != null && comodinBlue.getExpresion() == null) {
-                        parametrosPregunta.add(comodinBlue);
-                    }
-
+                if (!comodinesColor.isEmpty()) {
+                    parametrosPregunta.addAll(comodinesColor);
                 }
-
-                if(color instanceof NodoHslColor){
-                    NodoHslColor rgbColor = (NodoHslColor) color;
-                    NodoComodin comodinRed = extraerValor(rgbColor.getRed());
-                    NodoComodin comodinGreen = extraerValor(rgbColor.getGreen());
-                    NodoComodin comodinBlue = extraerValor(rgbColor.getBlue());
-
-                    if(comodinRed != null && comodinRed.getExpresion() == null) {
-                        parametrosPregunta.add(comodinRed);
-                    }
-                    if(comodinGreen != null && comodinGreen.getExpresion() == null ) {
-                        parametrosPregunta.add(comodinGreen);
-                    }
-                    if(comodinBlue != null && comodinBlue.getExpresion() == null) {
-                        parametrosPregunta.add(comodinBlue);
-                    }
-
-                }
-
             }
 
+            if (this.estilos.getColor() != null) {
+                NodoColor color = this.estilos.getColor();
+                List<NodoComodin> comodinesColor = obtenerParametrosComodinesColor(color);
+                if (!comodinesColor.isEmpty()) {
+                    parametrosPregunta.addAll(comodinesColor);
+                }
+            }
+
+            if (this.estilos.getTextSize() != null) {
+                NodoExpresion expresion = this.estilos.getTextSize();
+                NodoComodin comodin = extraerValor(expresion);
+                if (comodin != null && comodin.getExpresion() == null) {
+                    parametrosPregunta.add(comodin);
+                }
+            }
         }
+        return parametrosPregunta;
     }
+
+    /*Metodo utilizado para retornar los valores Comodin de un color*/
+    private List<NodoComodin> obtenerParametrosComodinesColor(NodoColor color) {
+
+        List<NodoComodin> parametrosPregunta = new ArrayList<>();
+        NodoComodin comodinRed = null;
+        NodoComodin comodinGreen = null;
+        NodoComodin comodinBlue = null;
+
+        if (color instanceof NodoRgbColor) {
+
+            NodoRgbColor rgbColor = (NodoRgbColor) color;
+            comodinRed = extraerValor(rgbColor.getRed());
+            comodinGreen = extraerValor(rgbColor.getGreen());
+            comodinBlue = extraerValor(rgbColor.getBlue());
+        }
+
+        if (color instanceof NodoHslColor) {
+            NodoHslColor hslColor = (NodoHslColor) color;
+            comodinRed = extraerValor(hslColor.getRed());
+            comodinGreen = extraerValor(hslColor.getGreen());
+            comodinBlue = extraerValor(hslColor.getBlue());
+        }
+
+        if (comodinRed != null && comodinRed.getExpresion() == null) {
+            parametrosPregunta.add(comodinRed);
+        }
+        if (comodinGreen != null && comodinGreen.getExpresion() == null) {
+            parametrosPregunta.add(comodinGreen);
+        }
+        if (comodinBlue != null && comodinBlue.getExpresion() == null) {
+            parametrosPregunta.add(comodinBlue);
+        }
+
+        return parametrosPregunta;
+    }
+
+    /*Metodo que sirve para poder volver a meter los parametros en la pregunta*/
+
 
     /*Metodo delegado para extraer el valor de una expresion en dado caso lo sea*/
     private NodoComodin extraerValor(Nodo nodo) {

@@ -27,19 +27,18 @@ public class AnalizadorSemantico {
     //Metodo que permite retornar el codigo procesado y ya analizado por el analizador semantico
     public String codigoCompilado() {
 
-        StringBuilder stringBuilder = new StringBuilder();
-        TablaSimbolos tablaSimbolos = new TablaSimbolos();
-
         if (this.astParser == null) {
             return "";
         }
 
+        TablaSimbolos tablaSimbolos = new TablaSimbolos();
+
         for (Nodo nodo : astParser) {
 
-            if (nodo == null) {
-                continue;
+            if (nodo != null) {
+                nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
             }
-            nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
+
         }
 
         if (!this.listadoErroresTotal.isEmpty()) {
@@ -52,10 +51,22 @@ public class AnalizadorSemantico {
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
+        StringBuilder stringBuilder = new StringBuilder();
 
+        tablaSimbolos = new TablaSimbolos();
 
+        for (Nodo nodo : astParser) {
+            if (nodo != null) {
+                nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
+            }
+        }
+
+        if (!this.listadoErroresTotal.isEmpty()) {
+            return "";
+        }
         return stringBuilder.toString();
     }
+
 
     /*---Metodo delegado para poner los comodines que estaban en la funcion draw----*/
     private void agregarComodines(TablaSimbolos tablaSimbolos) {

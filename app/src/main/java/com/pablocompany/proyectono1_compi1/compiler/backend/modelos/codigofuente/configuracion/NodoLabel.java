@@ -33,6 +33,18 @@ public class NodoLabel extends Nodo {
         return tipoVariable;
     }
 
+    /*---Metodo getter para obtener el valor de la expresion dentro de la configuracion--*/
+    public NodoExpresion getExpresion() {
+        return this.expresion;
+    }
+
+    /*---Metodo setter para obtener el valor de la expresion dentro de la configuracion--*/
+    public int setExpresion( NodoExpresion expresion, int iterador) {
+        this.expresion = expresion;
+        iterador++;
+        return iterador;
+    }
+
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

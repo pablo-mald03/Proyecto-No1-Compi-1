@@ -84,4 +84,11 @@ public class NodoWidth extends Nodo implements ValidarDatosForms {
     public NodoExpresion getExpresion() {
         return this.expresion;
     }
+
+    /*---Metodo setter para obtener el valor de la expresion dentro de la configuracion--*/
+    public int setExpresion( NodoExpresion expresion, int iterador) {
+        this.expresion = expresion;
+        iterador++;
+        return iterador;
+    }
 }

@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -65,6 +66,35 @@ public class NodoRgbColor extends NodoColor{
 
     public NodoExpresion getBlue() {
         return blue;
+    }
+
+    /*Metodos que permiten setear de nuevo el valor de las expresiones*/
+
+    public int setRed(NodoExpresion expresion, int iterador) {
+        if(this.red != null && this.red instanceof NodoComodin){
+            NodoComodin comodin = (NodoComodin) this.red;
+            comodin.darValorIncognita(expresion);
+            iterador++;
+        }
+        return iterador;
+    }
+
+    public int setGreen(NodoExpresion expresion, int iterador) {
+        if(this.green != null && this.green instanceof NodoComodin){
+            NodoComodin comodin = (NodoComodin) this.green;
+            comodin.darValorIncognita(expresion);
+            iterador++;
+        }
+        return iterador;
+    }
+
+    public int setBlue(NodoExpresion expresion, int iterador) {
+        if(this.blue != null && this.blue instanceof NodoComodin){
+            NodoComodin comodin = (NodoComodin) this.blue;
+            comodin.darValorIncognita(expresion);
+            iterador++;
+        }
+        return iterador;
     }
 
     //Metodo que permite retornar el color en formato RGB (util en frontend)

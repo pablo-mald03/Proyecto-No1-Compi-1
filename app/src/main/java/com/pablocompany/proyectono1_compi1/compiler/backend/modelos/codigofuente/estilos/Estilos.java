@@ -1,8 +1,11 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoRgbColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -93,24 +96,64 @@ public class Estilos {
         return backgroundColor;
     }
 
-    public void setBackgroundColor(NodoColor backgroundColor) {
-        this.backgroundColor = backgroundColor;
+    /*Metodo que permite setear el nuevo valor de background color*/
+    public int setBackgroundColor(List<NodoComodin> comodines, int iterador) {
+
+        if(this.backgroundColor instanceof NodoRgbColor){
+            NodoRgbColor rgbColor = (NodoRgbColor) this.backgroundColor;
+            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+            return iterador;
+        }
+
+        if(this.backgroundColor instanceof NodoHslColor){
+            NodoHslColor rgbColor = (NodoHslColor) this.backgroundColor;
+            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+            return iterador;
+        }
+        return iterador;
     }
 
     public NodoColor getColor() {
         return color;
     }
 
-    public void setColor(NodoColor color) {
-        this.color = color;
+    public int setColor(List<NodoComodin> comodines, int iterador) {
+
+        if(this.backgroundColor instanceof NodoRgbColor){
+            NodoRgbColor rgbColor = (NodoRgbColor) this.backgroundColor;
+            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+            return iterador;
+        }
+
+        if(this.backgroundColor instanceof NodoHslColor){
+            NodoHslColor rgbColor = (NodoHslColor) this.backgroundColor;
+            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+            return iterador;
+        }
+        return iterador;
     }
 
     public NodoTipoLetra getFontFamily() {
         return fontFamily;
     }
 
+    /*--Metodo que permite obtener la expresion del text size---*/
     public NodoExpresion getTextSize() {
         return textSize;
+    }
+
+    public int setTextSize( NodoExpresion expresion, int iterador) {
+        this.textSize = expresion;
+        iterador++;
+        return iterador;
     }
 
     public void setTextSize(NodoExpresion textSize) {

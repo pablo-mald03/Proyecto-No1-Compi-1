@@ -52,6 +52,18 @@ public class NodoFuncionPokemon extends Nodo {
         return this.limit;
     }
 
+    /*--Metodos getter para setear los atributos de la funcion pokemon---*/
+    public int setOffset(NodoExpresion expresion, int iterador) {
+        this.offset = expresion;
+        iterador++;
+        return iterador;
+    }
+    public int setLimit(NodoExpresion expresion, int iterador) {
+        this.limit = expresion;
+        iterador++;
+        return iterador;
+    }
+
     //Metodo que permite ejecutar el request de a la API para poder obtener los pokemon
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

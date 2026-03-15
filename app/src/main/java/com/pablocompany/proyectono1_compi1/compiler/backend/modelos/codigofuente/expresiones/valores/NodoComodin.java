@@ -30,7 +30,9 @@ public class NodoComodin extends NodoExpresion {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
+        System.out.println("valor comodin: " + this.expresion);
         if (this.expresion != null) {
+            System.out.println("valorcomodin nuevo: " + this.expresion.getString());
             return this.expresion.validarSemantica(tabla, listaErrores);
         }
 

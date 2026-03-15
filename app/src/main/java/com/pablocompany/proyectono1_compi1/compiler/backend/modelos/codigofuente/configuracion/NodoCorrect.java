@@ -43,6 +43,23 @@ public class NodoCorrect extends Nodo {
         return TipoVariable.NUMBER;
     }
 
+    /*--Metodo getter para obtener el valor de la expresion dentro de la configuracion--*/
+    public NodoExpresion getExpresion() {
+        return expresion;
+    }
+
+    /*---Metodo que permite stear el valor de la expresion dentro de la configuracion---*/
+    public int setExpresion(NodoExpresion expresion, int iterador) {
+        this.expresion = expresion;
+        iterador++;
+        return iterador;
+    }
+
+    /*--Metodo que permite contar los comodines de la pregunta--*/
+    public int contarComodines() {
+        return expresion.contarComodines();
+    }
+
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
