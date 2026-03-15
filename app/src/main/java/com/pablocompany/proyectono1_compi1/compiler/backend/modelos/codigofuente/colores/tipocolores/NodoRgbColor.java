@@ -23,6 +23,37 @@ public class NodoRgbColor extends NodoColor{
         this.green = green;
         this.blue = blue;
     }
+
+    //Metodo que permite validar las expresiones dentro de un color RGB (PATRON EXPERTO)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        TipoVariable tipoRed = red.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoGreen = green.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoBlue = blue.validarSemantica(tabla, listaErrores);
+
+        if (esLayout) {
+            if (tipoRed == TipoVariable.COMODIN || tipoGreen == TipoVariable.COMODIN || tipoBlue == TipoVariable.COMODIN) {
+                listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                        "Los colores dentro de layouts \"SECTION\" o \"TABLE\" no permiten tipos COMODIN.",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        }
+
+        if ((tipoRed != TipoVariable.NUMBER && tipoRed != TipoVariable.COMODIN) ||
+                (tipoGreen != TipoVariable.NUMBER && tipoGreen != TipoVariable.COMODIN) ||
+                (tipoBlue != TipoVariable.NUMBER && tipoBlue != TipoVariable.COMODIN)) {
+
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                    "Los valores de color \"RGB\" deben ser \"numericos\".",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.COLOR;
+    }
+
     /*Metodos getter de las expresiones*/
     public NodoExpresion getRed() {
         return red;
@@ -64,5 +95,13 @@ public class NodoRgbColor extends NodoColor{
         };
 
     }
+
+    //Metodo que permite retornar los valores del color en formato String
+    @Override
+    public  String getString(){
+        return "(" + this.red.getString() + ", " + this.green.getString() + ", " + this.blue.getString() + ")";
+    }
+
+
 }
 /*Created by P*/

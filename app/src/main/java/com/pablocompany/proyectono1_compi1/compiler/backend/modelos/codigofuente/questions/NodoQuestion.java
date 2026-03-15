@@ -58,7 +58,11 @@ public abstract class NodoQuestion extends NodoComponente {
                     color = (NodoColor) valorNodo;
                     break;
                 case FONT_FAMILY:
-                    fontFamily = TipoLetra.valueOf((String) valorNodo);
+                    try{
+                        fontFamily = TipoLetra.valueOf((String) valorNodo);
+                    }catch (Exception e){
+                        fontFamily = TipoLetra.NOT_FOUND;
+                    }
                     break;
                 case TEXT_SIZE:
                     textSize = (NodoExpresion) valorNodo;

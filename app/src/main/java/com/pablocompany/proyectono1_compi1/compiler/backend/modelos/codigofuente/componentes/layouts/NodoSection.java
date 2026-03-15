@@ -3,6 +3,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoElements;
@@ -23,7 +24,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que define la seccion de un formulario y puede contener a mas componentes
-public class NodoSection extends NodoComponente {
+public class NodoSection extends NodoComponente implements ValidadorDatosForms {
 
     private NodoElements elementos;
     private NodoOrientation orientation;
@@ -45,11 +46,10 @@ public class NodoSection extends NodoComponente {
 
     }
 
-    //Metodo que permite validar semantica de la seccion (PATRON EXPERTO)
-    /*Simplemente es un llamado a lo que ya esta creado*/
+    //Metodo que permite bifurcar la logica para poder validar la seccion que no tenga comodines y
+    // no interrumpir el metodo heredado de la clase padre
     @Override
-    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
         if (this.elementos != null) {
             this.elementos.validarSemantica(tabla, listaErrores);
         }
@@ -70,15 +70,25 @@ public class NodoSection extends NodoComponente {
             }
         }
 
+        //Bifurcacion de logica
         if(this.estilos != null){
-            this.estilos.validarSemantica(tabla, listaErrores);
+            this.estilos.validarSemantica(tabla, listaErrores,true);
         }
+
 
         if (this.borde != null) {
             this.borde.validarSemantica(tabla, listaErrores);
         }
 
         return TipoVariable.VOID;
+    }
+
+    //Metodo que permite validar semantica de la seccion (PATRON EXPERTO)
+    /*Simplemente es un llamado a lo que ya esta creado*/
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+       return this.validarSemantica(tabla,listaErrores,true);
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
@@ -156,7 +166,12 @@ public class NodoSection extends NodoComponente {
                     color = (NodoColor) valorNodo;
                     break;
                 case FONT_FAMILY:
-                    fontFamily = TipoLetra.valueOf((String) valorNodo);
+                    try{
+                        fontFamily = TipoLetra.valueOf((String) valorNodo);
+                    }catch (Exception e){
+                        fontFamily = TipoLetra.NOT_FOUND;
+                    }
+
                     break;
                 case TEXT_SIZE:
                     textSize = (NodoExpresion) valorNodo;
@@ -179,5 +194,7 @@ public class NodoSection extends NodoComponente {
     public String getString() {
         return "";
     }
+
+
 }
 /*created by Pablo*/

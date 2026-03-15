@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -9,7 +10,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa el alto de configuracion de una pregunta o layout
-public class NodoHeight extends Nodo {
+public class NodoHeight extends Nodo implements ValidadorDatosForms {
 
     //Atributos
     private NodoExpresion expresion;
@@ -17,6 +18,18 @@ public class NodoHeight extends Nodo {
     public NodoHeight(NodoExpresion expresion, int linea, int columna) {
         super(linea, columna);
         this.expresion = expresion;
+    }
+
+
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        if(!esLayout){
+            return this.validarSemantica(tabla,listaErrores);
+        }
+
+
+        return null;
     }
 
     //Metodo que permite validar semantica de la altura (PATRON EXPERTO)
@@ -55,5 +68,6 @@ public class NodoHeight extends Nodo {
     public String getString() {
         return "height: " + this.expresion.getString();
     }
+
 }
 

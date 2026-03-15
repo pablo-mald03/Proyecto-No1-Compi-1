@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -21,6 +22,36 @@ public class NodoHslColor extends NodoColor {
         this.red = red;
         this.green = green;
         this.blue = blue;
+    }
+
+    //Metodo que permite validar las expresiones dentro de un color HSL (PATRON EXPERTO)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        TipoVariable tipoRed = red.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoGreen = green.validarSemantica(tabla, listaErrores);
+        TipoVariable tipoBlue = blue.validarSemantica(tabla, listaErrores);
+
+        if (esLayout) {
+            if (tipoRed == TipoVariable.COMODIN || tipoGreen == TipoVariable.COMODIN || tipoBlue == TipoVariable.COMODIN) {
+                listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                        "Los colores dentro de layouts \"SECTION\" o \"TABLE\" no permiten tipos \"comodin\".",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        }
+
+        if ((tipoRed != TipoVariable.NUMBER && tipoRed != TipoVariable.COMODIN) ||
+                (tipoGreen != TipoVariable.NUMBER && tipoGreen != TipoVariable.COMODIN) ||
+                (tipoBlue != TipoVariable.NUMBER && tipoBlue != TipoVariable.COMODIN)) {
+
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
+                    "Los valores de color \"HSL\" deben ser \"numericos\".",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.COLOR;
     }
 
     /*Metodos getter de las expresiones*/
@@ -62,6 +93,12 @@ public class NodoHslColor extends NodoColor {
                 ((Number) valorGreen).intValue(),
                 ((Number) valorBlue).intValue()
         };
+    }
+
+    //Metodo que permite retornar los valores del color en formato String
+    @Override
+    public String getString() {
+        return "<" + this.red.getString() + ", " + this.green.getString() + ", " + this.blue.getString() + ">";
     }
 }
 /*Created by P*/

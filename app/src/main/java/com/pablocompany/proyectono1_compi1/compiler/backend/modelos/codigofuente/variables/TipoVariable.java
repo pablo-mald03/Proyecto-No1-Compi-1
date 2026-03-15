@@ -10,6 +10,8 @@ public enum TipoVariable {
     BOOLEAN_AND("AND"),
     BOOLEAN_OR("OR"),
     VOID("void"),
+    COLOR("color"),
+
     ERROR("error");
 
     private final String tipo;

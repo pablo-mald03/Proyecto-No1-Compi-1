@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -16,6 +17,19 @@ public class NodoHexColor extends NodoColor {
         this.color = color;
     }
 
+    //Metodo que permite validar las expresiones dentro de un color
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+        if (color == null || color.isEmpty()) {
+            listaErrores.add(new ErrorAnalisis("HEX", "Semantico",
+                    "El valor del color \"HEX\" no debe estar vacio.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
+        return TipoVariable.COLOR;
+    }
+
     //Metodo que permite obtener el color especificado en la expresion
     @Override
     public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
@@ -25,6 +39,12 @@ public class NodoHexColor extends NodoColor {
         int blue = Integer.parseInt(this.color.substring(5,7), 16);
 
         return new int[]{red, green, blue};
+    }
+
+    //Metodo que permite retornar los valores del color en formato String
+    @Override
+    public  String getString(){
+        return this.color;
     }
 }
 /*Created by P*/

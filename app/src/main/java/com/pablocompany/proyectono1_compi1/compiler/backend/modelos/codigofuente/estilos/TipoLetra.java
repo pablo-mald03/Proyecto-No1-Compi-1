@@ -4,5 +4,6 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 public enum TipoLetra {
     MONO,
     SANS_SERIF,
-    CURSIVE
+    CURSIVE,
+    NOT_FOUND;
 }

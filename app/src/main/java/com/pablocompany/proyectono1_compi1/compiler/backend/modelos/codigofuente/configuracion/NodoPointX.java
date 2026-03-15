@@ -31,9 +31,7 @@ public class NodoPointX extends Nodo {
         TipoVariable tipoExpresion = expresion.validarSemantica(tabla, listaErrores);
 
         // Validamos que el resultado sea un número
-        if (tipoExpresion != TipoVariable.NUMBER &&
-                tipoExpresion != TipoVariable.COMODIN &&
-                tipoExpresion != TipoVariable.ERROR) {
+        if (tipoExpresion != TipoVariable.NUMBER && tipoExpresion != TipoVariable.ERROR) {
 
             listaErrores.add(new ErrorAnalisis("pointX", "Semantico",
                     "La coordenada \"X\" debe ser numerica. Se encontro con una expresion tipo: \"" + tipoExpresion.getTipo() + "\"",

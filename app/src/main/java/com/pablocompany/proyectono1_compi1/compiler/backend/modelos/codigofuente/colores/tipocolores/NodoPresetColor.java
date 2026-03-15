@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -13,7 +14,6 @@ public class NodoPresetColor extends NodoColor {
     //Atributos
     private TipoColor colorPreset;
 
-
     public NodoPresetColor(String colorPreset, int linea, int columna) {
         super(linea, columna);
         try {
@@ -22,7 +22,18 @@ public class NodoPresetColor extends NodoColor {
             this.colorPreset = TipoColor.NOT_FOUND;
         }
 
+    }
 
+    //Metodo que permite validar las expresiones dentro de un color
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+        if (this.colorPreset == TipoColor.NOT_FOUND) {
+            listaErrores.add(new ErrorAnalisis("COLOR PRESET", "Semantico",
+                    "El color \"PRESET\" proporcionado no es valido.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+        return TipoVariable.COLOR;
     }
 
     /*Metodos getter de las expresiones*/
@@ -43,5 +54,11 @@ public class NodoPresetColor extends NodoColor {
                 listaErrores.add(new ErrorAnalisis("Not Found", "Semántico", "Preset de color no valido", this.getLinea(), this.getColumna()));
                 return null;
         }
+    }
+
+    //Metodo que permite retornar los valores del color en formato String
+    @Override
+    public  String getString(){
+        return this.colorPreset.toString();
     }
 }

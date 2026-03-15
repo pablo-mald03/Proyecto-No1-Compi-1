@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
@@ -19,7 +20,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa por completo la tabla de los formularios. Otro tipo de layout que existe
-public class NodoTable extends NodoComponente {
+public class NodoTable extends NodoComponente implements ValidadorDatosForms {
 
     private List<List<NodoComponente>> filas;
 
@@ -41,9 +42,11 @@ public class NodoTable extends NodoComponente {
         procesarConfiguracion(configs);
     }
 
-    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    //Metodo que permite bifurcar la logica para poder validar la seccion que no tenga comodines y
+    // no interrumpir el metodo heredado de la clase padre
     @Override
-    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
         if (this.pointX != null) {
             TipoVariable tipoX = this.pointX.validarSemantica(tabla, listaErrores);
             if (tipoX != TipoVariable.NUMBER) {
@@ -60,11 +63,14 @@ public class NodoTable extends NodoComponente {
             }
         }
 
-        if (estilos != null) {
-            estilos.validarSemantica(tabla, listaErrores);
+        //Bifurcacion de logica
+        if(this.estilos != null){
+            this.estilos.validarSemantica(tabla, listaErrores,true);
         }
-        if (borde != null) {
-            borde.validarSemantica(tabla, listaErrores);
+
+
+        if (this.borde != null) {
+            this.borde.validarSemantica(tabla, listaErrores);
         }
 
         if (filas != null) {
@@ -85,6 +91,12 @@ public class NodoTable extends NodoComponente {
         }
 
         return TipoVariable.VOID;
+    }
+
+    //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
+    @Override
+    public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        return  this.validarSemantica(tabla,listaErrores,true);
     }
 
     //Metodo que permite procesar la configuracion de los textos
@@ -156,7 +168,13 @@ public class NodoTable extends NodoComponente {
                     color = (NodoColor) valorNodo;
                     break;
                 case FONT_FAMILY:
-                    fontFamily = TipoLetra.valueOf((String) valorNodo);
+
+                    try{
+                        fontFamily = TipoLetra.valueOf((String) valorNodo);
+                    }catch (Exception e){
+                        fontFamily = TipoLetra.NOT_FOUND;
+                    }
+
                     break;
                 case TEXT_SIZE:
                     textSize = (NodoExpresion) valorNodo;

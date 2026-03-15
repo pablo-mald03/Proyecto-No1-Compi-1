@@ -31,7 +31,7 @@ public class NodoBorder extends Nodo {
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (grosor != null) {
             TipoVariable tipoGrosor = grosor.validarSemantica(tabla, listaErrores);
-            if (tipoGrosor != TipoVariable.NUMBER && tipoGrosor != TipoVariable.COMODIN && tipoGrosor != TipoVariable.ERROR) {
+            if (tipoGrosor != TipoVariable.NUMBER && tipoGrosor != TipoVariable.ERROR) {
                 listaErrores.add(new ErrorAnalisis(
                         "border", "Semantico",
                         "El grosor del borde debe ser numerico. Se encontro con una expresion tipo: \"" + tipoGrosor.getTipo()+ "\"",
@@ -42,7 +42,7 @@ public class NodoBorder extends Nodo {
 
         if (color == null) {
             listaErrores.add(new ErrorAnalisis(
-                    "COLOR", "Semántico",
+                    "color", "Semantico",
                     "El color del borde no debe estar vacio." ,
                     getLinea(), getColumna()
             ));
