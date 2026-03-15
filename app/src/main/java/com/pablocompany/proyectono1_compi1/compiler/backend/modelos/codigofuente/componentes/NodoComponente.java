@@ -32,5 +32,7 @@ public abstract class NodoComponente extends Nodo {
     //Metodo abstracto para poder implementar los estilos en su demas jerarquia
     protected abstract Estilos procesarEstilos(List<NodoEstilos> lista);
 
+
+
 }
 /*Created by Pablo*/

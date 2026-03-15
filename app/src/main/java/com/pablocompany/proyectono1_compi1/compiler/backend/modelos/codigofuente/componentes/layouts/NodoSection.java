@@ -1,9 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts;
 
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoElements;
@@ -15,8 +13,6 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoBorde;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -25,7 +21,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que define la seccion de un formulario y puede contener a mas componentes
-public class NodoSection extends NodoComponente implements ValidadorDatosForms {
+public class NodoSection extends NodoComponente implements ValidarDatosForms{
 
     private NodoElements elementos;
     private NodoOrientation orientation;
@@ -51,6 +47,8 @@ public class NodoSection extends NodoComponente implements ValidadorDatosForms {
     // no interrumpir el metodo heredado de la clase padre
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        System.out.println("Esta entrando a la validacion de la section en boolean: " + esLayout);
         if (this.elementos != null) {
             this.elementos.validarSemantica(tabla, listaErrores);
         }
@@ -71,9 +69,17 @@ public class NodoSection extends NodoComponente implements ValidadorDatosForms {
             }
         }
 
+        if(this.width != null){
+            this.width.validarSemantica(tabla, listaErrores, esLayout);
+        }
+
+        if(this.height != null){
+            this.height.validarSemantica(tabla, listaErrores, esLayout);
+        }
+
         //Bifurcacion de logica
         if(this.estilos != null){
-            this.estilos.validarSemantica(tabla, listaErrores,true);
+            this.estilos.validarSemantica(tabla, listaErrores,esLayout);
         }
 
 

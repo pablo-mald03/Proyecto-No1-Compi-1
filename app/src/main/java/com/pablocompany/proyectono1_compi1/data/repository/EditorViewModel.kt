@@ -280,7 +280,6 @@ class EditorViewModel(
 
         val erroresFinales = gestorCodigoCompilado.getListadoErrores()
 
-
         if (erroresFinales.isNotEmpty()) {
             return Pair(erroresFinales, null)
         }

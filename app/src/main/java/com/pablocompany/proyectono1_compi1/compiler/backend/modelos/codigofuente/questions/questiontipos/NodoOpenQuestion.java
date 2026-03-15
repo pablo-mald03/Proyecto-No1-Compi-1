@@ -74,14 +74,13 @@ public class NodoOpenQuestion extends NodoQuestion {
 
         /*--Validacion de config---*/
         if (this.width != null) {
-            width.validarSemantica(tabla, listaErrores);
+            width.validarSemantica(tabla, listaErrores,false);
         }
         if (this.height != null) {
-            height.validarSemantica(tabla, listaErrores);
+            height.validarSemantica(tabla, listaErrores,false);
         }
-        if (this.estilos != null && estilos.getTextSize() != null) {
-
-            estilos.getTextSize().validarSemantica(tabla, listaErrores);
+        if(this.estilos != null){
+            this.estilos.validarSemantica(tabla, listaErrores, false);
         }
 
         if(this.label != null){

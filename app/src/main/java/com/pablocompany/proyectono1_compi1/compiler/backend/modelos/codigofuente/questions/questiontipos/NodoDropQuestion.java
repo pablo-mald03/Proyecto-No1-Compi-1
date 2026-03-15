@@ -53,16 +53,14 @@ public class NodoDropQuestion extends NodoQuestion {
 
         /*--Validacion de config---*/
         if(this.width != null){
-            width.validarSemantica(tabla,listaErrores);
+            width.validarSemantica(tabla,listaErrores,false);
         }
         if(this.height != null){
-            height.validarSemantica(tabla,listaErrores);
+            height.validarSemantica(tabla,listaErrores,false);
         }
         if(this.estilos != null){
 
-            if (estilos.getTextSize() != null) {
-                estilos.getTextSize().validarSemantica(tabla, listaErrores);
-            }
+            this.estilos.validarSemantica(tabla, listaErrores, false);
         }
 
         /*--Validacion de opciones--*/

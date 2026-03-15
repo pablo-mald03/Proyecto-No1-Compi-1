@@ -35,7 +35,33 @@ public class NodoText extends NodoComponente {
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        if (this.contenido != null) {
+            TipoVariable tipoContenido = this.contenido.validarSemantica(tabla, listaErrores);
+
+            if (tipoContenido != TipoVariable.STRING &&
+                    tipoContenido != TipoVariable.ERROR) {
+
+                listaErrores.add(new ErrorAnalisis("TEXT", "Semantico",
+                        "El contenido de un \"TEXT\" debe ser de tipo \"string\". Se encontro: " + tipoContenido,
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        }
+
+        if(this.width != null){
+            this.width.validarSemantica(tabla, listaErrores, true);
+        }
+
+        if(this.height != null) {
+            this.height.validarSemantica(tabla, listaErrores, true);
+        }
+
+        if (this.estilos != null) {
+            this.estilos.validarSemantica(tabla, listaErrores, true);
+        }
+
+        return TipoVariable.STRING;
+
     }
 
     //Metodo que permite procesar la configuracion de los textos

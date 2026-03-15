@@ -1,8 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.TipoOrientacion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
@@ -12,7 +10,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa los estilos que puede tener en general componentes del formulario
-public class Estilos implements ValidadorDatosForms {
+public class Estilos {
 
     //Atributos
     private NodoColor backgroundColor;
@@ -29,13 +27,12 @@ public class Estilos implements ValidadorDatosForms {
 
     //Metodo que permite generar la bifurcacion de codigo que permite validar la aceptacion de comodines en los estilos de questions
     /*Rechaza comodines en SECTIONS Y TABLES*/
-    @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
         this.validarFuente(tabla,listaErrores);
 
         if(esLayout){
-            return validarSemantica(tabla, listaErrores);
+            return this.validarSemantica(tabla, listaErrores);
         }
 
         if (this.textSize != null) {
@@ -69,13 +66,12 @@ public class Estilos implements ValidadorDatosForms {
             TipoVariable tipoSize = this.textSize.validarSemantica(tabla, listaErrores);
             if (tipoSize != TipoVariable.NUMBER) {
                 listaErrores.add(new ErrorAnalisis(textSize.getString(), "Semantico",
-                        "El valor de \"text size\" debe ser de tipo numerico.", this.textSize.getLinea(), this.textSize.getColumna()));
+                        "El valor de \"text size\" debe ser de tipo numerico dentro de \"SECTION\", \"TABLE\" o \"TEXT\".", this.textSize.getLinea(), this.textSize.getColumna()));
             }
         }
 
         if(this.color != null){
            this.color.validarSemantica(tabla, listaErrores,true);
-
         }
 
         if(this.backgroundColor != null){

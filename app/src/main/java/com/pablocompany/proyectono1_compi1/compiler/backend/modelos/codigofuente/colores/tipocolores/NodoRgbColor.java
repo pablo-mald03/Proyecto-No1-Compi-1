@@ -35,7 +35,7 @@ public class NodoRgbColor extends NodoColor{
         if (esLayout) {
             if (tipoRed == TipoVariable.COMODIN || tipoGreen == TipoVariable.COMODIN || tipoBlue == TipoVariable.COMODIN) {
                 listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
-                        "Los colores dentro de layouts \"SECTION\" o \"TABLE\" no permiten tipos COMODIN.",
+                        "Los colores dentro de \"SECTION\", \"TABLE\" o \"TEXT\" no permiten tipos COMODIN.",
                         getLinea(), getColumna()));
                 return TipoVariable.ERROR;
             }

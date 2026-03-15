@@ -2,7 +2,6 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
@@ -12,7 +11,6 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -21,7 +19,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa por completo la tabla de los formularios. Otro tipo de layout que existe
-public class NodoTable extends NodoComponente implements ValidadorDatosForms {
+public class NodoTable extends NodoComponente implements ValidarDatosForms {
 
     private List<List<NodoComponente>> filas;
 
@@ -48,12 +46,22 @@ public class NodoTable extends NodoComponente implements ValidadorDatosForms {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
+        System.out.println("Esta entrando a la validacion de la tabla en boolean " + esLayout);
+
         if (this.pointX != null) {
             TipoVariable tipoX = this.pointX.validarSemantica(tabla, listaErrores);
             if (tipoX != TipoVariable.NUMBER) {
                 listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
                         "El valor de PointX debe ser tipo \"number\".", getLinea(), getColumna()));
             }
+        }
+
+        if(this.width != null){
+            this.width.validarSemantica(tabla, listaErrores, esLayout);
+        }
+
+        if(this.height != null){
+            this.height.validarSemantica(tabla, listaErrores, esLayout);
         }
 
         if (this.pointY != null) {
@@ -66,7 +74,7 @@ public class NodoTable extends NodoComponente implements ValidadorDatosForms {
 
         //Bifurcacion de logica
         if (this.estilos != null) {
-            this.estilos.validarSemantica(tabla, listaErrores, true);
+            this.estilos.validarSemantica(tabla, listaErrores, esLayout);
         }
 
         if (this.borde != null) {

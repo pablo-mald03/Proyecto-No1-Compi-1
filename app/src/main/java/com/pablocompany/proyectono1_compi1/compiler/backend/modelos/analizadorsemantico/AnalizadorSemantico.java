@@ -36,8 +36,11 @@ public class AnalizadorSemantico {
             if (nodo == null) {
                 continue;
             }
-
             nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
+        }
+
+        if(!this.listadoErroresTotal.isEmpty()){
+            return "";
         }
 
         return stringBuilder.toString();

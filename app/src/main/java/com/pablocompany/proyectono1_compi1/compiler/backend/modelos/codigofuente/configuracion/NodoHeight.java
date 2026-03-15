@@ -1,7 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.ValidadorDatosForms;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.ValidarDatosForms;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -10,7 +10,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que representa el alto de configuracion de una pregunta o layout
-public class NodoHeight extends Nodo implements ValidadorDatosForms {
+public class NodoHeight extends Nodo implements ValidarDatosForms {
 
     //Atributos
     private NodoExpresion expresion;
@@ -29,7 +29,7 @@ public class NodoHeight extends Nodo implements ValidadorDatosForms {
         if (esLayout) {
             if (tipoResult == TipoVariable.COMODIN) {
                 listaErrores.add(new ErrorAnalisis("height", "Semantico",
-                        "La propiedad \"height\" en un layout \"SECTION\" o \"TABLE\" no permite el uso de \"comodines\".",
+                        "La propiedad \"height\" en un layout \"SECTION\", \"TABLE\" o \"TEXT\" no permiten el uso de \"comodines\".",
                         getLinea(), getColumna()));
                 return TipoVariable.ERROR;
             }
@@ -41,6 +41,8 @@ public class NodoHeight extends Nodo implements ValidadorDatosForms {
     //Metodo que permite validar semantica de la altura (PATRON EXPERTO)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+
         if (this.expresion == null) {
             listaErrores.add(new ErrorAnalisis("height", "Semantico",
                     "El valor de la altura es obligatorio.", getLinea(), getColumna()));
@@ -60,7 +62,7 @@ public class NodoHeight extends Nodo implements ValidadorDatosForms {
             return TipoVariable.ERROR;
         }
 
-        return TipoVariable.NUMBER;
+        return tipoExpresion;
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
