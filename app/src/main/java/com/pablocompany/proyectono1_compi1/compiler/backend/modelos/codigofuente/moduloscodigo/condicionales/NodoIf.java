@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.interfacesmodules.NodoVisitante;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -40,7 +41,7 @@ public class NodoIf extends Nodo {
                 && tipoCond != TipoVariable.COMODIN
                 && tipoCond != TipoVariable.ERROR
                 && tipoCond != TipoVariable.BOOLEAN_AND
-                && tipoCond != TipoVariable.BOOLEAN_OR  ) {
+                && tipoCond != TipoVariable.BOOLEAN_OR) {
             listaErrores.add(new ErrorAnalisis("IF", "Semantico",
                     "La condicion del IF debe ser una expresion logica o numerica.", getLinea(), getColumna()));
         }
@@ -94,6 +95,23 @@ public class NodoIf extends Nodo {
     @Override
     public String getString() {
         return "";
+    }
+
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarDraws(tabla, errores);
+            }
+        }
+
+        if (this.nodoElse != null) {
+            if(this.nodoElse instanceof NodoVisitante){
+                ((NodoVisitante) this.nodoElse).ejecutarDraws(tabla, errores);
+            }
+        }
     }
 }
 /*Created by Pablo*/

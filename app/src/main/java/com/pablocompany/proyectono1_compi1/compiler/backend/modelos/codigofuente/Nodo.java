@@ -34,6 +34,11 @@ public abstract class Nodo {
     //Metodo que permite validar la semantica del lenguaje generado
     public abstract TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
 
+    //Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+    }
+
 }
 
 /*Created by Pablo*/

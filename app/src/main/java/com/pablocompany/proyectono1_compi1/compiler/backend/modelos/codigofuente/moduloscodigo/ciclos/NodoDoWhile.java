@@ -1,7 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.ciclos;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -74,6 +73,16 @@ public class NodoDoWhile extends Nodo {
         } while (true);
 
         return null;
+    }
+
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarDraws(tabla, errores);
+            }
+        }
     }
 
     @Override

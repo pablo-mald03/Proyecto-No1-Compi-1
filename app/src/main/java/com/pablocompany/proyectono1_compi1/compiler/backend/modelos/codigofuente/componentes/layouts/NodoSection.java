@@ -21,7 +21,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import java.util.List;
 
 //Clase que define la seccion de un formulario y puede contener a mas componentes
-public class NodoSection extends NodoComponente implements ValidarDatosForms{
+public class NodoSection extends NodoComponente implements ValidarDatosForms {
 
     private NodoElements elementos;
     private NodoOrientation orientation;
@@ -185,6 +185,16 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms{
         return new Estilos(backgroundColor, color, fontFamily, textSize);
 
     }
+
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.elementos != null) {
+            this.elementos.ejecutarDraws(tabla, errores);
+        }
+    }
+
 
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

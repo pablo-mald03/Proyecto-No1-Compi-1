@@ -20,7 +20,7 @@ public class NodoForPorRango extends Nodo {
     //Codigo dentro del ciclo
     private List<Nodo> codigo;
 
-    public NodoForPorRango( String id, NodoExpresion rangoInicial,NodoExpresion rangoFinal, List<Nodo> codigo, int linea, int columna) {
+    public NodoForPorRango(String id, NodoExpresion rangoInicial, NodoExpresion rangoFinal, List<Nodo> codigo, int linea, int columna) {
         super(linea, columna);
         this.id = id;
         this.rangoInicial = rangoInicial;
@@ -42,14 +42,14 @@ public class NodoForPorRango extends Nodo {
         Simbolo simboloExistente = tabla.buscar(id);
 
         if (simboloExistente != null) {
-            if(simboloExistente.getTipo() != TipoVariable.NUMBER) {
+            if (simboloExistente.getTipo() != TipoVariable.NUMBER) {
                 listaErrores.add(new ErrorAnalisis("FOR", "Semantico",
                         "La variable \"" + id + "\" no es de tipo \"number\".",
                         getLinea(), getColumna()));
                 return TipoVariable.ERROR;
             }
             tabla.insertar(simboloExistente);
-        }else{
+        } else {
             tabla.insertar(new Simbolo(id, TipoVariable.NUMBER, 0.0, getLinea(), getColumna()));
 
         }
@@ -64,7 +64,7 @@ public class NodoForPorRango extends Nodo {
             return TipoVariable.ERROR;
         }
 
-        for(Nodo nodo : codigo) {
+        for (Nodo nodo : codigo) {
             if (nodo == null) {
                 continue;
             }
@@ -95,12 +95,22 @@ public class NodoForPorRango extends Nodo {
 
         while (i <= fin) {
             tabla.asignar(id, i, listaErrores);
-            for(Nodo nodo : codigo) {
+            for (Nodo nodo : codigo) {
                 nodo.ejecutar(tabla, listaErrores);
             }
             i = ((Number) tabla.buscar(id).getValor()).doubleValue() + 1;
         }
         return null;
+    }
+
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarDraws(tabla, errores);
+            }
+        }
     }
 
     @Override

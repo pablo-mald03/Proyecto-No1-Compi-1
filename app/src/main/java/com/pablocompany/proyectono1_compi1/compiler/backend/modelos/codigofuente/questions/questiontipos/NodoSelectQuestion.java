@@ -203,14 +203,14 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         if (this.width != null) {
             NodoComodin comodin = extraerValor(this.width.getExpresion());
-            if (comodin != null) {
+            if (comodin != null && comodin.getExpresion() == null) {
                 parametrosPregunta.add(comodin);
             }
         }
 
         if (this.height != null) {
             NodoComodin comodin = extraerValor(this.height.getExpresion());
-            if (comodin != null) {
+            if (comodin != null && comodin.getExpresion() == null) {
                 parametrosPregunta.add(comodin);
             }
         }
@@ -224,11 +224,11 @@ public class NodoSelectQuestion extends NodoQuestion {
             NodoComodin comodinOffset = extraerValor(offset);
             NodoComodin comodinLimit = extraerValor(limit);
 
-            if(comodinOffset != null){
+            if(comodinOffset != null && comodinOffset.getExpresion() == null){
                 parametrosPregunta.add(comodinOffset);
             }
 
-            if(comodinLimit != null){
+            if(comodinLimit != null && comodinLimit.getExpresion() == null){
                 parametrosPregunta.add(comodinLimit);
             }
         }
@@ -238,7 +238,7 @@ public class NodoSelectQuestion extends NodoQuestion {
 
             for (Nodo parametro : parametrosOpciones) {
                 NodoComodin comodin = extraerValor(parametro);
-                if (comodin != null) {
+                if (comodin != null && comodin.getExpresion() == null) {
                     parametrosPregunta.add(comodin);
                 }
             }
@@ -256,13 +256,13 @@ public class NodoSelectQuestion extends NodoQuestion {
                     NodoComodin comodinGreen = extraerValor(rgbColor.getGreen());
                     NodoComodin comodinBlue = extraerValor(rgbColor.getBlue());
 
-                    if(comodinRed != null) {
+                    if(comodinRed != null && comodinRed.getExpresion() == null) {
                         parametrosPregunta.add(comodinRed);
                     }
-                    if(comodinGreen != null) {
+                    if(comodinGreen != null && comodinGreen.getExpresion() == null ) {
                         parametrosPregunta.add(comodinGreen);
                     }
-                    if(comodinBlue != null) {
+                    if(comodinBlue != null && comodinBlue.getExpresion() == null) {
                         parametrosPregunta.add(comodinBlue);
                     }
 
@@ -274,13 +274,13 @@ public class NodoSelectQuestion extends NodoQuestion {
                     NodoComodin comodinGreen = extraerValor(rgbColor.getGreen());
                     NodoComodin comodinBlue = extraerValor(rgbColor.getBlue());
 
-                    if(comodinRed != null) {
+                    if(comodinRed != null && comodinRed.getExpresion() == null) {
                         parametrosPregunta.add(comodinRed);
                     }
-                    if(comodinGreen != null) {
+                    if(comodinGreen != null && comodinGreen.getExpresion() == null ) {
                         parametrosPregunta.add(comodinGreen);
                     }
-                    if(comodinBlue != null) {
+                    if(comodinBlue != null && comodinBlue.getExpresion() == null) {
                         parametrosPregunta.add(comodinBlue);
                     }
 

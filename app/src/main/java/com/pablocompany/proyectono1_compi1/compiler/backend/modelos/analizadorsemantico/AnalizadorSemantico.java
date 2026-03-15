@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.analizadors
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.interfacesmodules.NodoVisitante;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.NodoDraw;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -24,7 +25,7 @@ public class AnalizadorSemantico {
     }
 
     //Metodo que permite retornar el codigo procesado y ya analizado por el analizador semantico
-    public String codigoCompilado(){
+    public String codigoCompilado() {
 
         StringBuilder stringBuilder = new StringBuilder();
         TablaSimbolos tablaSimbolos = new TablaSimbolos();
@@ -41,14 +42,14 @@ public class AnalizadorSemantico {
             nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
         }
 
-        if(!this.listadoErroresTotal.isEmpty()){
+        if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
 
         //Metodo que agrega los comodines en su lugar
         this.agregarComodines(tablaSimbolos);
 
-        if(!this.listadoErroresTotal.isEmpty()){
+        if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
 
@@ -57,16 +58,13 @@ public class AnalizadorSemantico {
     }
 
     /*---Metodo delegado para poner los comodines que estaban en la funcion draw----*/
-    private void agregarComodines(TablaSimbolos tablaSimbolos){
+    private void agregarComodines(TablaSimbolos tablaSimbolos) {
 
         for (Nodo nodo : astParser) {
             if (nodo == null) {
                 continue;
             }
-            if(nodo instanceof NodoDraw){
-                NodoDraw nodoDraw = (NodoDraw) nodo;
-                nodoDraw.ejecutar(tablaSimbolos,this.listadoErroresTotal);
-            }
+            nodo.ejecutarDraws(tablaSimbolos, this.listadoErroresTotal);
         }
     }
 

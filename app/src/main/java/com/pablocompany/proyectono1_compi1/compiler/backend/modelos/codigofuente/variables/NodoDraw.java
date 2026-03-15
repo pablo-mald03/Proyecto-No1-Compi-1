@@ -65,6 +65,12 @@ public class NodoDraw extends NodoComponente {
         return TipoVariable.SPECIAL;
     }
 
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+        this.ejecutar(tabla, errores);
+    }
+
     /*METODO EJECUTADO PPARA INYECTAR LOS PARAMETROS A LOS COMODINES QUE ESTAN DENTRO DE LA FUNCION*/
 
     @Override

@@ -54,6 +54,11 @@ public class NodoComodin extends NodoExpresion {
         this.expresion = expresion;
     }
 
+    //Metodo que permite validar si ya fue seteado el valor de la expresion incognita
+    public NodoExpresion getExpresion() {
+        return expresion;
+    }
+
     //Retorna su valor string (comodin)
     @Override
     public String getString() {

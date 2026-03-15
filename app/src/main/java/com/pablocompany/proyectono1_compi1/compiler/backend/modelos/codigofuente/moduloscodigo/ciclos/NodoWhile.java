@@ -50,16 +50,16 @@ public class NodoWhile extends Nodo {
 
     //Metodo que permite ejecutar el ciclo while (PATRON EXPERTO)
     /*
-    *Solo se convierte a un ciclo while normal (PENDIENTE DEFNIR RETORNO)
-    */
+     *Solo se convierte a un ciclo while normal (PENDIENTE DEFNIR RETORNO)
+     */
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
 
-        while(true){
+        while (true) {
             Object valorCondicion = condicion.ejecutar(tabla, listaErrores);
 
-            if(!(valorCondicion instanceof  Number) || ((Number) valorCondicion).doubleValue() <= 0.0){
+            if (!(valorCondicion instanceof Number) || ((Number) valorCondicion).doubleValue() <= 0.0) {
                 break;
             }
 
@@ -73,6 +73,18 @@ public class NodoWhile extends Nodo {
         }
 
         return null;
+    }
+
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarDraws(tabla, errores);
+            }
+        }
+
     }
 
     @Override

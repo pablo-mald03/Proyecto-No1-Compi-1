@@ -28,12 +28,23 @@ public class NodoElements extends Nodo {
             for (NodoComponente nodo : this.expresion) {
                 if (nodo != null) {
 
-                   nodo.validarSemantica(tabla, listaErrores);
+                    nodo.validarSemantica(tabla, listaErrores);
                 }
             }
         }
 
         return TipoVariable.VOID;
+    }
+
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.expresion != null) {
+            for (Nodo n : this.expresion) {
+                n.ejecutarDraws(tabla, errores);
+            }
+        }
     }
 
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion de layouts PENDIENTE

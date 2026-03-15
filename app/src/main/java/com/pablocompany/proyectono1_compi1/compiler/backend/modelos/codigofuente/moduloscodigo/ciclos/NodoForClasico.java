@@ -112,6 +112,16 @@ public class NodoForClasico extends Nodo {
         return null;
     }
 
+    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarDraws(tabla, errores);
+            }
+        }
+    }
+
     @Override
     public String getString() {
         return "";

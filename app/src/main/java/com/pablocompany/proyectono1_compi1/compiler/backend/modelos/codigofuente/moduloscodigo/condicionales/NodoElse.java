@@ -46,6 +46,11 @@ public class NodoElse extends Nodo {
         return TipoVariable.VOID;
     }
 
+    /*--MetodoGetter que permite obtener el cuerpo del else para poder ejecutar la primera pasada--*/
+    public List<Nodo> getCuerpo(){
+        return this.cuerpo;
+    }
+
     //Clase que permite ejecutar por completo el codigo que tiene dentro el caso contrario else
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
@@ -57,6 +62,17 @@ public class NodoElse extends Nodo {
 
         //PENDIENTE DEFINIR RETORNO
         return null;
+    }
+
+    //Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)
+    @Override
+    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if(this.cuerpo != null){
+            for (Nodo nodo : this.cuerpo) {
+                nodo.ejecutarDraws(tabla, errores);
+            }
+        }
     }
 
     //Pendiente definir
