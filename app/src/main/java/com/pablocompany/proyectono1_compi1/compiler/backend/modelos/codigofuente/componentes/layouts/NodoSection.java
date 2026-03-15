@@ -48,7 +48,6 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms{
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
-        System.out.println("Esta entrando a la validacion de la section en boolean: " + esLayout);
         if (this.elementos != null) {
             this.elementos.validarSemantica(tabla, listaErrores);
         }

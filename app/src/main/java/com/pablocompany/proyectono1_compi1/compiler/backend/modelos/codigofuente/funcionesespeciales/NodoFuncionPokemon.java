@@ -44,6 +44,14 @@ public class NodoFuncionPokemon extends Nodo {
         return TipoVariable.VOID;
     }
 
+    /*--Metodos getter para retornar los atributos de la funcion pokemon---*/
+    public NodoExpresion getOffset() {
+        return this.offset;
+    }
+    public NodoExpresion getLimit() {
+        return this.limit;
+    }
+
     //Metodo que permite ejecutar el request de a la API para poder obtener los pokemon
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

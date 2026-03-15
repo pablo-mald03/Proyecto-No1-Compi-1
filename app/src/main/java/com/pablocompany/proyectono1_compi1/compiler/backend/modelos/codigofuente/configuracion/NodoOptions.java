@@ -47,6 +47,12 @@ public class NodoOptions extends Nodo {
         return TipoVariable.STRING;
     }
 
+    /*Metodo getter que retorna la lista de opciones */
+    public List<Nodo> getOpciones() {
+        return this.opciones;
+    }
+
+
     //Metodo que permite ejecutar la lista de opciones de expresion que esta dentro del nodo de configuracion
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
@@ -94,6 +100,12 @@ public class NodoOptions extends Nodo {
             }
         }
         return contadorComodines;
+    }
+
+    /*---Metodo delegado para poder pasar los parametros a las funciones dentro de las preguntas y asignarlos a las opciones----*/
+    public void inyectarParametros(List<Nodo> parametros,List<ErrorAnalisis> listaErrores) {
+        //for(int i = 0; i < parametros.size();)
+
     }
 }
 

@@ -79,4 +79,9 @@ public class NodoWidth extends Nodo implements ValidarDatosForms {
     public int contarComodines() {
         return this.expresion.contarComodines();
     }
+
+    /*---Metodo getter para obtener el valor de la expresion dentro de la configuracion--*/
+    public NodoExpresion getExpresion() {
+        return this.expresion;
+    }
 }

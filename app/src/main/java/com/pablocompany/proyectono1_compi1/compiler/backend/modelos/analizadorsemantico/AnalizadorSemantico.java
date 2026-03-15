@@ -1,6 +1,8 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.analizadorsemantico;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.NodoDraw;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -43,8 +45,31 @@ public class AnalizadorSemantico {
             return "";
         }
 
+        //Metodo que agrega los comodines en su lugar
+        this.agregarComodines(tablaSimbolos);
+
+        if(!this.listadoErroresTotal.isEmpty()){
+            return "";
+        }
+
+
         return stringBuilder.toString();
     }
+
+    /*---Metodo delegado para poner los comodines que estaban en la funcion draw----*/
+    private void agregarComodines(TablaSimbolos tablaSimbolos){
+
+        for (Nodo nodo : astParser) {
+            if (nodo == null) {
+                continue;
+            }
+            if(nodo instanceof NodoDraw){
+                NodoDraw nodoDraw = (NodoDraw) nodo;
+                nodoDraw.ejecutar(tablaSimbolos,this.listadoErroresTotal);
+            }
+        }
+    }
+
 
     //Retorna la lista de errores semanticos
     public List<ErrorAnalisis> getListadoErroresTotal() {

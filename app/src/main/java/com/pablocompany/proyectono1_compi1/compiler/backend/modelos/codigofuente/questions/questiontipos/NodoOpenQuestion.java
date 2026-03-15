@@ -146,6 +146,14 @@ public class NodoOpenQuestion extends NodoQuestion {
         return contador;
     }
 
+    /*----APARTADO DE METODOS DELEGADOS A LA CLASE (PATRON EXPERTO)----*/
+
+    /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
+    public void inyectarParametros(List<Nodo> parametros,List<ErrorAnalisis> listaErrores) {
+
+    }
+
+
     //Metodo que permite ejecutar las acciones que tenga la pregunta
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

@@ -46,7 +46,6 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
-        System.out.println("Esta entrando a la validacion de la tabla en boolean " + esLayout);
 
         if (this.pointX != null) {
             TipoVariable tipoX = this.pointX.validarSemantica(tabla, listaErrores);

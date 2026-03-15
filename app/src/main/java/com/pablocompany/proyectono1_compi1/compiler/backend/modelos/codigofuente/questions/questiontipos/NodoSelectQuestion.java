@@ -1,6 +1,9 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questiontipos;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoRgbColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
@@ -8,6 +11,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales.NodoFuncionPokemon;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
@@ -15,6 +19,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolo
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa una pregunta de seleccion
@@ -41,13 +46,13 @@ public class NodoSelectQuestion extends NodoQuestion {
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 
-        if(configuracion.isEmpty()){
+        if (configuracion.isEmpty()) {
             return;
         }
 
         for (AtributoConfig config : configuracion) {
 
-            if(config ==null){
+            if (config == null) {
                 continue;
             }
 
@@ -79,20 +84,20 @@ public class NodoSelectQuestion extends NodoQuestion {
 
     //Metodo que permite validar semantica de la pregunta tipo select (PATRON EXPERTO)
     /*
-    * Comentarios de validacion detallados porque es importante saber en que momento se valida cada cosa
-    *
-    * */
+     * Comentarios de validacion detallados porque es importante saber en que momento se valida cada cosa
+     *
+     * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         /*--Validacion de config---*/
-        if(this.width != null){
-            width.validarSemantica(tabla,listaErrores,false);
+        if (this.width != null) {
+            width.validarSemantica(tabla, listaErrores, false);
         }
-        if(this.height != null){
-            height.validarSemantica(tabla,listaErrores,false);
+        if (this.height != null) {
+            height.validarSemantica(tabla, listaErrores, false);
         }
-        if(this.estilos != null){
+        if (this.estilos != null) {
             this.estilos.validarSemantica(tabla, listaErrores, false);
         }
 
@@ -113,8 +118,8 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         /*---Validacion de la respuesta correcta---*/
 
-        if(respuestaCorrecta != null){
-            respuestaCorrecta.validarSemantica(tabla,listaErrores);
+        if (respuestaCorrecta != null) {
+            respuestaCorrecta.validarSemantica(tabla, listaErrores);
         }
 
         /*---Validacion de la funcion para el request a la api de pokemon---*/
@@ -180,7 +185,7 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         if (this.funcionPokemon != null) {
 
-            if(this.funcionPokemon instanceof NodoFuncionPokemon){
+            if (this.funcionPokemon instanceof NodoFuncionPokemon) {
                 NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
                 contador += funcionPokemon.contarComodines();
             }
@@ -189,7 +194,111 @@ public class NodoSelectQuestion extends NodoQuestion {
         return contador;
     }
 
-    /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/
+    /*----APARTADO DE METODOS DELEGADOS A LA CLASE (PATRON EXPERTO)----*/
+
+    /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
+    public void inyectarParametros(List<Nodo> parametros, List<ErrorAnalisis> listaErrores) {
+
+        List<Nodo> parametrosPregunta = new ArrayList<>();
+
+        if (this.width != null) {
+            NodoComodin comodin = extraerValor(this.width.getExpresion());
+            if (comodin != null) {
+                parametrosPregunta.add(comodin);
+            }
+        }
+
+        if (this.height != null) {
+            NodoComodin comodin = extraerValor(this.height.getExpresion());
+            if (comodin != null) {
+                parametrosPregunta.add(comodin);
+            }
+        }
+
+        if (this.funcionPokemon != null && this.funcionPokemon instanceof NodoFuncionPokemon) {
+            NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
+
+            NodoExpresion offset = funcionPokemon.getOffset();
+            NodoExpresion limit = funcionPokemon.getLimit();
+
+            NodoComodin comodinOffset = extraerValor(offset);
+            NodoComodin comodinLimit = extraerValor(limit);
+
+            if(comodinOffset != null){
+                parametrosPregunta.add(comodinOffset);
+            }
+
+            if(comodinLimit != null){
+                parametrosPregunta.add(comodinLimit);
+            }
+        }
+
+        if (this.opciones != null) {
+            List<Nodo> parametrosOpciones = this.opciones.getOpciones();
+
+            for (Nodo parametro : parametrosOpciones) {
+                NodoComodin comodin = extraerValor(parametro);
+                if (comodin != null) {
+                    parametrosPregunta.add(comodin);
+                }
+            }
+        }
+
+        if(this.estilos != null){
+
+            if(this.estilos.getBackgroundColor() != null){
+                NodoColor color = this.estilos.getBackgroundColor();
+
+                if(color instanceof NodoRgbColor){
+
+                    NodoRgbColor rgbColor = (NodoRgbColor) color;
+                    NodoComodin comodinRed = extraerValor(rgbColor.getRed());
+                    NodoComodin comodinGreen = extraerValor(rgbColor.getGreen());
+                    NodoComodin comodinBlue = extraerValor(rgbColor.getBlue());
+
+                    if(comodinRed != null) {
+                        parametrosPregunta.add(comodinRed);
+                    }
+                    if(comodinGreen != null) {
+                        parametrosPregunta.add(comodinGreen);
+                    }
+                    if(comodinBlue != null) {
+                        parametrosPregunta.add(comodinBlue);
+                    }
+
+                }
+
+                if(color instanceof NodoHslColor){
+                    NodoHslColor rgbColor = (NodoHslColor) color;
+                    NodoComodin comodinRed = extraerValor(rgbColor.getRed());
+                    NodoComodin comodinGreen = extraerValor(rgbColor.getGreen());
+                    NodoComodin comodinBlue = extraerValor(rgbColor.getBlue());
+
+                    if(comodinRed != null) {
+                        parametrosPregunta.add(comodinRed);
+                    }
+                    if(comodinGreen != null) {
+                        parametrosPregunta.add(comodinGreen);
+                    }
+                    if(comodinBlue != null) {
+                        parametrosPregunta.add(comodinBlue);
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+    /*Metodo delegado para extraer el valor de una expresion en dado caso lo sea*/
+    private NodoComodin extraerValor(Nodo nodo) {
+        if (nodo instanceof NodoComodin) {
+            return (NodoComodin) nodo;
+        }
+
+        return null;
+    }
 
     //Metodo que permite ejecutar laa acciones dentro de la question
     @Override

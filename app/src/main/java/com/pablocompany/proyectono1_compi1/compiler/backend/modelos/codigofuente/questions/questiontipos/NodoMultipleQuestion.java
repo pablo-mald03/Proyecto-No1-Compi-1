@@ -195,7 +195,12 @@ public class NodoMultipleQuestion extends NodoQuestion {
         return contador;
     }
 
-    /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/
+    /*----APARTADO DE METODOS DELEGADOS A LA CLASE (PATRON EXPERTO)----*/
+
+    /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
+    public void inyectarParametros(List<Nodo> parametros,List<ErrorAnalisis> listaErrores) {
+
+    }
 
     //Metodo que permite ejecutar laa acciones dentro de la question
     @Override

@@ -109,10 +109,6 @@ public class Estilos {
         return fontFamily;
     }
 
-    public void setFontFamily(NodoTipoLetra fontFamily) {
-        this.fontFamily = fontFamily;
-    }
-
     public NodoExpresion getTextSize() {
         return textSize;
     }

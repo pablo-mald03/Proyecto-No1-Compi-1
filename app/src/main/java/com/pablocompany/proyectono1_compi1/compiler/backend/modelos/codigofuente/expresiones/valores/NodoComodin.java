@@ -20,8 +20,20 @@ public class NodoComodin extends NodoExpresion {
     }
 
     //Metodo que permite validar semantica del lenguaje generado cuando se encuentra un comodin
+    /*
+    * Este comodin es realmente seteable ya que juega con la referencia nula para retornar una expresion
+    * Lo que permite en tiempo de ejecucion setear valores y ya poder retornar un valor cuando ya estan asignadas
+    *
+    * A esto se le conoce como las famosas PASADAS que hace un traductor o compilador
+    *
+    * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        if (this.expresion != null) {
+            return this.expresion.validarSemantica(tabla, listaErrores);
+        }
+
         return TipoVariable.COMODIN;
     }
 

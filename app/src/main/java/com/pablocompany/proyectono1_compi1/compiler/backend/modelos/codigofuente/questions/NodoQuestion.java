@@ -11,6 +11,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
 import java.util.List;
 
@@ -72,6 +73,9 @@ public abstract class NodoQuestion extends NodoComponente {
 
     //Metodo que permite validar si tiene comodines la question
     public abstract int contarComodines();
+
+    /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
+    public abstract void inyectarParametros(List<Nodo> parametros,List<ErrorAnalisis> listaErrores);
 
     /*Created by Pablo*/
 }

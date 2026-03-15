@@ -83,5 +83,10 @@ public class NodoHeight extends Nodo implements ValidarDatosForms {
         return this.expresion.contarComodines();
     }
 
+    /*---Metodo getter para obtener el valor de la expresion dentro de la configuracion--*/
+    public NodoExpresion getExpresion() {
+        return this.expresion;
+    }
+
 }
 
