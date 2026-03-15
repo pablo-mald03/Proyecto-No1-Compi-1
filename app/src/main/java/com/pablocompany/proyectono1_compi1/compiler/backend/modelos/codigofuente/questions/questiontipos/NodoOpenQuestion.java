@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questiontipos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
@@ -9,6 +10,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales.NodoFuncionPokemon;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questionrecursos.TipoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
@@ -93,6 +95,18 @@ public class NodoOpenQuestion extends NodoQuestion {
 
         }
 
+        /*--Validacion de comodines--*/
+        if (this.id == null) {
+            int totalComodines = this.contarComodines();
+            if (totalComodines > 0) {
+                listaErrores.add(new ErrorAnalisis("OPEN_QUESTION", "Semantico",
+                        "La pregunta contiene: " + totalComodines +
+                                " comodines. Las preguntas sin estar asignadas a una variable no pueden ser dinamicas.",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        }
+
         if (id != null) {
             Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
             if (!tabla.insertar(simbolo)) {
@@ -104,10 +118,32 @@ public class NodoOpenQuestion extends NodoQuestion {
         return TipoVariable.SPECIAL;
     }
 
-    //Metodo que permite validar si tiene comodines la question (PENDIENTE)
+    //Metodo que permite validar si tiene comodines la open question
     @Override
-    public int contarComodines(){
-        return 0;
+    public int contarComodines() {
+        return contarComodinesPregunta();
+    }
+
+    /*--Metodo delegado para poder contar los comodines de la pregunta--*/
+    private int contarComodinesPregunta() {
+        int contador = 0;
+
+        if (this.label != null) {
+            contador += this.label.contarComodines();
+        }
+
+        if (this.width != null) {
+            contador += this.width.contarComodines();
+        }
+        if (this.height != null) {
+            contador += this.height.contarComodines();
+        }
+
+        if (this.estilos != null) {
+            contador += this.estilos.contarComodines();
+        }
+
+        return contador;
     }
 
     //Metodo que permite ejecutar las acciones que tenga la pregunta

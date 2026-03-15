@@ -35,6 +35,9 @@ public abstract class NodoColor {
     //Metodo que permite validar la semantica dentro de un color
     public abstract  TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout);
 
+    /*--Metodo propio de la clase que permite contar los comodines que tienen en el color--*/
+    public abstract int contarComodines();
+
 }
 
 /*Created by P*/

@@ -77,5 +77,11 @@ public class NodoHeight extends Nodo implements ValidarDatosForms {
         return "height: " + this.expresion.getString();
     }
 
+
+    /*--Metodo propio de la clase que permite contar los comodines que tienen en el alto--*/
+    public int contarComodines() {
+        return this.expresion.contarComodines();
+    }
+
 }
 

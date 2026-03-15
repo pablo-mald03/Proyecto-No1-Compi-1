@@ -52,13 +52,13 @@ public class NodoDropQuestion extends NodoQuestion {
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         /*--Validacion de config---*/
-        if(this.width != null){
-            width.validarSemantica(tabla,listaErrores,false);
+        if (this.width != null) {
+            width.validarSemantica(tabla, listaErrores, false);
         }
-        if(this.height != null){
-            height.validarSemantica(tabla,listaErrores,false);
+        if (this.height != null) {
+            height.validarSemantica(tabla, listaErrores, false);
         }
-        if(this.estilos != null){
+        if (this.estilos != null) {
 
             this.estilos.validarSemantica(tabla, listaErrores, false);
         }
@@ -79,9 +79,9 @@ public class NodoDropQuestion extends NodoQuestion {
         }
 
         /*---Validacion del label---*/
-        if(this.label != null){
-            this.label.validarSemantica(tabla,listaErrores);
-        }else{
+        if (this.label != null) {
+            this.label.validarSemantica(tabla, listaErrores);
+        } else {
 
             //Solo es preventivo
             listaErrores.add(new ErrorAnalisis(id, "Semántico",
@@ -91,14 +91,26 @@ public class NodoDropQuestion extends NodoQuestion {
 
         /*---Validacion de la respuesta correcta---*/
 
-        if(respuestaCorrecta != null){
-            respuestaCorrecta.validarSemantica(tabla,listaErrores);
+        if (respuestaCorrecta != null) {
+            respuestaCorrecta.validarSemantica(tabla, listaErrores);
         }
 
         /*---Validacion de la funcion para el request a la api de pokemon---*/
 
         if (this.funcionPokemon != null) {
             this.funcionPokemon.validarSemantica(tabla, listaErrores);
+        }
+
+        /*--Validacion de comodines--*/
+        if (this.id == null) {
+            int totalComodines = this.contarComodines();
+            if (totalComodines > 0) {
+                listaErrores.add(new ErrorAnalisis("DROP_QUESTION", "Semantico",
+                        "La pregunta contiene: " + totalComodines +
+                                " comodines. Las preguntas sin estar asignadas a una variable no pueden ser dinamicas.",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
         }
 
         /*---Registrar y validar existencia---*/
@@ -116,13 +128,13 @@ public class NodoDropQuestion extends NodoQuestion {
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 
-        if(configuracion.isEmpty()){
+        if (configuracion.isEmpty()) {
             return;
         }
 
         for (AtributoConfig config : configuracion) {
 
-            if(config ==null){
+            if (config == null) {
                 continue;
             }
 
@@ -153,10 +165,50 @@ public class NodoDropQuestion extends NodoQuestion {
         }
     }
 
-    //Metodo que permite validar si tiene comodines la question (PENDIENTE)
+    //Metodo que permite validar si tiene comodines la drop question
     @Override
-    public int contarComodines(){
-        return 0;
+    public int contarComodines() {
+        return contarComodinesPregunta();
+    }
+
+    /*--Metodo delegado para poder contar los comodines de la pregunta--*/
+    private int contarComodinesPregunta() {
+        int contador = 0;
+        if (this.opciones != null) {
+            contador += this.opciones.contarComodines();
+        }
+
+        if (this.label != null) {
+            contador += this.label.contarComodines();
+        }
+
+        if (this.respuestaCorrecta != null) {
+            if (this.respuestaCorrecta instanceof NodoExpresion) {
+                NodoExpresion expresion = (NodoExpresion) this.respuestaCorrecta;
+                contador += expresion.contarComodines();
+            }
+        }
+
+        if (this.width != null) {
+            contador += this.width.contarComodines();
+        }
+        if (this.height != null) {
+            contador += this.height.contarComodines();
+        }
+
+        if (this.estilos != null) {
+            contador += this.estilos.contarComodines();
+        }
+
+        if (this.funcionPokemon != null) {
+
+            if(this.funcionPokemon instanceof NodoFuncionPokemon){
+                NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
+                contador += funcionPokemon.contarComodines();
+            }
+        }
+
+        return contador;
     }
 
     /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/

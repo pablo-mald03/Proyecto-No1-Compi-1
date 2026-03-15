@@ -54,4 +54,16 @@ public class NodoFuncionPokemon extends Nodo {
     public String getString() {
         return "wh";
     }
+
+    /*--Metodo delegado para poder contar los comodines de la funcion--*/
+    public int contarComodines() {
+        int contador = 0;
+        if (this.offset != null) {
+            contador += this.offset.contarComodines();
+        }
+        if (this.limit != null) {
+            contador += this.limit.contarComodines();
+        }
+        return contador;
+    }
 }

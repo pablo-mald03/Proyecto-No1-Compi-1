@@ -121,6 +121,25 @@ public class Estilos {
         this.textSize = textSize;
     }
 
+    /*--Metodo propio de la clase que permite contar los comodines que tienen en los estilos--*/
+    public  int contarComodines(){
+        int contador = 0;
+
+        if(this.color != null){
+            contador += this.color.contarComodines();
+        }
+        if(this.backgroundColor != null){
+            contador += this.backgroundColor.contarComodines();
+        }
+        if(this.fontFamily != null){
+            contador += this.fontFamily.contarComodines();
+        }
+        if(this.textSize != null){
+            contador += this.textSize.contarComodines();
+        }
+        return contador;
+    }
+
 
 
 }

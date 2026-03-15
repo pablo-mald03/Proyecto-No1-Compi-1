@@ -52,8 +52,8 @@ public class NodoOptions extends Nodo {
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         //Metodo pendiente de implementar
-        for (Nodo objeto: this.opciones) {
-            objeto.ejecutar(tabla,listaErrores);
+        for (Nodo objeto : this.opciones) {
+            objeto.ejecutar(tabla, listaErrores);
         }
 
         return null;
@@ -76,7 +76,24 @@ public class NodoOptions extends Nodo {
             }
         }
 
-        return "options: {" + builder.toString() +"}";
+        return "options: {" + builder.toString() + "}";
+    }
+
+    /*---Metodo propio de la clase que permite contar los comodines que tienen en las opciones---*/
+    public int contarComodines() {
+
+        int contadorComodines = 0;
+
+        for (Nodo nodo : this.opciones) {
+            if (nodo == null) {
+                continue;
+            }
+            if (nodo instanceof NodoExpresion) {
+                NodoExpresion expresion = (NodoExpresion) nodo;
+                contadorComodines += expresion.contarComodines();
+            }
+        }
+        return contadorComodines;
     }
 }
 

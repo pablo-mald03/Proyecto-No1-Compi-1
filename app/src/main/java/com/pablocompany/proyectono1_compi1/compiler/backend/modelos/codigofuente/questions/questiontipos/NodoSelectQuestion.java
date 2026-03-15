@@ -123,6 +123,17 @@ public class NodoSelectQuestion extends NodoQuestion {
             this.funcionPokemon.validarSemantica(tabla, listaErrores);
         }
 
+        if (this.id == null) {
+            int totalComodines = this.contarComodines();
+            if (totalComodines > 0) {
+                listaErrores.add(new ErrorAnalisis("SELECT_QUESTION", "Semantico",
+                        "La pregunta contiene: " + totalComodines +
+                                " comodines. Las preguntas sin estar asignadas a una variable no pueden ser dinamicas.",
+                        getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        }
+
         /*---Registrar y validar existencia---*/
         if (id != null) {
             Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
@@ -136,9 +147,46 @@ public class NodoSelectQuestion extends NodoQuestion {
     }
 
     //Metodo que permite validar si tiene comodines la question (PENDIENTE)
+    //Metodo que permite validar si tiene comodines la multiple question
     @Override
-    public int contarComodines(){
-        return 0;
+    public int contarComodines() {
+        return contarComodinesPregunta();
+    }
+
+    /*--Metodo delegado para poder contar los comodines de la pregunta--*/
+    private int contarComodinesPregunta() {
+        int contador = 0;
+
+        if (this.opciones != null) {
+            contador += this.opciones.contarComodines();
+        }
+
+        if (this.respuestaCorrecta != null) {
+            if (this.respuestaCorrecta instanceof NodoExpresion) {
+                NodoExpresion expresion = (NodoExpresion) this.respuestaCorrecta;
+                contador += expresion.contarComodines();
+            }
+        }
+        if (this.width != null) {
+            contador += this.width.contarComodines();
+        }
+        if (this.height != null) {
+            contador += this.height.contarComodines();
+        }
+
+        if (this.estilos != null) {
+            contador += this.estilos.contarComodines();
+        }
+
+        if (this.funcionPokemon != null) {
+
+            if(this.funcionPokemon instanceof NodoFuncionPokemon){
+                NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
+                contador += funcionPokemon.contarComodines();
+            }
+        }
+
+        return contador;
     }
 
     /*----APARTADO DE METODOS GETTERS Y SETTERS (PENDIENTE)----*/

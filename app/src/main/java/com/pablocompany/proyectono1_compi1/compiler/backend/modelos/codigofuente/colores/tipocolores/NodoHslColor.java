@@ -100,6 +100,22 @@ public class NodoHslColor extends NodoColor {
     public String getString() {
         return "<" + this.red.getString() + ", " + this.green.getString() + ", " + this.blue.getString() + ">";
     }
+
+    /*--Metodo propio de la clase que permite contar los comodines que tienen en el color HSL--*/
+    public  int contarComodines(){
+        int contador = 0;
+
+        if(this.red != null){
+            contador += this.red.contarComodines();
+        }
+        if(this.green != null){
+            contador += this.green.contarComodines();
+        }
+        if(this.blue != null){
+            contador += this.blue.contarComodines();
+        }
+        return contador;
+    }
 }
 /*Created by P*/
 

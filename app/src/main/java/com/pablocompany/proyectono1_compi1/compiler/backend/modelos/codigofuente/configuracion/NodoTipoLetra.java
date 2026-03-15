@@ -50,4 +50,8 @@ public class NodoTipoLetra extends Nodo {
     public String getString() {
         return "font family: " + this.letraTipo.toString();
     }
+    /*--Metodo propio de la clase que permite contar los comodines que tienen en los estilos--*/
+    public  int contarComodines(){
+        return 0;
+    }
 }

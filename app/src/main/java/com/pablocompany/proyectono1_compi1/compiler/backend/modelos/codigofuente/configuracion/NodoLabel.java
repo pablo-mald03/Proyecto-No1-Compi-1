@@ -44,4 +44,9 @@ public class NodoLabel extends Nodo {
     public String getString() {
         return "label: " + this.expresion.getString();
     }
+
+    /*---Metodo propio de la clase que permite contar los comodines que tienen en el label---*/
+    public int contarComodines() {
+        return this.expresion.contarComodines();
+    }
 }

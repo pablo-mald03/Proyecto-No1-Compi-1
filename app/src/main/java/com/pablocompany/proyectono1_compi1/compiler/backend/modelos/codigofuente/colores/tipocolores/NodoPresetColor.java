@@ -61,4 +61,9 @@ public class NodoPresetColor extends NodoColor {
     public  String getString(){
         return this.colorPreset.toString();
     }
+
+    /*--Metodo propio de la clase que permite contar los comodines que tienen en el color PRESET--*/
+    public  int contarComodines(){
+        return 0;
+    }
 }
