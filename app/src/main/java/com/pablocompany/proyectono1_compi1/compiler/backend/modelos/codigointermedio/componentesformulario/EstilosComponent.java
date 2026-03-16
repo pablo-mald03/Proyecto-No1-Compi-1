@@ -47,7 +47,7 @@ public class EstilosComponent {
         return textSize;
     }
 
-    public void setTextSize(double textSize) {
+    public void setTextSize(Number textSize) {
         this.textSize = textSize;
     }
 }

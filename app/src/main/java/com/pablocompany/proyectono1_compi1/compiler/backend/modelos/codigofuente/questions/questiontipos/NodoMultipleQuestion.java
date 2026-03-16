@@ -1,21 +1,22 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questiontipos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoRgbColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoCorrect;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOptions;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales.NodoFuncionPokemon;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.PreguntaMultiple;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -460,8 +461,127 @@ public class NodoMultipleQuestion extends NodoQuestion {
     //Metodo que permite ejecutar laa acciones dentro de la question
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
+
+        if (widthResultado instanceof OnCompilacionError) return widthResultado;
+
+        Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        if (heightResultado instanceof OnCompilacionError) return heightResultado;
+
+        Object opcionesResultado = (this.opciones != null) ? this.opciones.ejecutar(tabla, listaErrores) : new ArrayList<String>();
+
+        if (opcionesResultado instanceof OnCompilacionError) return opcionesResultado;
+
+        List<String> listaOpciones = (List<String>) opcionesResultado;
+
+        Object indicesCalculados = this.obtenerListaindices(tabla, listaErrores, listaOpciones);
+
+        if(indicesCalculados instanceof OnCompilacionError) return indicesCalculados;
+
+
+        List<Integer> indicesCorrectos = new ArrayList<>();
+
+        if(indicesCalculados instanceof  List ){
+            indicesCorrectos = (List<Integer>) indicesCalculados;
+
+            if(indicesCorrectos.isEmpty()){
+                indicesCorrectos = null;
+            }
+        }
+
+
+        EstilosComponent estilosObjeto = new EstilosComponent();
+
+        if (this.estilos != null) {
+
+            Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+
+            if (textSize instanceof OnCompilacionError) return textSize;
+
+            Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
+
+            if (letra instanceof OnCompilacionError) return letra;
+
+            Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+
+            if (backgroundColor instanceof OnCompilacionError) return backgroundColor;
+
+            Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
+
+            if (color instanceof OnCompilacionError) return color;
+
+            if (textSize instanceof Number) {
+                estilosObjeto.setTextSize((Number) textSize);
+            }
+
+            if (letra != null) {
+                estilosObjeto.setFontFamily(TipoLetra.valueOf(letra.toString()));
+            }
+
+            if (backgroundColor != null) {
+                estilosObjeto.setBackgroundColor(backgroundColor.toString());
+            }
+
+            if (color != null) {
+                estilosObjeto.setColor(color.toString());
+            }
+        }
+
+        Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
+        Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
+
+        return new PreguntaMultiple(alto, ancho, listaOpciones,indicesCorrectos, estilosObjeto, getLinea(), getColumna());
     }
+
+    /*Metodo auxiliar que permite retornar el listado de indices correctos*/
+    private Object obtenerListaindices(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores,List<String> listaOpciones){
+
+        List<Integer> indicesCorrectos = new ArrayList<>();
+
+        if (this.respuestasCorrectas != null) {
+            for (Nodo nodo : this.respuestasCorrectas) {
+                Object resultadoValor = nodo.ejecutar(tabla, listaErrores);
+
+                if (resultadoValor instanceof OnCompilacionError) return resultadoValor;
+
+                Integer indiceActual = -1;
+
+                if (resultadoValor instanceof Integer || resultadoValor instanceof Long) {
+                    indiceActual = ((Number) resultadoValor).intValue();
+                }
+                else if (resultadoValor instanceof Double) {
+                    double val = (Double) resultadoValor;
+                    if (val == (int) val) {
+                        indiceActual = (int) val;
+                    } else {
+                        return reportarError(listaErrores, "Indice múltiple debe ser entero sin decimales", getLinea(), getColumna());
+                    }
+                }
+                else {
+                    return reportarError(listaErrores, "Índice múltiple debe ser un valor numérico", getLinea(), getColumna());
+                }
+
+                if (indiceActual < 0 || indiceActual >= listaOpciones.size()) {
+                    return reportarError(listaErrores, "Índice de respuesta (" + indiceActual + ") fuera de rango", getLinea(), getColumna());
+                }
+
+                indicesCorrectos.add(indiceActual);
+            }
+        }
+
+        return indicesCorrectos;
+    }
+
+
+    /*--Metodo utilizado para Reportar error--*/
+    private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
+        listaErrores.add(new ErrorAnalisis(this.opciones.getString(), "Semantico",
+                mensaje,linea, columna ));
+        return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
+    }
+
 
     @Override
     public String getString() {

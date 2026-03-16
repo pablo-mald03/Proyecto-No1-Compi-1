@@ -1,13 +1,11 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questiontipos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoRgbColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoCorrect;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOptions;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
@@ -18,7 +16,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.PreguntaAbierta;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.PreguntaSelect;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -420,43 +418,97 @@ public class NodoSelectQuestion extends NodoQuestion {
     //Metodo que permite ejecutar laa acciones dentro de la question
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        /*Object contenido = (this.width != null) ? this.label.ejecutar(tabla, listaErrores):null;
 
-        Object width = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
-        Object height = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+        Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
 
-        EstilosComponent estilos = new EstilosComponent();
+        if (widthResultado instanceof OnCompilacionError) return widthResultado;
+
+        Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        if (heightResultado instanceof OnCompilacionError) return heightResultado;
+
+        Object opcionesResultado = (this.opciones != null) ? this.opciones.ejecutar(tabla, listaErrores) : new ArrayList<String>();
+        if (opcionesResultado instanceof OnCompilacionError) return opcionesResultado;
+
+        Object respuestaCorrectaQuest = (this.respuestaCorrecta != null) ? this.respuestaCorrecta.ejecutar(tabla, listaErrores) : null;
+
+        if (respuestaCorrectaQuest instanceof OnCompilacionError) return respuestaCorrectaQuest;
+
+        EstilosComponent estilosObjeto = new EstilosComponent();
 
         if (this.estilos != null) {
 
             Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+
+            if (textSize instanceof OnCompilacionError) return textSize;
+
             Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
 
+            if (letra instanceof OnCompilacionError) return letra;
+
             Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+
+            if (backgroundColor instanceof OnCompilacionError) return backgroundColor;
+
             Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
 
+            if (color instanceof OnCompilacionError) return color;
 
-            if (textSize != null) {
-                estilos.setTextSize(Double.parseDouble(textSize.toString()));
+            if (textSize instanceof Number) {
+                estilosObjeto.setTextSize((Number) textSize);
             }
 
             if (letra != null) {
-                estilos.setFontFamily(TipoLetra.valueOf(letra.toString()));
+                estilosObjeto.setFontFamily(TipoLetra.valueOf(letra.toString()));
             }
 
             if (backgroundColor != null) {
-                estilos.setBackgroundColor(backgroundColor.toString());
+                estilosObjeto.setBackgroundColor(backgroundColor.toString());
             }
 
             if (color != null) {
-                estilos.setColor(color.toString());
+                estilosObjeto.setColor(color.toString());
             }
         }
-        Double alto = (height != null) ? Double.parseDouble(height.toString()) : null;
-        Double ancho = (width != null) ? Double.parseDouble(width.toString()) : null;
 
-        return new PreguntaAbierta(alto, ancho, ( contenido != null)? contenido.toString():null, estilos, getLinea(), getColumna());*/
-        return null;
+        Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
+        Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
+        List<String> listaOpciones = (List<String>) opcionesResultado;
+
+        Integer indiceCorrecto = -1;
+
+        if (respuestaCorrectaQuest != null) {
+            if (respuestaCorrectaQuest instanceof Integer || respuestaCorrectaQuest instanceof Long) {
+                indiceCorrecto = ((Number) respuestaCorrectaQuest).intValue();
+            }
+            else if (respuestaCorrectaQuest instanceof Double) {
+                double val = (Double) respuestaCorrectaQuest;
+                if (val == (int) val) {
+                    indiceCorrecto = (int) val;
+                } else {
+
+                    return reportarError(listaErrores,"La respuesta correcta debe ser un indice con valor numerico \"entero\" sin decimales diferentes a 0",
+                            getLinea(), getColumna());
+                }
+            }
+            else {
+                return reportarError(listaErrores,"Valor numerico entero requerido", getLinea(), getColumna());
+            }
+
+            if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
+                return reportarError(listaErrores,"La respuesta correcta esta fuera de los indices de las \"opciones\" disponibles",getLinea(), getColumna());
+            }
+        }
+
+
+        return new PreguntaSelect(alto, ancho, listaOpciones,indiceCorrecto, estilosObjeto, getLinea(), getColumna());
+    }
+
+    /*--Metodo utilizado para Reportar error--*/
+    private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
+        listaErrores.add(new ErrorAnalisis(this.opciones.getString(), "Semantico",
+                mensaje,linea, columna ));
+        return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
     }
 
     @Override

@@ -277,42 +277,59 @@ public class NodoOpenQuestion extends NodoQuestion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
-        Object contenido = (this.label != null) ? this.label.ejecutar(tabla, listaErrores):null;
+        Object labelTexto = this.label.ejecutar(tabla, listaErrores);
 
-        Object width = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
-        Object height = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+        if (labelTexto instanceof OnCompilacionError) return labelTexto;
 
-        EstilosComponent estilos = new EstilosComponent();
+        Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
+
+        if (widthResultado instanceof OnCompilacionError) return widthResultado;
+
+        Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        if (heightResultado instanceof OnCompilacionError) return heightResultado;
+
+
+        EstilosComponent estilosObjeto = new EstilosComponent();
 
         if (this.estilos != null) {
 
             Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+
+            if (textSize instanceof OnCompilacionError) return textSize;
+
             Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
 
+            if (letra instanceof OnCompilacionError) return letra;
+
             Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+
+            if (backgroundColor instanceof OnCompilacionError) return backgroundColor;
+
             Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
 
+            if (color instanceof OnCompilacionError) return color;
 
-            if (textSize != null) {
-                estilos.setTextSize(Double.parseDouble(textSize.toString()));
+            if (textSize instanceof Number) {
+                estilosObjeto.setTextSize((Number) textSize);
             }
 
             if (letra != null) {
-                estilos.setFontFamily(TipoLetra.valueOf(letra.toString()));
+                estilosObjeto.setFontFamily(TipoLetra.valueOf(letra.toString()));
             }
 
             if (backgroundColor != null) {
-                estilos.setBackgroundColor(backgroundColor.toString());
+                estilosObjeto.setBackgroundColor(backgroundColor.toString());
             }
 
             if (color != null) {
-                estilos.setColor(color.toString());
+                estilosObjeto.setColor(color.toString());
             }
         }
-        Double alto = (height != null) ? Double.parseDouble(height.toString()) : -1.00;
-        Double ancho = (width != null) ? Double.parseDouble(width.toString()) : -1.00;
+        Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
+        Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
-        return new PreguntaAbierta(alto, ancho, ( contenido != null)? contenido.toString():null, estilos, getLinea(), getColumna());
+        return new PreguntaAbierta(alto, ancho, ( labelTexto != null)? labelTexto.toString():null, estilosObjeto, getLinea(), getColumna());
     }
 
     //Metodo que retorna la representacion base de la variable

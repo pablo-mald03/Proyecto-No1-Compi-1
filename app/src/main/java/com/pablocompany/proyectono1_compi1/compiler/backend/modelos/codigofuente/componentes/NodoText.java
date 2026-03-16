@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoBorder;
@@ -139,42 +140,59 @@ public class NodoText extends NodoComponente {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
-        Object contenido = this.contenido.ejecutar(tabla, listaErrores);
+        Object contenidoTexto = this.contenido.ejecutar(tabla, listaErrores);
 
-        Object width = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
-        Object height = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+        if (contenidoTexto instanceof OnCompilacionError) return contenidoTexto;
 
-        EstilosComponent estilos = new EstilosComponent();
+        Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
+
+        if (widthResultado instanceof OnCompilacionError) return widthResultado;
+
+        Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        if (heightResultado instanceof OnCompilacionError) return heightResultado;
+
+
+        EstilosComponent estilosObjeto = new EstilosComponent();
 
         if (this.estilos != null) {
 
             Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+
+            if (textSize instanceof OnCompilacionError) return textSize;
+
             Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
 
+            if (letra instanceof OnCompilacionError) return letra;
+
             Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+
+            if (backgroundColor instanceof OnCompilacionError) return backgroundColor;
+
             Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
 
+            if (color instanceof OnCompilacionError) return color;
 
-            if (textSize != null) {
-                estilos.setTextSize(Double.parseDouble(textSize.toString()));
+            if (textSize instanceof Number) {
+                estilosObjeto.setTextSize((Number) textSize);
             }
 
             if (letra != null) {
-                estilos.setFontFamily(TipoLetra.valueOf(letra.toString()));
+                estilosObjeto.setFontFamily(TipoLetra.valueOf(letra.toString()));
             }
 
             if (backgroundColor != null) {
-                estilos.setBackgroundColor(backgroundColor.toString());
+                estilosObjeto.setBackgroundColor(backgroundColor.toString());
             }
 
             if (color != null) {
-                estilos.setColor(color.toString());
+                estilosObjeto.setColor(color.toString());
             }
         }
-        Double alto = (height != null) ? Double.parseDouble(height.toString()) : null;
-        Double ancho = (width != null) ? Double.parseDouble(width.toString()) : null;
+        Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
+        Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
-        return new TextoPlano(alto, ancho, contenido.toString(), estilos, getLinea(), getColumna());
+        return new TextoPlano(alto, ancho, contenidoTexto.toString(), estilosObjeto, getLinea(), getColumna());
 
     }
 

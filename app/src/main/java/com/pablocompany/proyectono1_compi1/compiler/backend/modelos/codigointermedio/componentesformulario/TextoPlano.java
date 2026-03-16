@@ -11,7 +11,7 @@ public class TextoPlano extends Formulario {
     private String texto;
     private EstilosComponent estilos;
 
-    public TextoPlano( Double height, Double width, String texto, EstilosComponent estilos,int linea, int columna) {
+    public TextoPlano( Number height, Number width, String texto, EstilosComponent estilos,int linea, int columna) {
         super(linea, columna);
         this.height = height;
         this.width = width;
