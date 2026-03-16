@@ -30,6 +30,11 @@ public class NodoHexColor extends NodoColor {
         return TipoVariable.COLOR;
     }
 
+    //Metodo que permite ejecutar y retornar el valor del color
+    public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
+        return String.format("%s", color != null ? color : "0");
+    }
+
     //Metodo que permite obtener el color especificado en la expresion
     @Override
     public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

@@ -103,6 +103,21 @@ public class NodoHslColor extends NodoColor {
         return iterador;
     }
 
+
+    //Metodo que permite ejecutar y retornar el valor del color
+    public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
+        Object valorRed = (this.red != null) ? this.red.ejecutar(tabla, listaErrores) : null;
+        Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : null;
+        Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : null;
+
+        return String.format("<%s, %s, %s>",
+                valorRed != null ? valorRed : "0",
+                valorGreen != null ? valorGreen : "0",
+                valorBlue != null ? valorBlue : "0");
+
+    }
+
+
     //Metodo que permite retornar el color en formato RGB (util en frontend)
     @Override
     public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

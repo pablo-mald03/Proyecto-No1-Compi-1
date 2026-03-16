@@ -32,6 +32,8 @@ public abstract class NodoColor {
     //Metodo principal que retorna el color en formato RGB (util en frontend)
     public abstract int [] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
 
+    public abstract Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
+
     //Metodo que permite validar la semantica dentro de un color
     public abstract  TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout);
 

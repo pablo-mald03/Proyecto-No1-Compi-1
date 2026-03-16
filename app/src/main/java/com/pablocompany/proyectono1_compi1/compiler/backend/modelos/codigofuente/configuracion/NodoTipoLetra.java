@@ -42,7 +42,7 @@ public class NodoTipoLetra extends Nodo {
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion (PENDIENTE)
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        return this.letraTipo;
     }
 
     //Metodo que retorna la configuracion que es

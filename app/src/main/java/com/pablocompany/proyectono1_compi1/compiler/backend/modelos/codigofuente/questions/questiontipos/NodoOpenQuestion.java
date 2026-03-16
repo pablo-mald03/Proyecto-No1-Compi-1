@@ -18,6 +18,9 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questionrecursos.TipoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.PreguntaAbierta;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.TextoPlano;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -279,7 +282,43 @@ public class NodoOpenQuestion extends NodoQuestion {
     //Metodo que permite ejecutar las acciones que tenga la pregunta
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return this;
+
+        Object contenido = (this.label != null) ? this.label.ejecutar(tabla, listaErrores):null;
+
+        Object width = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
+        Object height = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        EstilosComponent estilos = new EstilosComponent();
+
+        if (this.estilos != null) {
+
+            Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+            Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
+
+            Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+            Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
+
+
+            if (textSize != null) {
+                estilos.setTextSize(Double.parseDouble(textSize.toString()));
+            }
+
+            if (letra != null) {
+                estilos.setFontFamily(TipoLetra.valueOf(letra.toString()));
+            }
+
+            if (backgroundColor != null) {
+                estilos.setBackgroundColor(backgroundColor.toString());
+            }
+
+            if (color != null) {
+                estilos.setColor(color.toString());
+            }
+        }
+        Double alto = (height != null) ? Double.parseDouble(height.toString()) : null;
+        Double ancho = (width != null) ? Double.parseDouble(width.toString()) : null;
+
+        return new PreguntaAbierta(alto, ancho, ( contenido != null)? contenido.toString():null, estilos, getLinea(), getColumna());
     }
 
     //Metodo que retorna la representacion base de la variable

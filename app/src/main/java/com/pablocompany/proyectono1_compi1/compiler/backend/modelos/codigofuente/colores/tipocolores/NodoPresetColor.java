@@ -36,6 +36,11 @@ public class NodoPresetColor extends NodoColor {
         return TipoVariable.COLOR;
     }
 
+    //Metodo que permite ejecutar y retornar el valor del color
+    public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
+        return this.colorPreset.toString();
+    }
+
     /*Metodos getter de las expresiones*/
 
     //Metodo que permite retornar el color en formato RGB (util en frontend)

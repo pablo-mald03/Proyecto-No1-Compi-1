@@ -14,6 +14,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.TextoPlano;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -48,11 +50,11 @@ public class NodoText extends NodoComponente {
             }
         }
 
-        if(this.width != null){
+        if (this.width != null) {
             this.width.validarSemantica(tabla, listaErrores, true);
         }
 
-        if(this.height != null) {
+        if (this.height != null) {
             this.height.validarSemantica(tabla, listaErrores, true);
         }
 
@@ -94,7 +96,7 @@ public class NodoText extends NodoComponente {
         }
     }
 
-    //Pendiente procesar los estilos del texto
+    //Metodo que permite procesar los estilos del texto
     @Override
     protected Estilos procesarEstilos(List<NodoEstilos> lista) {
         if (lista.isEmpty()) {
@@ -139,9 +141,41 @@ public class NodoText extends NodoComponente {
 
         Object contenido = this.contenido.ejecutar(tabla, listaErrores);
 
+        Object width = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
+        Object height = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        EstilosComponent estilos = new EstilosComponent();
+
+        if (this.estilos != null) {
+
+            Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+            Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
+
+            Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+            Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
 
 
-        return null;
+            if (textSize != null) {
+                estilos.setTextSize(Double.parseDouble(textSize.toString()));
+            }
+
+            if (letra != null) {
+                estilos.setFontFamily(TipoLetra.valueOf(letra.toString()));
+            }
+
+            if (backgroundColor != null) {
+                estilos.setBackgroundColor(backgroundColor.toString());
+            }
+
+            if (color != null) {
+                estilos.setColor(color.toString());
+            }
+        }
+        Double alto = (height != null) ? Double.parseDouble(height.toString()) : null;
+        Double ancho = (width != null) ? Double.parseDouble(width.toString()) : null;
+
+        return new TextoPlano(alto, ancho, contenido.toString(), estilos, getLinea(), getColumna());
+
     }
 
     @Override
