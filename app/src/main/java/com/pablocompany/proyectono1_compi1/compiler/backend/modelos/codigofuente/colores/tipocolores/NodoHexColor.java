@@ -32,7 +32,7 @@ public class NodoHexColor extends NodoColor {
 
     //Metodo que permite ejecutar y retornar el valor del color
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
-        return String.format("%s", color != null ? color : "0");
+        return String.format("%s", color != null ? color : "#000000");
     }
 
     //Metodo que permite obtener el color especificado en la expresion

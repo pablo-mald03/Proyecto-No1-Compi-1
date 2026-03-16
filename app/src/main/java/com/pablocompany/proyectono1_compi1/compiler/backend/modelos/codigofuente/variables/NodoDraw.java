@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
@@ -83,7 +84,7 @@ public class NodoDraw extends NodoComponente {
             listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico",
                     "La variable: \"" + id + "\" no ha sido definida aun \".draw()\".",
                     getLinea(), getColumna()));
-            return null;
+            return new OnCompilacionError("Draw invalido", getLinea(), getColumna(), true);
         }
 
         NodoQuestion nodoQuestion = (NodoQuestion) variable.getValor();
@@ -102,7 +103,7 @@ public class NodoDraw extends NodoComponente {
             }
 
             listaErrores.add(new ErrorAnalisis(this.getString(), "Semántico", mensaje, getLinea(), getColumna()));
-            return null;
+            return new OnCompilacionError("Mismatch de parametros", getLinea(), getColumna(), true);
         }
 
         if (comodines > 0) {

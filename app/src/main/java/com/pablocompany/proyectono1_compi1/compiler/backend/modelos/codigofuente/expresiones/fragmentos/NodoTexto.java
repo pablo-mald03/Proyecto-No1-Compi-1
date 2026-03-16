@@ -26,7 +26,7 @@ public class NodoTexto extends NodoFragmento{
     //Metodo que permite ejecutarse propio de la jerarquia pero en este caso retorna solo su propio valor object
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return this.contenido;
+        return this;
     }
 
     //Metodo que permite obtener como texto el contenido de la cadena

@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
@@ -44,7 +45,7 @@ public class NodoAccesoVariable extends NodoExpresion {
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         Simbolo simbolo = tabla.buscar(this.id);
         if (simbolo == null) {
-            listaErrores.add(new ErrorAnalisis(this.id, "Semántico", "Variable no definida", super.getLinea(), super.getColumna()));
+            listaErrores.add(new ErrorAnalisis(this.id, "Semantico", "Variable no definida", super.getLinea(), super.getColumna()));
             return null;
         }
 

@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -80,10 +81,10 @@ public class NodoDeclaracion extends Nodo {
         if (valorResuelto == null) {
 
             if (this.tipo == TipoVariable.NUMBER && !(valorResuelto instanceof Double || valorResuelto instanceof Integer)) {
-                listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: inicialización de '" + id + "' requiere un number", super.getLinea(), super.getColumna()));
+                listaErrores.add(new ErrorAnalisis(id, "Semantico", "Tipo incompatible: inicialización de '" + id + "' requiere un number", super.getLinea(), super.getColumna()));
                 valorResuelto = 0.0;
             } else if (this.tipo == TipoVariable.STRING && !(valorResuelto instanceof String)) {
-                listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: inicialización de '" + id + "' requiere un string", super.getLinea(), super.getColumna()));
+                listaErrores.add(new ErrorAnalisis(id, "Semantico", "Tipo incompatible: inicialización de '" + id + "' requiere un string", super.getLinea(), super.getColumna()));
                 valorResuelto = "";
             }
         } else {
@@ -98,9 +99,10 @@ public class NodoDeclaracion extends Nodo {
 
         if (!tabla.insertar(nuevo)) {
             listaErrores.add(new ErrorAnalisis(id, "Semántico", "La variable '" + id + "' ya ha sido definida", super.getLinea(), super.getColumna()));
+            return null;
         }
 
-        return null;
+        return valorResuelto;
     }
 
     //Retorna el valor literal escrito

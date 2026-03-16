@@ -18,7 +18,6 @@ public class NodoEmoji extends NodoFragmento {
         super(linea, columna);
         this.valorTexto = valorTexto;
         this.tipo = tipo;
-
         this.reconocerEmoji(tipo);
 
     }

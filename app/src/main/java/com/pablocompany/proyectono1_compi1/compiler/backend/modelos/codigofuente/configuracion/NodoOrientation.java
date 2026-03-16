@@ -33,10 +33,10 @@ public class NodoOrientation extends Nodo {
         return TipoVariable.VOID;
     }
 
-    //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion (PENDIENTE)
+    //Metodo que permite retornar el valor de orientacion del dock
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+        return this.orientacion;
     }
 
     //Metodo que retorna la configuracion que es

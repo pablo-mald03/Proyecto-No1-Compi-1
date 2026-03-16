@@ -6,8 +6,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointerm
 public class PreguntaAbierta extends Formulario {
 
     //Atributos caracteristicos de la pregunta abierta
-    private Double height;
-    private Double width;
+    private Number height;
+    private Number width;
     private String label;
     private EstilosComponent estilos;
 

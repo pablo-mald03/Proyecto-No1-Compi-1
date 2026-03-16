@@ -8,8 +8,8 @@ import java.util.List;
 public class PreguntaSelect extends Formulario {
 
     //Atributos caracteristicos de la pregunta select
-    private Double height;
-    private Double width;
+    private Number height;
+    private Number width;
     private String label;
 
     //Atributo que representa la lista de opciones que tiene la pregunta select

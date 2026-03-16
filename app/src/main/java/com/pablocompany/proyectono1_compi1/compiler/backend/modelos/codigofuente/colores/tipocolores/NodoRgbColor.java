@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
@@ -57,14 +58,28 @@ public class NodoRgbColor extends NodoColor{
 
     //Metodo que permite ejecutar y retornar el valor del color
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
-        Object valorRed = (this.red != null) ? this.red.ejecutar(tabla, listaErrores) : null;
-        Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : null;
-        Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : null;
+        Object valorRed = (this.red != null) ? this.red.ejecutar(tabla, listaErrores) : 0;
+
+        if (valorRed instanceof OnCompilacionError) return valorRed;
+
+        Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : 0;
+
+        if (valorGreen instanceof OnCompilacionError) return valorGreen;
+
+        Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : 0;
+
+        if (valorBlue instanceof OnCompilacionError) return valorBlue;
+
+        if (!(valorRed instanceof Number) || !(valorGreen instanceof Number) || !(valorBlue instanceof Number)) {
+            OnCompilacionError err = new OnCompilacionError("Los valores de color RGB deben ser numericos", getLinea(), getColumna(), false);
+            err.reportar(listaErrores, this.getString());
+            return err;
+        }
 
         return String.format("(%s, %s, %s)",
-                valorRed != null ? valorRed : "0",
-                valorGreen != null ? valorGreen : "0",
-                valorBlue != null ? valorBlue : "0");
+                valorRed,
+                valorGreen,
+                valorBlue);
 
     }
 

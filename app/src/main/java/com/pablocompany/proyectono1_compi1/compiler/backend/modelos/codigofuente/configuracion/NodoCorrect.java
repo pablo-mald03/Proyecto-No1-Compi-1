@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
@@ -68,10 +69,22 @@ public class NodoCorrect extends Nodo {
         return expresion.contarComodines();
     }
 
-    //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
+    //Metodo que permite ejecutar la expresion que esta dentro del nodo de la respuesta correcta
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return expresion.ejecutar(tabla, listaErrores);
+        Object resultado = (expresion != null) ? expresion.ejecutar(tabla, listaErrores) : null;
+        if (resultado instanceof OnCompilacionError) return resultado;
+
+        if (resultado == null) {
+            OnCompilacionError error = new OnCompilacionError(
+                    "La respuesta correcta no pudo ser resuelta. Tipos incompatibles",
+                    getLinea(), getColumna(), false
+            );
+            error.reportar(listaErrores, this.getString());
+            return error;
+        }
+
+        return resultado;
     }
 
     //Metodo que retorna la configuracion que es

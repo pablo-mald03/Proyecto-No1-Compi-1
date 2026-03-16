@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.operaciones;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -53,7 +54,19 @@ public class NodoModulo extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         Object valorIzquierdo = izquierda.ejecutar(tabla, listaErrores);
+
+        if (valorIzquierdo instanceof OnCompilacionError) return valorIzquierdo;
+
         Object valorDerecho = derecha.ejecutar(tabla, listaErrores);
+
+        if (valorDerecho instanceof OnCompilacionError) return valorDerecho;
+
+        if (valorDerecho instanceof Number && ((Number) valorDerecho).doubleValue() == 0) {
+            listaErrores.add(new ErrorAnalisis(this.getString(), "OnCompilacionError",
+                    "No se puede calcular el modulo por cero.", super.getLinea(), super.getColumna()));
+            return new OnCompilacionError("Modulo por cero", getLinea(), getColumna(), true);
+        }
+
 
         if (valorIzquierdo instanceof Double && valorDerecho instanceof Double) {
             return (Double) valorIzquierdo % (Double) valorDerecho;
@@ -62,8 +75,8 @@ public class NodoModulo extends NodoExpresion {
             return (Integer) valorIzquierdo % (Integer) valorDerecho;
         }
 
-        listaErrores.add(new ErrorAnalisis(this.getString(), "Semántico", "Solo se puede aplicar el modulo a valores numericos", super.getLinea(), super.getColumna()));
-        return null;
+        listaErrores.add(new ErrorAnalisis(this.getString(), "OnCompilacionError", "Solo se puede aplicar el modulo a valores numericos", super.getLinea(), super.getColumna()));
+        return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
     }
 
     //Metodo que permite obtener el string de la expresion

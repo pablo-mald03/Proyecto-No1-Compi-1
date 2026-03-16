@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
@@ -71,7 +72,7 @@ public class NodoHslColor extends NodoColor {
     /*Metodos que permiten setear de nuevo el valor de las expresiones*/
 
     public int setRed(List<NodoComodin> comodines, int iterador) {
-        if(iterador < comodines.size() && this.red instanceof NodoComodin){
+        if (iterador < comodines.size() && this.red instanceof NodoComodin) {
             NodoComodin comodin = (NodoComodin) this.red;
             if (comodin.getExpresion() == null) {
                 comodin.darValorIncognita(comodines.get(iterador).getExpresion());
@@ -82,7 +83,7 @@ public class NodoHslColor extends NodoColor {
     }
 
     public int setGreen(List<NodoComodin> comodines, int iterador) {
-        if(iterador < comodines.size() && this.green instanceof NodoComodin){
+        if (iterador < comodines.size() && this.green instanceof NodoComodin) {
             NodoComodin comodin = (NodoComodin) this.green;
             if (comodin.getExpresion() == null) {
                 comodin.darValorIncognita(comodines.get(iterador).getExpresion());
@@ -93,7 +94,7 @@ public class NodoHslColor extends NodoColor {
     }
 
     public int setBlue(List<NodoComodin> comodines, int iterador) {
-        if(iterador < comodines.size() && this.blue instanceof NodoComodin){
+        if (iterador < comodines.size() && this.blue instanceof NodoComodin) {
             NodoComodin comodin = (NodoComodin) this.blue;
             if (comodin.getExpresion() == null) {
                 comodin.darValorIncognita(comodines.get(iterador).getExpresion());
@@ -105,15 +106,30 @@ public class NodoHslColor extends NodoColor {
 
 
     //Metodo que permite ejecutar y retornar el valor del color
-    public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
-        Object valorRed = (this.red != null) ? this.red.ejecutar(tabla, listaErrores) : null;
-        Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : null;
-        Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : null;
+    public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+        Object valorRed = (this.red != null) ? this.red.ejecutar(tabla, listaErrores) : 0;
+
+        if (valorRed instanceof OnCompilacionError) return valorRed;
+
+        Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : 0;
+
+        if (valorGreen instanceof OnCompilacionError) return valorGreen;
+
+        Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : 0;
+
+        if (valorBlue instanceof OnCompilacionError) return valorBlue;
+
+        if (!(valorRed instanceof Number) || !(valorGreen instanceof Number) || !(valorBlue instanceof Number)) {
+            OnCompilacionError err = new OnCompilacionError("Los valores de color HSL deben ser numericos", getLinea(), getColumna(), false);
+            err.reportar(listaErrores, this.getString());
+            return err;
+        }
+
 
         return String.format("<%s, %s, %s>",
-                valorRed != null ? valorRed : "0",
-                valorGreen != null ? valorGreen : "0",
-                valorBlue != null ? valorBlue : "0");
+                valorRed,
+                valorGreen,
+                valorBlue);
 
     }
 
@@ -153,16 +169,16 @@ public class NodoHslColor extends NodoColor {
     }
 
     /*--Metodo propio de la clase que permite contar los comodines que tienen en el color HSL--*/
-    public  int contarComodines(){
+    public int contarComodines() {
         int contador = 0;
 
-        if(this.red != null){
+        if (this.red != null) {
             contador += this.red.contarComodines();
         }
-        if(this.green != null){
+        if (this.green != null) {
             contador += this.green.contarComodines();
         }
-        if(this.blue != null){
+        if (this.blue != null) {
             contador += this.blue.contarComodines();
         }
         return contador;

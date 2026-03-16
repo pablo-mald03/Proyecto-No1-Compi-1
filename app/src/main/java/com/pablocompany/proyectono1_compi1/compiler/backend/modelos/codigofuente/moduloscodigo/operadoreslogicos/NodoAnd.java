@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.operadoreslogicos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -64,6 +65,9 @@ public class NodoAnd extends Nodo {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         Object valorA = condicionA.ejecutar(tabla, listaErrores);
+
+        if (valorA instanceof OnCompilacionError) return valorA;
+
         double numA = (valorA instanceof Number) ? ((Number) valorA).doubleValue() : 0.0;
 
         if (numA <= 0) {
@@ -71,6 +75,9 @@ public class NodoAnd extends Nodo {
         }
 
         Object valorB = condicionB.ejecutar(tabla, listaErrores);
+
+        if (valorB instanceof OnCompilacionError) return valorB;
+
         double numB = (valorB instanceof Number) ? ((Number) valorB).doubleValue() : 0.0;
 
         return (numB > 0) ? 1.0 : 0.0;

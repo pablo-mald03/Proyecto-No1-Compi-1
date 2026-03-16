@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.funcionesespeciales;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.NodoFragmento;
@@ -89,7 +90,12 @@ public class NodoFuncionPokemon extends Nodo {
         int valLimit = 1;
 
         Object off = (this.offset != null) ? this.offset.ejecutar(tabla, listaErrores) : 0;
+
+        if (off instanceof OnCompilacionError) return off;
+
         Object lim = (this.limit != null) ? this.limit.ejecutar(tabla, listaErrores) : 1;
+
+        if (lim instanceof OnCompilacionError) return lim;
 
         if (off instanceof Number) valOffset = ((Number) off).intValue();
         if (lim instanceof Number) valLimit = ((Number) lim).intValue();
@@ -99,7 +105,9 @@ public class NodoFuncionPokemon extends Nodo {
         List<String> nombresPokemon = pokeApiService.getPokemones(valOffset, valLimit, listaErrores, getLinea(), getColumna(), this.getString());
 
         if (nombresPokemon == null) {
-            return new ArrayList<Nodo>();
+            OnCompilacionError errorAPI = new OnCompilacionError("Fallo en la llamada a la API", getLinea(), getColumna(), false);
+            errorAPI.reportar(listaErrores, this.getString());
+            return errorAPI;
         }
 
         return  convertirNodos(nombresPokemon);

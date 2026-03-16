@@ -9,7 +9,7 @@ public class EstilosComponent {
     private String backgroundColor;
     private String color;
     private TipoLetra fontFamily;
-    private Double textSize;
+    private Number textSize;
 
     public EstilosComponent() {
         this.backgroundColor = null;
@@ -43,7 +43,7 @@ public class EstilosComponent {
         this.fontFamily = fontFamily;
     }
 
-    public double getTextSize() {
+    public Number getTextSize() {
         return textSize;
     }
 

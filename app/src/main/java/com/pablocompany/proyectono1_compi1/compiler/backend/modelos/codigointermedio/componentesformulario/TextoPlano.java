@@ -6,8 +6,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointerm
 public class TextoPlano extends Formulario {
 
     //Atributos caracteristicos del texto
-    private Double height;
-    private Double width;
+    private Number height;
+    private Number width;
     private String texto;
     private EstilosComponent estilos;
 

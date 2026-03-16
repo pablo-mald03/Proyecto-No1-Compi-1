@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -31,7 +32,7 @@ public class NodoMenosUnario extends NodoExpresion {
             listaErrores.add(new ErrorAnalisis(
                     this.getString(),
                     "Semántico",
-                    "No se puede aplicar el operador unario '-' a un tipo: \"" + tipoExpresion.getTipo()+"\"",
+                    "No se puede aplicar el operador unario '-' a un tipo: \"" + tipoExpresion.getTipo() + "\"",
                     getLinea(),
                     getColumna()
             ));
@@ -51,7 +52,9 @@ public class NodoMenosUnario extends NodoExpresion {
             return (Double) valor * -1.0;
         }
 
-        return null;
+        OnCompilacionError error = new OnCompilacionError("El operador unario solo se puede aplicar a valores tipo \"number\"", getLinea(), getColumna(), false);
+        error.reportar(listaErrores, (this.expresion != null) ? this.expresion.getString() : "UNARIO");
+        return error;
     }
 
     @Override

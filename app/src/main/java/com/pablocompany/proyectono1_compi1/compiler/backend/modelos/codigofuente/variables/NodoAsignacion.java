@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -66,17 +67,22 @@ public class NodoAsignacion extends Nodo {
 
         if (variable == null) {
             listaErrores.add(new ErrorAnalisis(id, "Semántico", "La variable '" + id + "' no ha sido declarada", super.getLinea(), super.getColumna()));
-            return null;
+            return new OnCompilacionError("Variable no declarada", getLinea(), getColumna(), true);
         }
 
         Object nuevoValor = expresion.ejecutar(tabla, listaErrores);
 
+        if (nuevoValor instanceof OnCompilacionError) {
+            return nuevoValor;
+        }
+
         if (variable.getTipo() == TipoVariable.NUMBER && !(nuevoValor instanceof Double || nuevoValor instanceof Integer)) {
             listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es number", super.getLinea(), super.getColumna()));
-            return null;
+            return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
+
         } else if (variable.getTipo() == TipoVariable.STRING && !(nuevoValor instanceof String)) {
             listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es string", super.getLinea(), super.getColumna()));
-            return null;
+            return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
         }
 
         variable.setValor(nuevoValor);

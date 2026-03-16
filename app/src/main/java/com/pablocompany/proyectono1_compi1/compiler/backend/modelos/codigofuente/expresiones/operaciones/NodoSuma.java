@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.operaciones;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -58,7 +59,13 @@ public class NodoSuma extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         Object valorIzquierdo = izquierda.ejecutar(tabla, listaErrores);
+
+        if (valorIzquierdo instanceof OnCompilacionError) return valorIzquierdo;
+
         Object valorDerecho = derecha.ejecutar(tabla, listaErrores);
+
+        if (valorDerecho instanceof OnCompilacionError) return valorDerecho;
+
 
         if (valorIzquierdo instanceof Double && valorDerecho instanceof Double) {
             return (Double) valorIzquierdo + (Double) valorDerecho;
@@ -70,8 +77,8 @@ public class NodoSuma extends NodoExpresion {
             return valorIzquierdo.toString() + valorDerecho.toString();
         }
 
-        listaErrores.add(new ErrorAnalisis(this.getString(), "Semántico", "No se pueden sumar tipos diferentes", super.getLinea(), super.getColumna()));
-        return null;
+        listaErrores.add(new ErrorAnalisis(this.getString(), "OnCompilacionError", "No se pueden sumar tipos diferentes", super.getLinea(), super.getColumna()));
+        return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
     }
 
     //Metodo que permite obtener el string de la expresion

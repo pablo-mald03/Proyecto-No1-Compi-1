@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.NodoFragmento;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
@@ -44,9 +45,15 @@ public class NodoCadenaCompuesta extends NodoExpresion {
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (NodoFragmento f : fragmentos) {
+        for (NodoFragmento fragmento : fragmentos) {
 
-            stringBuilder.append(f.getString());
+            Object valorFragmento = fragmento.ejecutar(tabla, listaErrores);
+
+            if (valorFragmento instanceof OnCompilacionError) {
+                return valorFragmento;
+            }
+
+            stringBuilder.append(valorFragmento != null ? fragmento.getString() : "");
 
         }
         return stringBuilder.toString();

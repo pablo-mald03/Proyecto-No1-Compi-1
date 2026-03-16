@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
@@ -47,7 +48,20 @@ public class NodoPointX extends Nodo {
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return expresion.ejecutar(tabla,listaErrores);
+        Object resultado = (expresion != null) ? expresion.ejecutar(tabla, listaErrores) : 0.0;
+
+        if (resultado instanceof OnCompilacionError) return resultado;
+
+        if (!(resultado instanceof Number)) {
+            OnCompilacionError errorCompilacion = new OnCompilacionError(
+                    "El valor de la coordenada \"pointX\" debe ser \"numerico\"",
+                    getLinea(), getColumna(), false
+            );
+            errorCompilacion.reportar(listaErrores, this.getString());
+            return errorCompilacion;
+        }
+
+        return resultado;
     }
 
     //Metodo que retorna la configuracion que es

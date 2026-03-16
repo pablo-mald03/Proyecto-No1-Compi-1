@@ -1,10 +1,12 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoBorde;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstiloBorde;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -65,10 +67,26 @@ public class NodoBorder extends Nodo {
         return TipoVariable.VOID;
     }
 
-    //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion (PENDIENTE)
+    //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+
+        Object valorGrosor = (this.grosor != null) ? this.grosor.ejecutar(tabla, listaErrores) : 1;
+
+        if (valorGrosor instanceof OnCompilacionError) return valorGrosor;
+
+        Object valorColor = (this.color != null) ? this.color.ejecutar(tabla, listaErrores) : "#000000";
+
+        if (valorColor instanceof OnCompilacionError) return valorColor;
+
+        if (!(valorGrosor instanceof Number)) {
+            OnCompilacionError errorCompilado = new OnCompilacionError("El grosor del borde debe ser \"numerico\"", getLinea(), getColumna(), false);
+            errorCompilado.reportar(listaErrores, this.getString());
+            return errorCompilado;
+        }
+
+        return new EstiloBorde(this.tipoBorde, (Number) valorGrosor, valorColor.toString());
     }
 
     //Metodo que retorna la configuracion que es
