@@ -129,6 +129,8 @@ fun EditorScreen(
     /* ---------- Banner flotante ---------- */
     var hayErrores by remember { mutableStateOf(false) }
 
+    var estaCompilando by remember { mutableStateOf(false) }
+
     //Control del teclado
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -231,7 +233,7 @@ fun EditorScreen(
 
 
             //Registrar archivo en el SharedViewModel
-            sharedFormViewModel.loadFromFile(it, codigo,nombreArchivo)
+            sharedFormViewModel.loadFromFile(it, codigo, nombreArchivo)
             sharedFormViewModel.marcarDesdeEditor()
             navController.navigate("form")
         }
@@ -378,11 +380,11 @@ fun EditorScreen(
                 onAbrirCodigo = {
                     if (viewModel.isModified) {
                         pendingAction = {
-                            openLauncher.launch(arrayOf("text/plain","application/octet-stream"))
+                            openLauncher.launch(arrayOf("text/plain", "application/octet-stream"))
                         }
                         showUnsavedDialog = true
                     } else {
-                        openLauncher.launch(arrayOf("text/plain","application/octet-stream"))
+                        openLauncher.launch(arrayOf("text/plain", "application/octet-stream"))
                         sharedFormViewModel.desmarcarDesdeEditor()
                     }
                 },
@@ -412,7 +414,7 @@ fun EditorScreen(
                         sharedFormViewModel.codigoCompilado != null &&
                         !sharedFormViewModel.generadoDesdeEditor &&
                         sharedFormViewModel.currentFileUri?.toString() != viewModel.currentFileUri?.toString()
-                    ){
+                    ) {
 
                         Toast.makeText(
                             context,
@@ -423,26 +425,32 @@ fun EditorScreen(
                         return@DrawerContent
                     }
 
-                    val compilado = viewModel.compilarFormulario()
+                    if(estaCompilando){
+                        return@DrawerContent
+                    }
+                    estaCompilando = true
 
-                    //Pendiente compilar
-                    //pendiente preguntar si guardar y redireccionar
 
-                    if (!compilado) {
+                    viewModel.compilarFormulario { exito ->
 
-                        //Cierra el teclado si hay errores
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
+                        estaCompilando = false
 
-                        hayErrores = true
-                    } else {
-                        hayErrores = false
-                        showErrorDrawer = false
+                        if (!exito) {
 
-                        val codigoFinal = viewModel.codigoGenerado ?: ""
+                            //Cierra el teclado si hay errores
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
 
-                        codigoPendiente = codigoFinal
-                        showSaveFormDialog = true
+                            hayErrores = true
+                        } else {
+                            hayErrores = false
+                            showErrorDrawer = false
+
+                            val codigoFinal = viewModel.codigoGenerado ?: ""
+
+                            codigoPendiente = codigoFinal
+                            showSaveFormDialog = true
+                        }
                     }
                 },
                 currentFileUri = viewModel.currentFileUri,
@@ -473,7 +481,7 @@ fun EditorScreen(
                                 sharedFormViewModel.codigoCompilado != null &&
                                 !sharedFormViewModel.generadoDesdeEditor &&
                                 sharedFormViewModel.currentFileUri?.toString() != viewModel.currentFileUri?.toString()
-                            ){
+                            ) {
 
                                 Toast.makeText(
                                     context,
@@ -484,37 +492,69 @@ fun EditorScreen(
                                 return@ConsoleSection
                             }
 
+                            if(estaCompilando){
+                                return@ConsoleSection
+                            }
+                            estaCompilando = true
+
                             //Instruccion de compilacion absoluta
-                            //Pendiente preguntar si guardar y redireccionar y compilar
-                            val compilado = viewModel.compilarFormulario()
+                            viewModel.compilarFormulario { exito ->
 
-                            if (!compilado) {
+                                estaCompilando = false
 
-                                //Cierra el teclado si hay errores
-                                keyboardController?.hide()
-                                focusManager.clearFocus()
+                                if (!exito) {
 
-                                hayErrores = true
-                            } else {
-                                hayErrores = false
-                                showErrorDrawer = false
+                                    //Cierra el teclado si hay errores
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
 
-                                val codigoFinal = viewModel.codigoGenerado ?: ""
+                                    hayErrores = true
+                                } else {
+                                    hayErrores = false
+                                    showErrorDrawer = false
 
-                                codigoPendiente = codigoFinal
-                                showSaveFormDialog = true
+                                    val codigoFinal = viewModel.codigoGenerado ?: ""
+
+                                    codigoPendiente = codigoFinal
+                                    showSaveFormDialog = true
+                                }
                             }
                         },
                         onReemplazarClick = {
-                            val hayErroresFormales = viewModel.ejecutarAnalisisFormal()
 
-                            if (hayErroresFormales) {
-                                hayErrores = true
-                            } else {
-                                hayErrores = false
-                                showErrorDrawer = false
-                                // Flujo normal tras compilado PENDIENTE (MODIFICAR UI)
+                            if (
+                                sharedFormViewModel.codigoCompilado != null &&
+                                !sharedFormViewModel.generadoDesdeEditor &&
+                                sharedFormViewModel.currentFileUri?.toString() != viewModel.currentFileUri?.toString()
+                            ) {
 
+                                Toast.makeText(
+                                    context,
+                                    "Hay un formulario abierto diferente. Ciérrelo antes de actualizarlo.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                return@ConsoleSection
+                            }
+
+                            if (estaCompilando) return@ConsoleSection
+                            estaCompilando = true
+
+                            viewModel.compilarFormulario { exito ->
+                                estaCompilando = false
+
+                                if (!exito) {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                    hayErrores = true
+                                    showErrorDrawer = true
+                                } else {
+                                    hayErrores = false
+                                    showErrorDrawer = false
+
+                                    // PENDIENTE LOGICA DE REFRESCADO
+                                    Toast.makeText(context, "Vista actualizada", Toast.LENGTH_SHORT).show()
+                                }
                             }
                         },
                         onAgregarClick = {//Pendiente definir bloques de codigo
@@ -735,6 +775,7 @@ fun EditorScreen(
         }
     }
 }
+
 //Permite mostrar el contenido del drawer de los resportes. Es decir que muestra los errores y sus tablas
 @Composable
 fun ErrorDrawerContent(
@@ -1005,6 +1046,8 @@ fun ConsoleSection(
     val density = LocalDensity.current
     val imeBottom = WindowInsets.ime.getBottom(density)
     val isKeyboardVisible = imeBottom > 0
+
+    var estaCompilando by remember { mutableStateOf(false) }
 
     val editorScroll = rememberScrollState()
 

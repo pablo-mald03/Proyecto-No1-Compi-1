@@ -23,12 +23,14 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
 import com.pablocompany.proyectono1_compi1.data.clases.CompilacionState
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarLexicoUseCase
+import kotlinx.coroutines.Dispatchers
 import kotlin.collections.emptyList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.StringReader
 
 class EditorViewModel(
@@ -341,20 +343,24 @@ class EditorViewModel(
     }
 
     //Metodo encargado de compilar el codigo y hacer TODA LA LOGICA BACKEND QUE CONLLEVA
-    fun compilarFormulario(): Boolean {
+    fun compilarFormulario(onResult: (Boolean) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val (errores, codigo) = analizarCompleto(codeField.text)
 
-        val (errores, codigo) = analizarCompleto(codeField.text)
 
-        listaErrores = errores
+            withContext(Dispatchers.Main) {
+                listaErrores = errores
 
-        if (errores.isNotEmpty()) {
-            codigoGenerado = null
-            return false
+                if (errores.isNotEmpty()) {
+                    codigoGenerado = null
+                    onResult(false)
+                } else {
+                    codigoGenerado = codigo
+                    isModified = false
+                    onResult(true)
+                }
+            }
         }
-
-        codigoGenerado = codigo
-        isModified = false
-        return true
     }
 
 
