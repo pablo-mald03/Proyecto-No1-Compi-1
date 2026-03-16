@@ -29,7 +29,7 @@ public class PokeApiService {
         List<String> nombresPokemon = new ArrayList<>();
 
         OkHttpClient client = new OkHttpClient();
-        String url = "https://pokeapi.co/api/v2/pokemon?offset=" + offset + "&limit=" + limit;
+        String url = BASE_URL + "pokemon?offset=" + offset + "&limit=" + limit;
 
         Request request = new Request.Builder()
                 .url(url)
@@ -49,7 +49,7 @@ public class PokeApiService {
             }
 
         } catch (Exception e) {
-            listaErrores.add(new ErrorAnalisis((ambito != null)? ambito:("who_is_that_pokemon()"), "Ejecución",
+            listaErrores.add(new ErrorAnalisis((ambito != null)? ambito:("who_is_that_pokemon()"), "Semantico",
                     "Error al conectar con PokeAPI: " + e.getMessage(), linea, columna));
             return null;
         }

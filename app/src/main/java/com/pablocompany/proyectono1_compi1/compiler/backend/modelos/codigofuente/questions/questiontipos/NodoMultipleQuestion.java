@@ -118,6 +118,23 @@ public class NodoMultipleQuestion extends NodoQuestion {
         return TipoVariable.SPECIAL;
     }
 
+    /*Metodo que permite ejecutar los requests a la API SI HAY FUNCION POKEMON DECLARADA*/
+    @Override
+    public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.funcionPokemon != null) {
+            Object respuesta = this.funcionPokemon.ejecutar(tabla, errores);
+
+            if (respuesta instanceof List) {
+
+                List<Nodo> listaNodos = (List<Nodo>) respuesta;
+
+                this.opciones = new NodoOptions(listaNodos, getLinea(), getColumna());
+                this.funcionPokemon = null;
+            }
+        }
+    }
+
     //Metodo que permite setear los valores que vienen en la configuracion
     private void setConfiguraciones(List<AtributoConfig> configuracion) {
 

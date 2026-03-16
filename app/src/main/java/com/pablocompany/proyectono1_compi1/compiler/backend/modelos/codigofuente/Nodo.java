@@ -39,6 +39,11 @@ public abstract class Nodo {
 
     }
 
+    //Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)
+    public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores){
+
+    }
+
 }
 
 /*Created by Pablo*/

@@ -98,6 +98,10 @@ public class NodoFuncionPokemon extends Nodo {
 
         List<String> nombresPokemon = pokeApiService.getPokemones(valOffset, valLimit, listaErrores, getLinea(), getColumna(), this.getString());
 
+        if (nombresPokemon == null) {
+            return new ArrayList<Nodo>();
+        }
+
         return  convertirNodos(nombresPokemon);
     }
 
@@ -105,6 +109,10 @@ public class NodoFuncionPokemon extends Nodo {
         List<Nodo> listaNodos = new ArrayList<>();
         for (String nombre : nombres) {
 
+            NodoTexto nodoTexto = new NodoTexto(nombre, getLinea(), getColumna());
+            List<NodoFragmento> fragmentos = new ArrayList<>();
+            fragmentos.add(nodoTexto);
+            listaNodos.add(new NodoCadenaCompuesta(fragmentos, getLinea(), getColumna()));
         }
 
         if(nombres.isEmpty()){

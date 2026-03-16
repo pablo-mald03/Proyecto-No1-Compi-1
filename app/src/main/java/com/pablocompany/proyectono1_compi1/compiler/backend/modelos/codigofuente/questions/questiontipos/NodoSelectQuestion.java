@@ -86,6 +86,23 @@ public class NodoSelectQuestion extends NodoQuestion {
 
     }
 
+    /*Metodo que permite ejecutar los requests a la API SI HAY FUNCION POKEMON DECLARADA*/
+    @Override
+    public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.funcionPokemon != null) {
+            Object respuesta = this.funcionPokemon.ejecutar(tabla, errores);
+
+            if (respuesta instanceof List) {
+
+                List<Nodo> listaNodos = (List<Nodo>) respuesta;
+
+                this.opciones = new NodoOptions(listaNodos, getLinea(), getColumna());
+                this.funcionPokemon = null;
+            }
+        }
+    }
+
     /*------Metodo interno que permite determinar si viene la funcion pokemon------*/
     private boolean tieneFuncionPokemon(NodoOptions options) {
 

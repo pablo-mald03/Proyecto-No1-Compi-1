@@ -21,10 +21,13 @@ import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.ParserForms
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.sym
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
+import com.pablocompany.proyectono1_compi1.data.clases.CompilacionState
 import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarLexicoUseCase
 import kotlin.collections.emptyList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.io.StringReader
 
@@ -34,6 +37,9 @@ class EditorViewModel(
 
     //Variable que optimiza el pintado de letras
     private var highlightJob: Job? = null
+
+    private val _compilacionResult = MutableStateFlow<CompilacionState>(CompilacionState.Idle)
+    val compilacionResult: StateFlow<CompilacionState> = _compilacionResult
 
 
     /*======Apartado de codigo que permite generar el coloreado dinamico de codigo=======*/

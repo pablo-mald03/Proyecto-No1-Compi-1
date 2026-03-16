@@ -75,6 +75,16 @@ public class NodoElse extends Nodo {
         }
     }
 
+    /*-----Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)-----*/
+    @Override
+    public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+        if (this.cuerpo != null) {
+            for (Nodo nodo : this.cuerpo) {
+                nodo.ejecutarRequests(tabla, errores);
+            }
+        }
+    }
+
     //Pendiente definir
     @Override
     public String getString() {

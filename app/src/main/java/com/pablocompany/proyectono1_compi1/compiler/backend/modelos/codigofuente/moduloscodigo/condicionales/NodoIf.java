@@ -108,9 +108,22 @@ public class NodoIf extends Nodo {
         }
 
         if (this.nodoElse != null) {
-            if(this.nodoElse instanceof NodoVisitante){
-                ((NodoVisitante) this.nodoElse).ejecutarDraws(tabla, errores);
+            this.nodoElse.ejecutarDraws(tabla, errores);
+        }
+    }
+
+    /*-----Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)-----*/
+    @Override
+    public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarRequests(tabla, errores);
             }
+        }
+
+        if (this.nodoElse != null) {
+            this.nodoElse.ejecutarRequests(tabla, errores);
         }
     }
 }

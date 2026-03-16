@@ -31,15 +31,7 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        TablaSimbolos tablaSimbolos = new TablaSimbolos();
-
-        for (Nodo nodo : astParser) {
-
-            if (nodo != null) {
-                nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
-            }
-
-        }
+        TablaSimbolos tablaSimbolos = ejecutarPasadasAnalisis();
 
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
@@ -51,9 +43,33 @@ public class AnalizadorSemantico {
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
+
+        tablaSimbolos = ejecutarPasadasAnalisis();
+
+        //Metodo que ejecuta los requests a la API
+        this.ejecutarRequests(tablaSimbolos);
+
+        if (!this.listadoErroresTotal.isEmpty()) {
+            return "";
+        }
+
+        tablaSimbolos = ejecutarPasadasAnalisis();
+
+        if (!this.listadoErroresTotal.isEmpty()) {
+            return "";
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
 
-        tablaSimbolos = new TablaSimbolos();
+        /*Metodo de compilacion del codigo*/
+
+
+        return stringBuilder.toString();
+    }
+
+    /*Metodo utilizado para ejecutar pasadas*/
+    private TablaSimbolos ejecutarPasadasAnalisis() {
+        TablaSimbolos tablaSimbolos = new TablaSimbolos();
 
         for (Nodo nodo : astParser) {
             if (nodo != null) {
@@ -61,12 +77,8 @@ public class AnalizadorSemantico {
             }
         }
 
-        if (!this.listadoErroresTotal.isEmpty()) {
-            return "";
-        }
-        return stringBuilder.toString();
+        return  tablaSimbolos;
     }
-
 
     /*---Metodo delegado para poner los comodines que estaban en la funcion draw----*/
     private void agregarComodines(TablaSimbolos tablaSimbolos) {
@@ -79,6 +91,16 @@ public class AnalizadorSemantico {
         }
     }
 
+    /*Metodo delegado para ejecutar la segunda pasada que es para mandar los requests a la POKEAPI*/
+    private void ejecutarRequests(TablaSimbolos tablaSimbolos) {
+
+        for (Nodo nodo : astParser) {
+            if (nodo == null) {
+                continue;
+            }
+            nodo.ejecutarRequests(tablaSimbolos, this.listadoErroresTotal);
+        }
+    }
 
     //Retorna la lista de errores semanticos
     public List<ErrorAnalisis> getListadoErroresTotal() {

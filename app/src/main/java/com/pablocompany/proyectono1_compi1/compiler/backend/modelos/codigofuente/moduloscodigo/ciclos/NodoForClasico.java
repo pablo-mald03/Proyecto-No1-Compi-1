@@ -122,6 +122,17 @@ public class NodoForClasico extends Nodo {
         }
     }
 
+    /*-----Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)-----*/
+    @Override
+    public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+        if (this.codigo != null) {
+            for (Nodo nodo : this.codigo) {
+                nodo.ejecutarRequests(tabla, errores);
+            }
+        }
+    }
+
+
     @Override
     public String getString() {
         return "";
