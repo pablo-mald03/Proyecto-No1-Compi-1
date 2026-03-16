@@ -101,17 +101,17 @@ public class Estilos {
 
         if(this.backgroundColor instanceof NodoRgbColor){
             NodoRgbColor rgbColor = (NodoRgbColor) this.backgroundColor;
-            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setRed(comodines, iterador);
+            iterador = rgbColor.setGreen(comodines, iterador);
+            iterador = rgbColor.setBlue(comodines, iterador);
             return iterador;
         }
 
         if(this.backgroundColor instanceof NodoHslColor){
             NodoHslColor rgbColor = (NodoHslColor) this.backgroundColor;
-            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+            iterador = rgbColor.setRed(comodines, iterador);
+            iterador = rgbColor.setGreen(comodines, iterador);
+            iterador = rgbColor.setBlue(comodines, iterador);
             return iterador;
         }
         return iterador;
@@ -123,19 +123,19 @@ public class Estilos {
 
     public int setColor(List<NodoComodin> comodines, int iterador) {
 
-        if(this.backgroundColor instanceof NodoRgbColor){
-            NodoRgbColor rgbColor = (NodoRgbColor) this.backgroundColor;
-            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+        if(this.color instanceof NodoRgbColor){
+            NodoRgbColor rgbColor = (NodoRgbColor) this.color;
+            iterador = rgbColor.setRed(comodines, iterador);
+            iterador = rgbColor.setGreen(comodines, iterador);
+            iterador = rgbColor.setBlue(comodines, iterador);
             return iterador;
         }
 
-        if(this.backgroundColor instanceof NodoHslColor){
-            NodoHslColor rgbColor = (NodoHslColor) this.backgroundColor;
-            iterador = rgbColor.setRed(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setGreen(comodines.get(iterador).getExpresion(), iterador);
-            iterador = rgbColor.setBlue(comodines.get(iterador).getExpresion(), iterador);
+        if(this.color instanceof NodoHslColor){
+            NodoHslColor rgbColor = (NodoHslColor) this.color;
+            iterador = rgbColor.setRed(comodines, iterador);
+            iterador = rgbColor.setGreen(comodines, iterador);
+            iterador = rgbColor.setBlue(comodines, iterador);
             return iterador;
         }
         return iterador;
@@ -150,9 +150,16 @@ public class Estilos {
         return textSize;
     }
 
-    public int setTextSize( NodoExpresion expresion, int iterador) {
-        this.textSize = expresion;
-        iterador++;
+    public int setTextSize(List<NodoComodin> comodines, int iterador) {
+
+        if (iterador < comodines.size() && this.textSize instanceof NodoComodin) {
+            NodoComodin comodin = (NodoComodin) this.textSize;
+
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
+        }
         return iterador;
     }
 

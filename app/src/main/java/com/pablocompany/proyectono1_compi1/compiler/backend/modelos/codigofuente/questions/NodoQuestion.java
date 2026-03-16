@@ -2,6 +2,8 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoRgbColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoTipoLetra;
@@ -10,9 +12,11 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /*Created by Pablo*/
@@ -69,6 +73,52 @@ public abstract class NodoQuestion extends NodoComponente {
         }
         return new Estilos(backgroundColor, color, fontFamily, textSize);
 
+    }
+    /*Metodo utilizado para retornar los valores Comodin de un color*/
+    protected List<NodoComodin> obtenerParametrosComodinesColor(NodoColor color) {
+
+        List<NodoComodin> parametrosPregunta = new ArrayList<>();
+        NodoComodin comodinRed = null;
+        NodoComodin comodinGreen = null;
+        NodoComodin comodinBlue = null;
+
+        if (color instanceof NodoRgbColor) {
+
+            NodoRgbColor rgbColor = (NodoRgbColor) color;
+            comodinRed = extraerValor(rgbColor.getRed());
+            comodinGreen = extraerValor(rgbColor.getGreen());
+            comodinBlue = extraerValor(rgbColor.getBlue());
+        }
+
+        if (color instanceof NodoHslColor) {
+            NodoHslColor hslColor = (NodoHslColor) color;
+            comodinRed = extraerValor(hslColor.getRed());
+            comodinGreen = extraerValor(hslColor.getGreen());
+            comodinBlue = extraerValor(hslColor.getBlue());
+        }
+
+        if (comodinRed != null && comodinRed.getExpresion() == null) {
+            parametrosPregunta.add(comodinRed);
+        }
+        if (comodinGreen != null && comodinGreen.getExpresion() == null) {
+            parametrosPregunta.add(comodinGreen);
+        }
+        if (comodinBlue != null && comodinBlue.getExpresion() == null) {
+            parametrosPregunta.add(comodinBlue);
+        }
+
+        return parametrosPregunta;
+    }
+
+    /*Metodo que sirve para poder volver a meter los parametros en la pregunta*/
+
+
+    /*Metodo delegado para extraer el valor de una expresion en dado caso lo sea*/
+    protected NodoComodin extraerValor(Nodo nodo) {
+        if (nodo instanceof NodoComodin) {
+            return (NodoComodin) nodo;
+        }
+        return null;
     }
 
     //Metodo que permite validar si tiene comodines la question

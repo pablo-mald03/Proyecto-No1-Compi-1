@@ -70,29 +70,35 @@ public class NodoRgbColor extends NodoColor{
 
     /*Metodos que permiten setear de nuevo el valor de las expresiones*/
 
-    public int setRed(NodoExpresion expresion, int iterador) {
-        if(this.red != null && this.red instanceof NodoComodin){
+    public int setRed(List<NodoComodin> comodines, int iterador) {
+        if(iterador < comodines.size() && this.red instanceof NodoComodin){
             NodoComodin comodin = (NodoComodin) this.red;
-            comodin.darValorIncognita(expresion);
-            iterador++;
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
         }
         return iterador;
     }
 
-    public int setGreen(NodoExpresion expresion, int iterador) {
-        if(this.green != null && this.green instanceof NodoComodin){
+    public int setGreen(List<NodoComodin> comodines, int iterador) {
+        if(iterador < comodines.size() && this.green instanceof NodoComodin){
             NodoComodin comodin = (NodoComodin) this.green;
-            comodin.darValorIncognita(expresion);
-            iterador++;
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
         }
         return iterador;
     }
 
-    public int setBlue(NodoExpresion expresion, int iterador) {
-        if(this.blue != null && this.blue instanceof NodoComodin){
+    public int setBlue(List<NodoComodin> comodines, int iterador) {
+        if(iterador < comodines.size() && this.blue instanceof NodoComodin){
             NodoComodin comodin = (NodoComodin) this.blue;
-            comodin.darValorIncognita(expresion);
-            iterador++;
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
         }
         return iterador;
     }

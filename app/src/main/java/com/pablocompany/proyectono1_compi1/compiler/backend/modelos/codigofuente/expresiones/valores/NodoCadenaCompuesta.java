@@ -62,6 +62,6 @@ public class NodoCadenaCompuesta extends NodoExpresion {
                 builder.append(f.getString());
             }
         }
-        return builder.toString();
+        return "\""+ builder+"\"";
     }
 }

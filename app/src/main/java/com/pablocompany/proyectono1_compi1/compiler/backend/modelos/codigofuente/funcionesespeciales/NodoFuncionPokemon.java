@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -53,14 +54,26 @@ public class NodoFuncionPokemon extends Nodo {
     }
 
     /*--Metodos getter para setear los atributos de la funcion pokemon---*/
-    public int setOffset(NodoExpresion expresion, int iterador) {
-        this.offset = expresion;
-        iterador++;
+    public int setOffset(List<NodoComodin> comodines, int iterador) {
+        if (iterador < comodines.size() && this.offset instanceof NodoComodin) {
+            NodoComodin comodin = (NodoComodin) this.offset;
+
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
+        }
         return iterador;
     }
-    public int setLimit(NodoExpresion expresion, int iterador) {
-        this.limit = expresion;
-        iterador++;
+    public int setLimit(List<NodoComodin> comodines, int iterador) {
+        if (iterador < comodines.size() && this.limit instanceof NodoComodin) {
+            NodoComodin comodin = (NodoComodin) this.limit;
+
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
+        }
         return iterador;
     }
 

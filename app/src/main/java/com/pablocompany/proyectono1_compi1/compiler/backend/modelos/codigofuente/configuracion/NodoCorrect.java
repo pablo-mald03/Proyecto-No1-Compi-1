@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -22,7 +23,7 @@ public class NodoCorrect extends Nodo {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (expresion == null) {
-            listaErrores.add(new ErrorAnalisis("CORRECT", "Semantico",
+            listaErrores.add(new ErrorAnalisis("correct", "Semantico",
                     "La respuesta correcta no puede estar vacía.", getLinea(), getColumna()));
             return TipoVariable.ERROR;
         }
@@ -33,8 +34,8 @@ public class NodoCorrect extends Nodo {
                 tipoExpresion != TipoVariable.COMODIN &&
                 tipoExpresion != TipoVariable.ERROR) {
 
-            listaErrores.add(new ErrorAnalisis("correct", "Semantico",
-                    "La respuesta correcta debe ser un numero. Se encontro con una expreion tipo: \"" + tipoExpresion.getTipo() +"\"",
+            listaErrores.add(new ErrorAnalisis((this.expresion != null) ? this.getString() : "correct", "Semantico",
+                    "La respuesta correcta debe ser un numero. Se encontro con una expreion tipo: \"" + tipoExpresion.getTipo() + "\"",
                     getLinea(), getColumna()));
 
             return TipoVariable.ERROR;
@@ -49,9 +50,16 @@ public class NodoCorrect extends Nodo {
     }
 
     /*---Metodo que permite stear el valor de la expresion dentro de la configuracion---*/
-    public int setExpresion(NodoExpresion expresion, int iterador) {
-        this.expresion = expresion;
-        iterador++;
+    public int setExpresion(List<NodoComodin> comodines, int iterador) {
+
+        if (iterador < comodines.size() && this.expresion instanceof NodoComodin) {
+            NodoComodin comodin = (NodoComodin) this.expresion;
+
+            if (comodin.getExpresion() == null) {
+                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+                iterador++;
+            }
+        }
         return iterador;
     }
 
@@ -63,7 +71,7 @@ public class NodoCorrect extends Nodo {
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return expresion.ejecutar(tabla,listaErrores);
+        return expresion.ejecutar(tabla, listaErrores);
     }
 
     //Metodo que retorna la configuracion que es

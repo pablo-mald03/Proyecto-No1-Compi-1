@@ -64,6 +64,11 @@ public class NodoComodin extends NodoExpresion {
     //Retorna su valor string (comodin)
     @Override
     public String getString() {
+
+        if(this.expresion != null){
+            return this.expresion.getString();
+        }
+
         return "?";
     }
 

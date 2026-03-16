@@ -39,7 +39,7 @@ public class NodoOptions extends Nodo {
             }
 
             if (tipoActual != TipoVariable.STRING) {
-                listaErrores.add(new ErrorAnalisis("options", "Semantico",
+                listaErrores.add(new ErrorAnalisis((this.opciones!=null)? this.getString():"options", "Semantico",
                         "Las opciones solo aceptan tipo \"string\". Se encontro con una expresion tipo: \"" +
                                 tipoActual + "\"", getLinea(), getColumna()));
             }
@@ -56,13 +56,17 @@ public class NodoOptions extends Nodo {
     /*--Metodo delegado para poder setear los valores nuevos de las opciones--*/
     public int setOpciones(List<NodoComodin> comodines, int iterador) {
         for (int i = 0; i < this.opciones.size(); i++) {
-            if (this.opciones.get(i) instanceof NodoExpresion) {
-                NodoComodin comodin = (NodoComodin) this.opciones.get(i);
-                comodin.darValorIncognita(comodines.get(iterador).getExpresion());
-                iterador++;
+            Nodo nodo = this.opciones.get(i);
+
+            if (nodo instanceof NodoComodin) {
+                NodoComodin comodin = (NodoComodin) nodo;
+                if (comodin.getExpresion() == null && iterador < comodines.size()) {
+                    comodin.darValorIncognita(comodines.get(iterador).getExpresion());
+
+                    iterador++;
+                }
             }
         }
-
         return iterador;
     }
 
@@ -97,7 +101,7 @@ public class NodoOptions extends Nodo {
             }
         }
 
-        return "options: {" + builder.toString() + "}";
+        return "options: {" + builder + "}";
     }
 
     /*---Metodo propio de la clase que permite contar los comodines que tienen en las opciones---*/
