@@ -11,6 +11,7 @@ public enum TipoVariable {
     BOOLEAN_OR("OR"),
     VOID("void"),
     COLOR("color"),
+    POKEMON("pokemon"),
 
     ERROR("error");
 

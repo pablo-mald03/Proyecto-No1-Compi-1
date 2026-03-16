@@ -1006,13 +1006,12 @@ fun ConsoleSection(
     val imeBottom = WindowInsets.ime.getBottom(density)
     val isKeyboardVisible = imeBottom > 0
 
-    val scrollState = rememberScrollState()
+    val editorScroll = rememberScrollState()
 
     Box {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState)
                 .padding(horizontal = 16.dp)
         ) {
 

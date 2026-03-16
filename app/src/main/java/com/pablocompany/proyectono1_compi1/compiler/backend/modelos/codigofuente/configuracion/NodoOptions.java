@@ -38,7 +38,7 @@ public class NodoOptions extends Nodo {
                 continue;
             }
 
-            if (tipoActual != TipoVariable.STRING) {
+            if (tipoActual != TipoVariable.STRING && tipoActual != TipoVariable.POKEMON) {
                 listaErrores.add(new ErrorAnalisis((this.opciones!=null)? this.getString():"options", "Semantico",
                         "Las opciones solo aceptan tipo \"string\". Se encontro con una expresion tipo: \"" +
                                 tipoActual + "\"", getLinea(), getColumna()));
@@ -53,7 +53,7 @@ public class NodoOptions extends Nodo {
         return this.opciones;
     }
 
-    /*--Metodo delegado para poder setear los valores nuevos de las opciones--*/
+    /*---Metodo delegado para poder pasar los parametros a las funciones dentro de las preguntas y asignarlos a las opciones----*/
     public int setOpciones(List<NodoComodin> comodines, int iterador) {
         for (int i = 0; i < this.opciones.size(); i++) {
             Nodo nodo = this.opciones.get(i);
@@ -69,8 +69,15 @@ public class NodoOptions extends Nodo {
         }
         return iterador;
     }
+    /*--Metodo que permite obtener la lista de opciones--*/
+    public List<Nodo> getListaOpciones(){
+        return this.opciones;
+    }
 
-
+    /*Metodo que permite setear la la lista de opciones */
+    public  void setLista(List<Nodo> lista){
+        this.opciones = lista;
+    }
 
     //Metodo que permite ejecutar la lista de opciones de expresion que esta dentro del nodo de configuracion
     @Override
@@ -121,10 +128,5 @@ public class NodoOptions extends Nodo {
         return contadorComodines;
     }
 
-    /*---Metodo delegado para poder pasar los parametros a las funciones dentro de las preguntas y asignarlos a las opciones----*/
-    public void inyectarParametros(List<Nodo> parametros,List<ErrorAnalisis> listaErrores) {
-        //for(int i = 0; i < parametros.size();)
-
-    }
 }
 

@@ -141,6 +141,10 @@ public class NodoMultipleQuestion extends NodoQuestion {
                     break;
                 case OPTIONS:
                     this.opciones = (NodoOptions) config.getNodoValor();
+
+                    if (tieneFuncionPokemon(this.opciones)) {
+                        getFuncionPokemon();
+                    }
                     break;
                 case POKEMON:
                     this.funcionPokemon = (NodoFuncionPokemon) config.getNodoValor();
@@ -152,6 +156,30 @@ public class NodoMultipleQuestion extends NodoQuestion {
                     this.respuestasCorrectas = (List<Nodo>) config.getNodoValor();
                     break;
             }
+        }
+    }
+
+    /*------Metodo interno que permite determinar si viene la funcion pokemon------*/
+    private boolean tieneFuncionPokemon(NodoOptions options) {
+
+        if (options != null && options.getOpciones() != null && options.getOpciones().size() == 1) {
+            return options.getOpciones().get(0) instanceof NodoFuncionPokemon;
+        }
+        return false;
+    }
+
+    /*Metodo que permite instanciar la funcion pokemon*/
+    private void getFuncionPokemon() {
+
+        if (this.opciones == null || this.opciones.getOpciones().isEmpty()) {
+            return;
+        }
+
+        Nodo nodo = this.opciones.getOpciones().get(0);
+
+        if (nodo instanceof NodoFuncionPokemon) {
+            this.funcionPokemon = nodo;
+            this.opciones = null;
         }
     }
 
@@ -200,7 +228,6 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         return contador;
     }
-
 
     /*----APARTADO DE METODOS DELEGADOS A LA CLASE (PATRON EXPERTO)----*/
 

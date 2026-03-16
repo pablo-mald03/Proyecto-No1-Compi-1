@@ -2,11 +2,15 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuent
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.NodoFragmento;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.NodoTexto;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoCadenaCompuesta;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa a la funcion especial para poder generar un requesta  la API DE POKEMON
@@ -42,7 +46,7 @@ public class NodoFuncionPokemon extends Nodo {
             }
         }
 
-        return TipoVariable.VOID;
+        return TipoVariable.POKEMON;
     }
 
     /*--Metodos getter para retornar los atributos de la funcion pokemon---*/
@@ -80,12 +84,41 @@ public class NodoFuncionPokemon extends Nodo {
     //Metodo que permite ejecutar el request de a la API para poder obtener los pokemon
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        int valOffset = 0;
+        int valLimit = 1;
+
+        Object off = (this.offset != null) ? this.offset.ejecutar(tabla, listaErrores) : 0;
+        Object lim = (this.limit != null) ? this.limit.ejecutar(tabla, listaErrores) : 1;
+
+        if (off instanceof Number) valOffset = ((Number) off).intValue();
+        if (lim instanceof Number) valLimit = ((Number) lim).intValue();
+
+        PokeApiService pokeApiService = new PokeApiService();
+
+        List<String> nombresPokemon = pokeApiService.getPokemones(valOffset, valLimit, listaErrores, getLinea(), getColumna(), this.getString());
+
+        return  convertirNodos(nombresPokemon);
+    }
+
+    private List<Nodo> convertirNodos(List<String> nombres) {
+        List<Nodo> listaNodos = new ArrayList<>();
+        for (String nombre : nombres) {
+
+        }
+
+        if(nombres.isEmpty()){
+            List<NodoFragmento> fragmentos = new ArrayList<>();
+            fragmentos.add(new NodoTexto("", getLinea(), getColumna()));
+            listaNodos.add(new NodoCadenaCompuesta(fragmentos, getLinea(), getColumna()));
+        }
+
+        return listaNodos;
     }
 
     @Override
     public String getString() {
-        return "wh";
+        return "who_is_that_pokemon(NUMBER,"+ this.offset.getString() + "," + this.limit.getString() + ")";
     }
 
     /*--Metodo delegado para poder contar los comodines de la funcion--*/
