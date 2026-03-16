@@ -31,6 +31,16 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
     /*Variable que representa los tipos de vorden que hay*/
     private NodoBorder borde;
 
+    /*Atributos contador que permiten validar si slo viene una configuracion de cada*/
+    private int countElementos = 0;
+    private int countOrientation = 0;
+    private int countPointX = 0;
+    private int countPointY = 0;
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countStyles = 0;
+
+
     public NodoSection(List<AtributoConfig> cuerpo, int linea, int columna) {
         super(null,null,null,linea, columna);
         this.elementos = null;
@@ -47,6 +57,15 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
     // no interrumpir el metodo heredado de la clase padre
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+
+        validarDuplicado(countElementos, "elements", listaErrores);
+        validarDuplicado(countOrientation, "orientation", listaErrores);
+        validarDuplicado(countPointX, "pointX", listaErrores);
+        validarDuplicado(countPointY, "pointY", listaErrores);
+        validarDuplicado(countWidth, "width", listaErrores);
+        validarDuplicado(countHeight, "height", listaErrores);
+        validarDuplicado(countStyles, "styles", listaErrores);
 
         if (this.elementos != null) {
             this.elementos.validarSemantica(tabla, listaErrores);
@@ -89,6 +108,15 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
         return TipoVariable.VOID;
     }
 
+    // Metodo que permite validar la duplicadad de instrucciones en el cuerpo de la seccion
+    private void validarDuplicado(int contador, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador > 1) {
+            listaErrores.add(new ErrorAnalisis("SECTION", "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" ha sido definido más de una vez en la SECTION.",
+                    getLinea(), getColumna()));
+        }
+    }
+
     //Metodo que permite validar semantica de la seccion (PATRON EXPERTO)
     /*Simplemente es un llamado a lo que ya esta creado*/
     @Override
@@ -114,24 +142,31 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
 
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
                 case POINT_X:
                     this.pointX = (NodoPointX) config.getNodoValor();
+                    this.countPointX++;
                     break;
                 case POINT_Y:
                     this.pointY = (NodoPointY) config.getNodoValor();
+                    this.countPointY++;
                     break;
                 case ELEMENTS:
                     this.elementos = (NodoElements) config.getNodoValor();
+                    this.countElementos++;
                     break;
                 case ORIENTATION:
                     this.orientation = (NodoOrientation) config.getNodoValor();
+                    this.countOrientation++;
                     break;
             }
         }

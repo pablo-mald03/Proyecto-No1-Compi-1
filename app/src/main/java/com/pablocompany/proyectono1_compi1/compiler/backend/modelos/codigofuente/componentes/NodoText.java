@@ -133,8 +133,14 @@ public class NodoText extends NodoComponente {
 
     }
 
+    //Metodo que permite retornar el codigo compilado de texto
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        Object contenido = this.contenido.ejecutar(tabla, listaErrores);
+
+
+
         return null;
     }
 

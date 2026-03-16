@@ -34,6 +34,14 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
     /*Variable que representa los tipos de vorden que hay*/
     private NodoBorder borde;
 
+    /*Atributos contador que permiten validar si slo viene una configuracion de cada*/
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countPointX = 0;
+    private int countPointY = 0;
+    private int countElements = 0;
+    private int countStyles = 0;
+
     public NodoTable(List<AtributoConfig> configs, int linea, int columna) {
         // Inicializamos con nulls por ahora, luego el procesado los llena
         super(null, null, null, linea, columna);
@@ -49,6 +57,13 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
     // no interrumpir el metodo heredado de la clase padre
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
+
+        validarDuplicado(countWidth, "width", listaErrores);
+        validarDuplicado(countHeight, "height", listaErrores);
+        validarDuplicado(countPointX, "pointX", listaErrores);
+        validarDuplicado(countPointY, "pointY", listaErrores);
+        validarDuplicado(countElements, "elements", listaErrores);
+        validarDuplicado(countStyles, "styles", listaErrores);
 
 
         if (this.pointX != null) {
@@ -126,21 +141,27 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
             switch (config.getTipo()) {
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
                 case POINT_X:
                     this.pointX = (NodoPointX) config.getNodoValor();
+                    this.countPointX++;
                     break;
                 case POINT_Y:
                     this.pointY = (NodoPointY) config.getNodoValor();
+                    this.countPointY++;
                     break;
                 case ELEMENTS:
                     this.filas = (List<List<NodoComponente>>) config.getNodoValor();
+                    this.countElements++;
                     break;
             }
         }
@@ -151,7 +172,17 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
             }*/
     }
 
+    //Metodo que permite validar la duplicidad de instrucciones en el cuerpo de la tabla
+    private void validarDuplicado(int contador, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador > 1) {
+            listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" ha sido definido más de una vez en la TABLE.",
+                    getLinea(), getColumna()));
+        }
+    }
 
+
+    //Metodo que permite procesar los estilos de la tabla
     @Override
     protected Estilos procesarEstilos(List<NodoEstilos> lista) {
         if (lista.isEmpty()) {

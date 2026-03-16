@@ -89,6 +89,30 @@ public class NodoMultipleQuestion extends NodoQuestion {
             }
         }
 
+        if (this.opciones != null && this.respuestasCorrectas != null) {
+
+            int cantidadOpciones = this.opciones.getListaOpciones().size();
+            int cantidadRespuestas = this.respuestasCorrectas.size();
+
+            if (cantidadRespuestas > cantidadOpciones) {
+
+                int lineaError = (cantidadRespuestas > 0)
+                        ? this.respuestasCorrectas.get(cantidadRespuestas - 1).getLinea()
+                        : getLinea();
+
+                listaErrores.add(new ErrorAnalisis(
+                        (id != null) ? id : "MULTIPLE_QUESTION",
+                        "Semántico",
+                        "La cantidad de respuestas correctas es: { " + cantidadRespuestas +
+                                " }. No puede ser mayor a la cantidad de opciones definidas: { " + cantidadOpciones + " }.",
+                        lineaError,
+                        this.respuestasCorrectas.get(0).getColumna()
+
+                ));
+            }
+        }
+
+
         /*---Validacion de la funcion para el request a la api de pokemon---*/
 
         if (this.funcionPokemon != null) {
