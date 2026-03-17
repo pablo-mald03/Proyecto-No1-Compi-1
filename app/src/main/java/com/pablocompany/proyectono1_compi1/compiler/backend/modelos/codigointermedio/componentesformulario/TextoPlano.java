@@ -2,6 +2,8 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointer
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 
+import java.util.List;
+
 //Clase que representa a la etiqueta texto dentro del formulario
 public class TextoPlano extends Formulario {
 
@@ -65,6 +67,12 @@ public class TextoPlano extends Formulario {
         this.estilos.setBackgroundColor(estilos.getBackgroundColor());
         this.estilos.setFontFamily(estilos.getFontFamily());
         this.estilos.setTextSize(estilos.getTextSize());
+
+    }
+
+    /*Metodo utilizado para contabilizar la cantidad de componentes del formulario*/
+    @Override
+    public void contarComponentes(Integer [] contadoresReporte){
 
     }
 

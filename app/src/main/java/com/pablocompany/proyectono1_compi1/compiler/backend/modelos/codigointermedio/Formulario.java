@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.Seccion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -34,5 +35,8 @@ public abstract class Formulario {
 
     //Metodo utilizado para heredar las configuraciones
     public abstract void heredarConfiguraciones(Formulario componente);
+
+    //Metodo que permite contar
+    public abstract void contarComponentes(Integer [] contadoresReporte);
 
 }

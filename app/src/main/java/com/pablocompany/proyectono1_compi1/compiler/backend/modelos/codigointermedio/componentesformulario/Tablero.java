@@ -2,6 +2,7 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointer
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 
+import java.text.Normalizer;
 import java.util.List;
 
 //Clase delegada que representa una tabla dentro de un formulario
@@ -163,6 +164,7 @@ public class Tablero extends Formulario {
 
     //Metodo que permite retornar la estructura de la tabla
     public String compilar() {
+
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("<table>\n");
@@ -196,19 +198,22 @@ public class Tablero extends Formulario {
         return stringBuilder.toString();
     }
 
-    // Metodo para calcular el maximo de columnas (la fila mas larga)
-    public int obtenerMaximoColumnas() {
-        int max = 0;
-        for (List<Formulario> fila : elementos) {
-            if (fila.size() > max) {
-                max = fila.size();
+    /*Metodo utilizado para contabilizar la cantidad de componentes del formulario*/
+    /*
+     * position 0 -> Secciones
+     * position 1 -> Preguntas
+     * position 2 -> Abiertas
+     * position 3 -> Drop
+     * position 4 -> Multiple
+     * position 5 -> Text
+     * */
+    @Override
+    public void contarComponentes(Integer [] contadoresReporte){
+        for (List<Formulario> fila : this.elementos) {
+            for (Formulario componente : fila) {
+                componente.contarComponentes(contadoresReporte);
             }
         }
-        return max;
-    }
-
-    public int obtenerCantidadFilas() {
-        return elementos != null ? elementos.size() : 0;
     }
 
     // Nueva versión del procesador de herencia para Tablero

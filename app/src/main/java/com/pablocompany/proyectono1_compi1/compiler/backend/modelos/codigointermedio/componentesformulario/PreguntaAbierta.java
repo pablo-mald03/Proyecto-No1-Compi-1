@@ -103,6 +103,22 @@ public class PreguntaAbierta extends Formulario {
         return estilosEtiquetaBasicos.toString();
     }
 
+    /*Metodo utilizado para contabilizar la cantidad de componentes del formulario*/
+    /*
+     * position 0 -> Secciones
+     * position 1 -> Preguntas
+     * position 2 -> Abiertas
+     * position 3 -> Drop
+     * position 4 -> Select
+     * position 5 -> Multiple
+     * */
+    @Override
+    public void contarComponentes(Integer [] contadoresReporte){
+
+        contadoresReporte[1]++;
+        contadoresReporte[2]++;
+    }
+
     //Metodo utilizado para heredar las configuraciones
     @Override
     public void heredarConfiguraciones(Formulario componente){

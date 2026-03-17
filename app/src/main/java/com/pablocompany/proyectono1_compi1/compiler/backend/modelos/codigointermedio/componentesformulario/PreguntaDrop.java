@@ -20,7 +20,7 @@ public class PreguntaDrop extends Formulario {
     private String label;
 
 
-    public PreguntaDrop( Number height, Number width,String label, List<String> opciones, Integer respuestaCorrecta, EstilosComponent estilos,int linea, int columna) {
+    public PreguntaDrop(Number height, Number width, String label, List<String> opciones, Integer respuestaCorrecta, EstilosComponent estilos, int linea, int columna) {
         super(linea, columna);
         this.height = height;
         this.width = width;
@@ -82,22 +82,22 @@ public class PreguntaDrop extends Formulario {
 
     //Metodo que permite heredar los estilos
     @Override
-    public void heredarEstilos(EstilosComponent estilos,Formulario componente) {
+    public void heredarEstilos(EstilosComponent estilos, Formulario componente) {
 
         if (this.estilos == null) {
             this.estilos = new EstilosComponent();
         }
 
-        if(this.estilos.getColor()==null) {
+        if (this.estilos.getColor() == null) {
             this.estilos.setColor(estilos.getColor());
         }
-        if(this.estilos.getBackgroundColor()==null) {
+        if (this.estilos.getBackgroundColor() == null) {
             this.estilos.setBackgroundColor(estilos.getBackgroundColor());
         }
-        if(this.estilos.getFontFamily()==null) {
+        if (this.estilos.getFontFamily() == null) {
             this.estilos.setFontFamily(estilos.getFontFamily());
         }
-        if(this.estilos.getTextSize()==null) {
+        if (this.estilos.getTextSize() == null) {
             this.estilos.setTextSize(estilos.getTextSize());
         }
 
@@ -115,11 +115,11 @@ public class PreguntaDrop extends Formulario {
         estilosEtiquetaBasicos.append(this.height != null ? this.height : "-1").append(",");
         estilosEtiquetaBasicos.append("\"").append(this.label).append("\",");
 
-        if(this.opciones != null){
+        if (this.opciones != null) {
             estilosEtiquetaBasicos.append("{");
             for (int i = 0; i < this.opciones.size(); i++) {
                 estilosEtiquetaBasicos.append("\"").append(this.opciones.get(i)).append("\"");
-                if(i < this.opciones.size() - 1){
+                if (i < this.opciones.size() - 1) {
                     estilosEtiquetaBasicos.append(",");
                 }
             }
@@ -143,30 +143,45 @@ public class PreguntaDrop extends Formulario {
         return estilosEtiquetaBasicos.toString();
     }
 
+    /*Metodo utilizado para contabilizar la cantidad de componentes del formulario*/
+    /*
+     * position 0 -> Secciones
+     * position 1 -> Preguntas
+     * position 2 -> Abiertas
+     * position 3 -> Drop
+     * position 4 -> Select
+     * position 5 -> Multiple
+     * */
+    @Override
+    public void contarComponentes(Integer[] contadoresReporte) {
+        contadoresReporte[1]++;
+        contadoresReporte[3]++;
+    }
+
     //Metodo utilizado para heredar las configuraciones
     @Override
-    public void heredarConfiguraciones(Formulario componente){
+    public void heredarConfiguraciones(Formulario componente) {
 
-        if(componente instanceof Seccion){
+        if (componente instanceof Seccion) {
             Seccion seccion = (Seccion) componente;
 
-            if(this.width== null){
+            if (this.width == null) {
                 this.width = seccion.getWidth();
             }
-            if(this.height== null){
+            if (this.height == null) {
                 this.height = seccion.getHeight();
             }
 
         }
 
 
-        if(componente instanceof Tablero){
+        if (componente instanceof Tablero) {
             Tablero tablero = (Tablero) componente;
 
-            if(this.width== null){
+            if (this.width == null) {
                 this.width = tablero.getWidth();
             }
-            if(this.height== null){
+            if (this.height == null) {
                 this.height = tablero.getHeight();
             }
         }

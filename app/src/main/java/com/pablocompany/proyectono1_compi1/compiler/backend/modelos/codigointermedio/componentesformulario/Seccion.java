@@ -142,6 +142,26 @@ public class Seccion extends Formulario {
         return estilosEtiquetaBasicos.toString();
     }
 
+    /*Metodo utilizado para contabilizar la cantidad de componentes del formulario*/
+    /*
+     * position 0 -> Secciones
+     * position 1 -> Preguntas
+     * position 2 -> Abiertas
+     * position 3 -> Drop
+     * position 4 -> Multiple
+     * position 5 -> Text
+     * */
+    @Override
+    public void contarComponentes(Integer [] contadoresReporte){
+
+        contadoresReporte[0]++;
+
+        for (Formulario formulario : this.elementos) {
+            formulario.contarComponentes(contadoresReporte);
+        }
+
+    }
+
     //Metodo que permite heredar los estilos
     @Override
     public void heredarEstilos(EstilosComponent estilos,Formulario componente) {

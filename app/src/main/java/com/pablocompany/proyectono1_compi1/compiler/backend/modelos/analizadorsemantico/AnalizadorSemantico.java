@@ -69,7 +69,6 @@ public class AnalizadorSemantico {
     /*Metodo que permite retornar el codigo intermedio listo para la ultima fase de compilacion*/
     private String codigoIntermedio(TablaSimbolos tablaSimbolos) throws TiempoEjecucionException {
 
-        System.out.println("Llega a codigo intermedio");
 
         List<Formulario> codigoIntermedio = new ArrayList<>();
         for (Nodo nodo : astParser) {
@@ -95,22 +94,22 @@ public class AnalizadorSemantico {
             }
         }
 
-        System.out.println("sale de codigo intermedio");
-
         return retornarCodigo(tablaSimbolos,codigoIntermedio);
     }
 
 
+    //Metodo delegado para correr el codigo intermedio y retornar el codigo compilado
     private String retornarCodigo(TablaSimbolos tabla, List<Formulario> codigoIntermedio){
 
-        int contadorSeciones = 0;
-        int contadorTablas = 0;
-        int contadorPregutnas= 0;
-
-        int contadorAbiertas = 0;
-        int contadorDesplegables = 0;
-        int contadorSeleccion = 0;
-        int contadorMultiples = 0;
+        Integer [] contadoresReporte  = {0, 0, 0, 0, 0, 0};
+        /*
+        * position 0 -> Secciones
+        * position 1 -> Preguntas
+        * position 2 -> Abiertas
+        * position 3 -> Drop
+        * position 4 -> Multiple
+        * position 5 -> Text
+        * */
 
 
         StringBuilder codigoIntermedioBuilder = new StringBuilder();
@@ -119,7 +118,25 @@ public class AnalizadorSemantico {
             codigoIntermedioBuilder.append("\n");
         }
 
-        return codigoIntermedioBuilder.toString();
+
+        for (Formulario formulario : codigoIntermedio){
+            formulario.contarComponentes(contadoresReporte);
+        }
+
+        StringBuilder reporte = new StringBuilder();
+
+        reporte.append("    Total de Secciones: ").append(contadoresReporte[0]).append("\n");
+        reporte.append("    Total de Preguntas: ").append(contadoresReporte[1]).append("\n");
+        reporte.append("        Abiertas: ").append(contadoresReporte[2]).append("\n");
+        reporte.append("        Desplegables: ").append(contadoresReporte[3]).append("\n");
+        reporte.append("        Seleccion: ").append(contadoresReporte[4]).append("\n");
+        reporte.append("        Multiples: ").append(contadoresReporte[5]).append("\n");
+        reporte.append("###").append("\n\n");
+
+        String codigoCompilado = codigoIntermedioBuilder.toString();
+        reporte.append(codigoCompilado);
+
+        return reporte.toString();
 
     }
 
