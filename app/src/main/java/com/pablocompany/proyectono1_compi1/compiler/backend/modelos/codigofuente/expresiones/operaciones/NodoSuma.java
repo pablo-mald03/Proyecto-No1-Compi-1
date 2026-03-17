@@ -66,6 +66,10 @@ public class NodoSuma extends NodoExpresion {
 
         if (valorDerecho instanceof OnCompilacionError) return valorDerecho;
 
+        if (valorIzquierdo == null || valorDerecho == null) {
+            listaErrores.add(new ErrorAnalisis(this.getString(), "Semantico", "Operacion con valores nulos en suma", getLinea(), getColumna()));
+            return new OnCompilacionError("Valor nulo", getLinea(), getColumna(), true);
+        }
 
         if (valorIzquierdo instanceof Double && valorDerecho instanceof Double) {
             return (Double) valorIzquierdo + (Double) valorDerecho;
@@ -74,7 +78,7 @@ public class NodoSuma extends NodoExpresion {
             return (Integer) valorIzquierdo + (Integer) valorDerecho;
         }
         else if (valorIzquierdo instanceof String || valorDerecho instanceof String) {
-            return valorIzquierdo.toString() + valorDerecho.toString();
+            return String.valueOf(valorIzquierdo) + String.valueOf(valorDerecho);
         }
 
         listaErrores.add(new ErrorAnalisis(this.getString(), "OnCompilacionError", "No se pueden sumar tipos diferentes", super.getLinea(), super.getColumna()));

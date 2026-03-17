@@ -1,10 +1,13 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa al caso contrario absoluto else dentro de el codigo de programacion fuente
@@ -51,17 +54,33 @@ public class NodoElse extends Nodo {
         return this.cuerpo;
     }
 
+
     //Clase que permite ejecutar por completo el codigo que tiene dentro el caso contrario else
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
-        //Solo invoca
-        for (Nodo nodo : cuerpo) {
-            nodo.ejecutar(tabla, listaErrores);
+        List<Formulario> componentesGenerados = new ArrayList<>();
+
+        if (this.cuerpo != null) {
+
+            for (Nodo nodo : cuerpo) {
+                Object resultado = nodo.ejecutar(tabla, listaErrores);
+
+                if (resultado instanceof OnCompilacionError) {
+                    return resultado;
+                }
+
+                if (resultado instanceof Formulario) {
+                    componentesGenerados.add((Formulario) resultado);
+                }
+                else if (resultado instanceof List) {
+                    componentesGenerados.addAll((List<Formulario>) resultado);
+                }
+
+            }
         }
 
-        //PENDIENTE DEFINIR RETORNO
-        return null;
+        return componentesGenerados;
     }
 
     //Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)

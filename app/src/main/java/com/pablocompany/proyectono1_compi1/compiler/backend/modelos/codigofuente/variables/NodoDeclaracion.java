@@ -61,7 +61,7 @@ public class NodoDeclaracion extends Nodo {
             if (tipoExpresion != TipoVariable.ERROR) {
                 if (this.tipo != tipoExpresion) {
                     listaErrores.add(new ErrorAnalisis(id, "Semantico",
-                            "Tipo incompatible: Se esperaba " +  tipoExpresion + " pero se declaro como \"" + this.tipo+"\"",
+                            "Tipo incompatible: Se esperaba " + tipoExpresion + " pero se declaro como \"" + this.tipo + "\"",
                             getLinea(), getColumna()));
                     return TipoVariable.ERROR;
                 }
@@ -77,29 +77,31 @@ public class NodoDeclaracion extends Nodo {
 
         Object valorResuelto = (expresion != null) ? expresion.ejecutar(tabla, listaErrores) : null;
 
+        if (valorResuelto instanceof OnCompilacionError) return valorResuelto;
 
-        if (valorResuelto == null) {
 
-            if (this.tipo == TipoVariable.NUMBER && !(valorResuelto instanceof Double || valorResuelto instanceof Integer)) {
-                listaErrores.add(new ErrorAnalisis(id, "Semantico", "Tipo incompatible: inicialización de '" + id + "' requiere un number", super.getLinea(), super.getColumna()));
-                valorResuelto = 0.0;
+        if (valorResuelto != null) {
+
+            if (this.tipo == TipoVariable.NUMBER && !(valorResuelto instanceof Number)) {
+                listaErrores.add(new ErrorAnalisis((this.expresion != null)? this.getString() : this.id, "Semantico", "Tipo incompatible: inicialización de \"" + id + "\" requiere un number", super.getLinea(), super.getColumna()));
+                return new OnCompilacionError("Tipos incompatibles", getLinea(), getColumna(), true);
+
             } else if (this.tipo == TipoVariable.STRING && !(valorResuelto instanceof String)) {
-                listaErrores.add(new ErrorAnalisis(id, "Semantico", "Tipo incompatible: inicialización de '" + id + "' requiere un string", super.getLinea(), super.getColumna()));
-                valorResuelto = "";
+
+                listaErrores.add(new ErrorAnalisis((this.expresion != null)? this.getString() : this.id, "Semantico", "Tipo incompatible: inicialización de \"" + id + "\" requiere un string", super.getLinea(), super.getColumna()));
+                return new OnCompilacionError("Tipos incompatibles", getLinea(), getColumna(), true);
             }
+
         } else {
-            if (this.tipo == TipoVariable.NUMBER) {
-                valorResuelto = 0.0;
-            } else if (this.tipo == TipoVariable.STRING) {
-                valorResuelto = "";
-            }
+            valorResuelto = (this.tipo == TipoVariable.NUMBER) ? 0.0 : "";
         }
 
-        Simbolo nuevo = new Simbolo(id, tipo, valorResuelto, super.getLinea(), super.getColumna());
-
-        if (!tabla.insertar(nuevo)) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico", "La variable '" + id + "' ya ha sido definida", super.getLinea(), super.getColumna()));
-            return null;
+        Simbolo existente = tabla.buscar(id);
+        if (existente == null) {
+            Simbolo nuevo = new Simbolo(id, tipo, valorResuelto, getLinea(), getColumna());
+            tabla.insertar(nuevo);
+        } else {
+            existente.setValor(valorResuelto);
         }
 
         return valorResuelto;

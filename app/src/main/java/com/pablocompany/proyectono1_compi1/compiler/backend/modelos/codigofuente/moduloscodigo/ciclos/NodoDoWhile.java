@@ -1,10 +1,13 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.ciclos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa al ciclo do while dentro del codigo fuente
@@ -50,29 +53,45 @@ public class NodoDoWhile extends Nodo {
 
     //Metodo que permite ejecutar el ciclo do while (PATRON EXPERTO)
     /*
-    *Solo pasa a un ciclo do while normal  de paso se hace infinito si la condicion nunca se cumple (PENDIENTE DEFNIR RETORNO)
+    *Solo pasa a un ciclo do while normal  de paso se hace infinito si la condicion nunca se cumple
     * */
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        List<Formulario> componentesAcumulados = new ArrayList<>();
 
         do {
 
             if (codigo != null) {
                 for (Nodo nodo : codigo) {
                     if (nodo != null) {
-                        nodo.ejecutar(tabla, listaErrores);
+
+                        Object resultado = nodo.ejecutar(tabla, listaErrores);
+
+                        if (resultado instanceof OnCompilacionError) {
+                            return resultado;
+                        }
+
+                        if (resultado instanceof Formulario) {
+                            componentesAcumulados.add((Formulario) resultado);
+                        } else if (resultado instanceof List) {
+                            componentesAcumulados.addAll((List<Formulario>) resultado);
+                        }
+
                     }
                 }
             }
 
             Object valorCondicion = condicion.ejecutar(tabla, listaErrores);
 
+            if (valorCondicion instanceof OnCompilacionError) return valorCondicion;
+
             if(!(valorCondicion instanceof  Number) || ((Number) valorCondicion).doubleValue() <= 0.0){
                 break;
             }
         } while (true);
 
-        return null;
+        return componentesAcumulados;
     }
 
     /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/

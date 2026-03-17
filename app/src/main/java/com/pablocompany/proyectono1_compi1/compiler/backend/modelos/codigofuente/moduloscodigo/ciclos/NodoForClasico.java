@@ -1,12 +1,15 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.ciclos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa el ciclo for pero de la manera estandar en la que se encuentra en el lenguaje de programacion
@@ -92,24 +95,47 @@ public class NodoForClasico extends Nodo {
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         Object valorInicial = expresionIgualacion.ejecutar(tabla, listaErrores);
+
+        if (valorInicial instanceof OnCompilacionError) return valorInicial;
+
         tabla.asignar(idInicial, valorInicial,listaErrores);
+
+        List<Formulario> componentesAcumulados = new ArrayList<>();
 
         while(true){
 
-            Object condidicionFor = condicion.ejecutar(tabla, listaErrores);
-            if(!(condidicionFor instanceof  Number) || ((Number) condidicionFor).doubleValue() <= 0.0){
+            Object condicionFor = condicion.ejecutar(tabla, listaErrores);
+
+            if (condicionFor instanceof OnCompilacionError) return condicionFor;
+
+            if(!(condicionFor instanceof  Number) || ((Number) condicionFor).doubleValue() <= 0.0){
                 break;
             }
 
             for(Nodo nodo : codigo) {
-                nodo.ejecutar(tabla, listaErrores);
+                Object resultado = nodo.ejecutar(tabla, listaErrores);
+                if (resultado instanceof OnCompilacionError) {
+                    return resultado;
+                }
+
+                if (resultado instanceof Formulario) {
+                    componentesAcumulados.add((Formulario) resultado);
+                } else if (resultado instanceof List) {
+                    componentesAcumulados.addAll((List<Formulario>) resultado);
+                }
+
             }
 
             Object valorIterador = expresionIterador.ejecutar(tabla, listaErrores);
+
+            if (valorIterador instanceof OnCompilacionError) {
+                return valorIterador;
+            }
+
             tabla.asignar(idIterador, valorIterador, listaErrores);
 
         }
-        return null;
+        return componentesAcumulados;
     }
 
     /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/

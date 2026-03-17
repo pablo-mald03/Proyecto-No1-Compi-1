@@ -42,9 +42,10 @@ public class NodoComodin extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (this.expresion == null) {
-            return null;
+            System.out.println("¡CRASH! Comodín vacío en L:" + getLinea() + " C:" + getColumna());
+            return new OnCompilacionError("Comodín sin valor inyectado", getLinea(), getColumna(), true);
         }
-        return   this.expresion.ejecutar(tabla, listaErrores);
+        return this.expresion.ejecutar(tabla, listaErrores);
     }
 
     //Metodo set utilizado para reemplazar el valor de la expresion incognita

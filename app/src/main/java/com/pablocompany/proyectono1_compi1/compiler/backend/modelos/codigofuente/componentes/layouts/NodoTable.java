@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
@@ -12,14 +13,21 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.Estilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.interfacesmodules.NodoVisitante;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales.NodoElse;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.NodoDraw;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstiloBorde;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.Seccion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.Tablero;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa por completo la tabla de los formularios. Otro tipo de layout que existe
@@ -31,7 +39,7 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
     private NodoPointY pointY;
 
 
-    /*Variable que representa los tipos de vorden que hay*/
+    /*Variable que representa los tipos de borde que hay*/
     private NodoBorder borde;
 
     /*Atributos contador que permiten validar si slo viene una configuracion de cada*/
@@ -241,10 +249,105 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
         }
     }
 
-
+    /*Metodo que permite retornar todos los componentes que tiene dentro la tabla*/
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        return null;
+
+        Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
+
+        if (widthResultado instanceof OnCompilacionError) return widthResultado;
+
+        Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
+
+        if (heightResultado instanceof OnCompilacionError) return heightResultado;
+
+        Object pointXConfig = (this.pointX != null) ? this.pointX.ejecutar(tabla, listaErrores) : null;
+
+        if (pointXConfig instanceof OnCompilacionError) return pointXConfig;
+
+        Object pointYConfig = (this.pointY != null) ? this.pointY.ejecutar(tabla, listaErrores) : null;
+
+        if (pointYConfig instanceof OnCompilacionError) return pointYConfig;
+
+        Object bordeResultado = (this.borde != null) ? this.borde.ejecutar(tabla, listaErrores) : null;
+
+        if (bordeResultado instanceof OnCompilacionError) return bordeResultado;
+
+        List<List<Formulario>> tablaFinal = new ArrayList<>();
+
+        if (this.filas != null) {
+            for (List<NodoComponente> filaActual : this.filas) {
+                List<Formulario> filaProcesada = new ArrayList<>();
+
+                for (NodoComponente componente : filaActual) {
+                    Object resultado = componente.ejecutar(tabla, listaErrores);
+
+                    if (resultado instanceof OnCompilacionError) return resultado;
+
+                    if (resultado instanceof Formulario) {
+                        filaProcesada.add((Formulario) resultado);
+                    }
+                }
+                tablaFinal.add(filaProcesada);
+            }
+        }
+
+        Object estilosObjetoProcesados = procesarEstilosLocales(tabla, listaErrores);
+
+        if (estilosObjetoProcesados instanceof OnCompilacionError) return estilosObjetoProcesados;
+
+        EstilosComponent estilosObjeto = (EstilosComponent) estilosObjetoProcesados;
+
+        Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
+        Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
+        Number x = (pointXConfig instanceof Number) ? (Number) pointXConfig : 0;
+        Number y = (pointYConfig instanceof Number) ? (Number) pointYConfig : 0;
+
+        EstiloBorde bordeFinal = (bordeResultado instanceof EstiloBorde) ? (EstiloBorde) bordeResultado : null;
+
+        return new Tablero(alto, ancho, x, y, tablaFinal, estilosObjeto, bordeFinal, getLinea(), getColumna());
+
+    }
+
+    /*Metodo que permite ejecutar el listado de estilos locales*/
+    private Object procesarEstilosLocales(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores){
+        EstilosComponent estilosObjeto = new EstilosComponent();
+
+        if (this.estilos != null) {
+
+            Object textSize = (this.estilos.getTextSize() != null) ? this.estilos.getTextSize().ejecutar(tabla, listaErrores) : null;
+
+            if (textSize instanceof OnCompilacionError) return textSize;
+
+            Object letra = (this.estilos.getFontFamily() != null) ? this.estilos.getFontFamily().ejecutar(tabla, listaErrores) : null;
+
+            if (letra instanceof OnCompilacionError) return letra;
+
+            Object backgroundColor = (this.estilos.getBackgroundColor() != null) ? this.estilos.getBackgroundColor().ejecutar(tabla, listaErrores) : null;
+
+            if (backgroundColor instanceof OnCompilacionError) return backgroundColor;
+
+            Object color = (this.estilos.getColor() != null) ? this.estilos.getColor().ejecutar(tabla, listaErrores) : null;
+
+            if (color instanceof OnCompilacionError) return color;
+
+            if (textSize instanceof Number) {
+                estilosObjeto.setTextSize((Number) textSize);
+            }
+
+            if (letra != null) {
+                estilosObjeto.setFontFamily(TipoLetra.valueOf(letra.toString()));
+            }
+
+            if (backgroundColor != null) {
+                estilosObjeto.setBackgroundColor(backgroundColor.toString());
+            }
+
+            if (color != null) {
+                estilosObjeto.setColor(color.toString());
+            }
+        }
+        return estilosObjeto;
     }
 
     @Override

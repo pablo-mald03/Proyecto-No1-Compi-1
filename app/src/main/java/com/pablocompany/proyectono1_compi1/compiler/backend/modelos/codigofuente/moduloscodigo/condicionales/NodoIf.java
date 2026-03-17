@@ -1,11 +1,14 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.condicionales;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.interfacesmodules.NodoVisitante;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa a los condicionales if dentro de el codigo de programacion fuente
@@ -73,22 +76,45 @@ public class NodoIf extends Nodo {
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         Object result = condicion.ejecutar(tabla, listaErrores);
 
+        if(result instanceof  OnCompilacionError){
+            return result;
+        }
+
         double valorCondicion = (result instanceof Number) ? ((Number) result).doubleValue() : 0.0;
 
-        //Pendiente definir la forma de condicionar
+        List<Formulario> componentesFinales = new ArrayList<>();
+
         if (valorCondicion > 0) {
 
             //Cuerpo de if
             for (Nodo nodo : codigo) {
-                nodo.ejecutar(tabla, listaErrores);
+
+                Object resultado = nodo.ejecutar(tabla, listaErrores);
+
+                if (resultado instanceof OnCompilacionError) return resultado;
+
+                if (resultado instanceof Formulario) {
+                    componentesFinales.add((Formulario) resultado);
+                } else if (resultado instanceof List) {
+                    componentesFinales.addAll((List<Formulario>) resultado);
+                }
+
+
             }
         } else if (nodoElse != null) {
             //Cuerpo de else o if
-            nodoElse.ejecutar(tabla, listaErrores);
+            Object resElse = nodoElse.ejecutar(tabla, listaErrores);
+
+            if (resElse instanceof OnCompilacionError) return resElse;
+
+            if (resElse instanceof Formulario) {
+                componentesFinales.add((Formulario) resElse);
+            } else if (resElse instanceof List) {
+                componentesFinales.addAll((List<Formulario>) resElse);
+            }
         }
 
-        //PENDIENTE DEFINIR RETORNO
-        return null;
+        return componentesFinales;
     }
 
     //Pendiente definir

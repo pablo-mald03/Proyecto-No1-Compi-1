@@ -66,7 +66,7 @@ public class NodoAsignacion extends Nodo {
         Simbolo variable = tabla.buscar(id);
 
         if (variable == null) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico", "La variable '" + id + "' no ha sido declarada", super.getLinea(), super.getColumna()));
+            listaErrores.add(new ErrorAnalisis(id, "Semantico", "La variable \"" + id + "\" no ha sido declarada.", getLinea(), getColumna()));
             return new OnCompilacionError("Variable no declarada", getLinea(), getColumna(), true);
         }
 
@@ -76,13 +76,16 @@ public class NodoAsignacion extends Nodo {
             return nuevoValor;
         }
 
-        if (variable.getTipo() == TipoVariable.NUMBER && !(nuevoValor instanceof Double || nuevoValor instanceof Integer)) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es number", super.getLinea(), super.getColumna()));
-            return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
-
-        } else if (variable.getTipo() == TipoVariable.STRING && !(nuevoValor instanceof String)) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico", "Tipo incompatible: '" + id + "' es string", super.getLinea(), super.getColumna()));
-            return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
+        if (variable.getTipo() == TipoVariable.NUMBER) {
+            if (!(nuevoValor instanceof Number)) {
+                listaErrores.add(new ErrorAnalisis(id, "Semantico", "Tipo incompatible: \"" + id + "\" es de tipo \"number\".", getLinea(), getColumna()));
+                return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
+            }
+        } else if (variable.getTipo() == TipoVariable.STRING) {
+            if (!(nuevoValor instanceof String)) {
+                listaErrores.add(new ErrorAnalisis(id, "Semantico", "Tipo incompatible: \"" + id + "\" es de tipo \"string\".", getLinea(), getColumna()));
+                return new OnCompilacionError("Tipo incompatible", getLinea(), getColumna(), true);
+            }
         }
 
         variable.setValor(nuevoValor);

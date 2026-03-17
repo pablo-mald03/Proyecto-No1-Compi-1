@@ -1,12 +1,16 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.analizadorsemantico;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.TiempoEjecucionException;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.interfacesmodules.NodoVisitante;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.NodoDraw;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase delegada para ocuparse por completo del analisis semantico (PATRON EXPERTO)
@@ -37,6 +41,8 @@ public class AnalizadorSemantico {
             return "";
         }
 
+        tablaSimbolos = new TablaSimbolos(tablaSimbolos);
+
         //Metodo que agrega los comodines en su lugar
         this.agregarComodines(tablaSimbolos);
 
@@ -46,6 +52,8 @@ public class AnalizadorSemantico {
 
         tablaSimbolos = ejecutarPasadasAnalisis();
 
+        tablaSimbolos = new TablaSimbolos(tablaSimbolos);
+
         //Metodo que ejecuta los requests a la API
         this.ejecutarRequests(tablaSimbolos);
 
@@ -53,18 +61,51 @@ public class AnalizadorSemantico {
             return "";
         }
 
+        //Tabla de simbolos final
         tablaSimbolos = ejecutarPasadasAnalisis();
 
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-
         /*Metodo de compilacion del codigo*/
 
+        String codigoCompilado = "";
+        try {
+            codigoCompilado = codigoIntermedio(tablaSimbolos);
 
-        return stringBuilder.toString();
+
+        } catch (TiempoEjecucionException e) {
+            return "";
+        }
+
+        return codigoCompilado;
+    }
+
+    /*Metodo que permite retornar el codigo intermedio listo para la ultima fase de compilacion*/
+    private String codigoIntermedio(TablaSimbolos tablaSimbolos ) throws TiempoEjecucionException {
+
+        List<Formulario> codigoIntermedio = new ArrayList<>();
+        for (Nodo nodo : astParser) {
+            if (nodo != null) {
+
+                Object resultado = nodo.ejecutar(tablaSimbolos, this.listadoErroresTotal);
+
+                if(resultado instanceof OnCompilacionError){
+                    throw new TiempoEjecucionException("Error en tiempo de ejecucion");
+                }
+
+                if (resultado instanceof Formulario) {
+                    codigoIntermedio.add((Formulario) resultado);
+                }
+                else if (resultado instanceof List) {
+                    codigoIntermedio.addAll((List<Formulario>) resultado);
+                }
+            }
+        }
+
+        //Pendiente
+        return "";
     }
 
     /*Metodo utilizado para ejecutar pasadas*/

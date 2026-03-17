@@ -1,12 +1,15 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.moduloscodigo.ciclos;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.Simbolo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa al ciclo for pero modificado. Tal como el que tiene kotlin de un rango a hacia b
@@ -86,21 +89,40 @@ public class NodoForPorRango extends Nodo {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
-        double inicio = ((Number) rangoInicial.ejecutar(tabla, listaErrores)).doubleValue();
-        double fin = ((Number) rangoFinal.ejecutar(tabla, listaErrores)).doubleValue();
+        Object resultadoInicio = rangoInicial.ejecutar(tabla, listaErrores);
+        if (resultadoInicio instanceof OnCompilacionError) return resultadoInicio;
+
+        Object resultadoFin = rangoFinal.ejecutar(tabla, listaErrores);
+        if (resultadoFin instanceof OnCompilacionError) return resultadoFin;
+
+        double inicio = ((Number) resultadoInicio).doubleValue();
+        double fin = ((Number) resultadoFin).doubleValue();
+
 
         tabla.insertar(new Simbolo(id, TipoVariable.NUMBER, inicio, getLinea(), getColumna()));
+
+        List<Formulario> componentesAcumulados = new ArrayList<>();
 
         double i = inicio;
 
         while (i <= fin) {
             tabla.asignar(id, i, listaErrores);
             for (Nodo nodo : codigo) {
-                nodo.ejecutar(tabla, listaErrores);
+
+                Object resultado = nodo.ejecutar(tabla, listaErrores);
+                if (resultado instanceof OnCompilacionError) {
+                    return resultado;
+                }
+
+                if (resultado instanceof Formulario) {
+                    componentesAcumulados.add((Formulario) resultado);
+                } else if (resultado instanceof List) {
+                    componentesAcumulados.addAll((List<Formulario>) resultado);
+                }
             }
             i = ((Number) tabla.buscar(id).getValor()).doubleValue() + 1;
         }
-        return null;
+        return componentesAcumulados;
     }
 
     /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
