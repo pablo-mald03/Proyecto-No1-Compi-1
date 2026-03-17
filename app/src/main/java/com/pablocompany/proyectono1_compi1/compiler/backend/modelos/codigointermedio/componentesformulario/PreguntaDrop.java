@@ -132,11 +132,12 @@ public class PreguntaDrop extends Formulario {
 
         if (this.estilos != null && this.estilos.tieneEstilos()) {
             estilosEtiquetaBasicos.append(">");
+            estilosEtiquetaBasicos.append("\n\n");
             estilosEtiquetaBasicos.append(this.estilos.crearEstilosBasicos());
-            estilosEtiquetaBasicos.append("\n");
-            estilosEtiquetaBasicos.append("</drop>");
+            estilosEtiquetaBasicos.append("\n\n");
+            estilosEtiquetaBasicos.append("</drop>\n\n");
         } else {
-            estilosEtiquetaBasicos.append("/>");
+            estilosEtiquetaBasicos.append("/>\n\n");
         }
 
         return estilosEtiquetaBasicos.toString();

@@ -121,11 +121,12 @@ public class PreguntaSelect extends Formulario {
 
         if (this.estilos != null && this.estilos.tieneEstilos()) {
             estilosEtiquetaBasicos.append(">");
+            estilosEtiquetaBasicos.append("\n\n");
             estilosEtiquetaBasicos.append(this.estilos.crearEstilosBasicos());
             estilosEtiquetaBasicos.append("\n");
-            estilosEtiquetaBasicos.append("</select>");
+            estilosEtiquetaBasicos.append("\n</select>\n\n");
         } else {
-            estilosEtiquetaBasicos.append("/>");
+            estilosEtiquetaBasicos.append("/>\n\n");
         }
 
         return estilosEtiquetaBasicos.toString();

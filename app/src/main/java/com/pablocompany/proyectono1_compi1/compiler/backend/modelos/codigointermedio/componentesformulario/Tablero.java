@@ -130,7 +130,7 @@ public class Tablero extends Formulario {
                 this.pointX = seccion.getPointX();
             }
             if(this.pointY== null){
-                this.pointY = seccion.getPointX();
+                this.pointY = seccion.getPointY();
             }
             if(this.width== null){
                 this.width = seccion.getWidth();
@@ -148,7 +148,7 @@ public class Tablero extends Formulario {
                 this.pointX = tablero.getPointX();
             }
             if(this.pointY== null){
-                this.pointY = tablero.getPointX();
+                this.pointY = tablero.getPointY();
             }
             if(this.width== null){
                 this.width = tablero.getWidth();
@@ -161,9 +161,65 @@ public class Tablero extends Formulario {
     }
 
 
-    //PENDIENTE
-    @Override
+    //Metodo que permite retornar la estructura de la tabla
     public String compilar() {
-        return "";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("<table>\n");
+        if (this.estilos != null && this.estilos.tieneEstilos()) {
+
+            stringBuilder.append("\n").append(this.estilos.crearEstilosLayout());
+
+            if (this.borde != null) {
+                stringBuilder.append("\n    ").append(this.borde.crearBorde());
+            }
+            stringBuilder.append("\n    </style>\n\n");
+        }
+
+        this.heredarEstilosAElementos();
+
+        stringBuilder.append("\n    <content>");
+
+        for (List<Formulario> fila : this.elementos) {
+            stringBuilder.append("\n\n        <line>\n");
+            for (Formulario componente : fila) {
+                stringBuilder.append("\n\n            <element>\n\n");
+                stringBuilder.append("                ").append(componente.compilar().replace("\n", "\n                "));
+                stringBuilder.append("\n\n            </element>");
+            }
+            stringBuilder.append("\n\n        </line>\n\n");
+        }
+
+        stringBuilder.append("\n    </content>\n\n");
+        stringBuilder.append("\n</table>\n\n");
+
+        return stringBuilder.toString();
+    }
+
+    // Metodo para calcular el maximo de columnas (la fila mas larga)
+    public int obtenerMaximoColumnas() {
+        int max = 0;
+        for (List<Formulario> fila : elementos) {
+            if (fila.size() > max) {
+                max = fila.size();
+            }
+        }
+        return max;
+    }
+
+    public int obtenerCantidadFilas() {
+        return elementos != null ? elementos.size() : 0;
+    }
+
+    // Nueva versión del procesador de herencia para Tablero
+    private void heredarEstilosAElementos() {
+        if (this.elementos == null) return;
+
+        for (List<Formulario> fila : this.elementos) {
+            for (Formulario componente : fila) {
+                componente.heredarEstilos(this.estilos, this);
+                componente.heredarConfiguraciones(this);
+            }
+        }
     }
 }

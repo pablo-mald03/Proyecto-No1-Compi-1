@@ -85,7 +85,7 @@ public class EstilosComponent {
         StringBuilder estilos = new StringBuilder();
 
         estilos.append("    <style>");
-        estilos.append("\n");
+        estilos.append("\n\n");
         if(this.color != null){
             estilos.append("        <color=");
             estilos.append(this.color);
@@ -114,45 +114,28 @@ public class EstilosComponent {
             estilos.append("\n");
         }
 
-        estilos.append("    </style>");
+        estilos.append("\n\n    </style>");
 
         return estilos.toString();
     }
 
 
-    //---Metodo que permite crear los estilos basicos de las preguntas o textos------
-    public String crearEstilosLayout(){
-
+    //---Metodo que permite crear los estilos basicos de las secciones o tablas------
+    public String crearEstilosLayout() {
         StringBuilder estilos = new StringBuilder();
+        estilos.append("\n\n    <style>\n");
 
-        estilos.append("    <style>");
-        estilos.append("\n");
-        if(this.color != null){
-            estilos.append("        <color=");
-            estilos.append(this.color);
-            estilos.append("/>");
-            estilos.append("\n");
+        if (this.color != null) {
+            estilos.append("\n        <color=").append(this.color).append("/>");
         }
-
-        if(this.backgroundColor != null){
-            estilos.append("        <background color=");
-            estilos.append(this.backgroundColor);
-            estilos.append("/>");
-            estilos.append("\n");
+        if (this.backgroundColor != null) {
+            estilos.append("\n        <background color=").append(this.backgroundColor).append("/>");
         }
-
-        if(this.fontFamily != null){
-            estilos.append("        <font family=");
-            estilos.append(this.fontFamily.toString());
-            estilos.append("/>");
-            estilos.append("\n");
+        if (this.fontFamily != null) {
+            estilos.append("\n        <font family=").append(this.fontFamily).append("/>");
         }
-
-        if(this.textSize != null){
-            estilos.append("        <text size=");
-            estilos.append(this.textSize.toString());
-            estilos.append(">");
-            estilos.append("\n");
+        if (this.textSize != null) {
+            estilos.append("\n        <text size=").append(this.textSize).append(">");
         }
 
         return estilos.toString();

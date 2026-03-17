@@ -112,7 +112,7 @@ public class AnalizadorSemantico {
         StringBuilder codigoIntermedioBuilder = new StringBuilder();
         for (Formulario formulario : codigoIntermedio){
             codigoIntermedioBuilder.append(formulario.compilar());
-
+            codigoIntermedioBuilder.append("\n");
         }
 
         return codigoIntermedioBuilder.toString();

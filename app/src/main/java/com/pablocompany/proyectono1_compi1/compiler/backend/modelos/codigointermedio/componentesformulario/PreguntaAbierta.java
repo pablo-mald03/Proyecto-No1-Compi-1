@@ -89,11 +89,13 @@ public class PreguntaAbierta extends Formulario {
         estilosEtiquetaBasicos.append(this.height != null ? this.height : "-1").append(",");
         estilosEtiquetaBasicos.append("\"").append(this.label).append("\"");
 
+
         if (this.estilos != null && this.estilos.tieneEstilos()) {
             estilosEtiquetaBasicos.append(">");
+            estilosEtiquetaBasicos.append("\n\n");
             estilosEtiquetaBasicos.append(this.estilos.crearEstilosBasicos());
-            estilosEtiquetaBasicos.append("\n");
-            estilosEtiquetaBasicos.append("</open>");
+            estilosEtiquetaBasicos.append("\n\n");
+            estilosEtiquetaBasicos.append("</open>\n\n");
         } else {
             estilosEtiquetaBasicos.append("/>");
         }

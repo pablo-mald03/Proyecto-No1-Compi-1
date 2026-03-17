@@ -81,12 +81,12 @@ public class TextoPlano extends Formulario {
         estilosEtiquetaBasicos.append("\"").append(this.texto).append("\"");
 
         if (this.estilos != null && this.estilos.tieneEstilos()) {
-            estilosEtiquetaBasicos.append(">");
+            estilosEtiquetaBasicos.append(">\n\n");
             estilosEtiquetaBasicos.append(this.estilos.crearEstilosBasicos());
-            estilosEtiquetaBasicos.append("\n");
+            estilosEtiquetaBasicos.append("\n\n");
             estilosEtiquetaBasicos.append("</open>");
         } else {
-            estilosEtiquetaBasicos.append("/>");
+            estilosEtiquetaBasicos.append("/>\n\n");
         }
 
         return estilosEtiquetaBasicos.toString();

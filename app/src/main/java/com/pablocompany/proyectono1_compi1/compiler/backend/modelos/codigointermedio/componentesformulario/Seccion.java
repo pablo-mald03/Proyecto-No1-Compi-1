@@ -112,51 +112,33 @@ public class Seccion extends Formulario {
         estilosEtiquetaBasicos.append(this.height != null ? this.height : "-1").append(",");
         estilosEtiquetaBasicos.append(this.pointX != null ? this.pointX : "-1").append(",");
         estilosEtiquetaBasicos.append(this.pointY != null ? this.pointY : "-1").append(",");
-        estilosEtiquetaBasicos.append(this.orientacion.toString());
+        estilosEtiquetaBasicos.append(this.orientacion != null ? this.orientacion : "VERTICAL");
 
         estilosEtiquetaBasicos.append(">");
 
         if (this.estilos != null && this.estilos.tieneEstilos()) {
-            estilosEtiquetaBasicos.append(">");
-            estilosEtiquetaBasicos.append(this.estilos.crearEstilosBasicos());
+            estilosEtiquetaBasicos.append("\n\n").append(this.estilos.crearEstilosLayout());
 
             if (this.borde != null) {
-                estilosEtiquetaBasicos.append(this.borde.crearBorde());
+                estilosEtiquetaBasicos.append("\n   ").append(this.borde.crearBorde());
             }
 
-            estilosEtiquetaBasicos.append("    </style>");
-        } else {
-            estilosEtiquetaBasicos.append("/>");
+            estilosEtiquetaBasicos.append("\n\n    </style>\n\n");
         }
 
         this.heredarEstilosComponentes();
 
-       /* if (this.opciones != null) {
-            estilosEtiquetaBasicos.append("{");
-            for (int i = 0; i < this.opciones.size(); i++) {
-                estilosEtiquetaBasicos.append("\"").append(this.opciones.get(i)).append("\"");
-                if (i < this.opciones.size() - 1) {
-                    estilosEtiquetaBasicos.append(",");
-                }
-            }
-            estilosEtiquetaBasicos.append("}");
-            estilosEtiquetaBasicos.append(",");
+        estilosEtiquetaBasicos.append("\n");
+
+        estilosEtiquetaBasicos.append("     <content>\n\n");
+
+        for (Formulario formulario : this.elementos) {
+            estilosEtiquetaBasicos.append("        ").append(formulario.compilar()).append("\n");
         }
 
-        if (this.respuestasCorrectas != null) {
-            estilosEtiquetaBasicos.append("{");
-            for (int i = 0; i < this.respuestasCorrectas.size(); i++) {
-                estilosEtiquetaBasicos.append("\"").append(this.respuestasCorrectas.get(i)).append("\"");
-                if (i < this.respuestasCorrectas.size() - 1) {
-                    estilosEtiquetaBasicos.append(",");
-                }
-            }
-            estilosEtiquetaBasicos.append("}");
-        } else {
-            estilosEtiquetaBasicos.append("{}");
-        }*/
+        estilosEtiquetaBasicos.append("     </content>\n");
 
-
+        estilosEtiquetaBasicos.append("</section>\n\n");
         return estilosEtiquetaBasicos.toString();
     }
 
@@ -198,7 +180,7 @@ public class Seccion extends Formulario {
     private void heredarEstilosComponentes() {
         for (Formulario formulario : this.elementos) {
             pasarHerencia(formulario);
-
+            pasarHerenciaConfiguraciones(formulario);
         }
     }
 
@@ -265,7 +247,7 @@ public class Seccion extends Formulario {
                 this.pointX = seccion.getPointX();
             }
             if(this.pointY== null){
-                this.pointY = seccion.getPointX();
+                this.pointY = seccion.getPointY();
             }
             if(this.width== null){
                 this.width = seccion.getWidth();
@@ -286,7 +268,7 @@ public class Seccion extends Formulario {
                 this.pointX = tablero.getPointX();
             }
             if(this.pointY== null){
-                this.pointY = tablero.getPointX();
+                this.pointY = tablero.getPointY();
             }
             if(this.width== null){
                 this.width = tablero.getWidth();
@@ -295,8 +277,6 @@ public class Seccion extends Formulario {
                 this.height = tablero.getHeight();
             }
         }
-
-
 
     }
 
