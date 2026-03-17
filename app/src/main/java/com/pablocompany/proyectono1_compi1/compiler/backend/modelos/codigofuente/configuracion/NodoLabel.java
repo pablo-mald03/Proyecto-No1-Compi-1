@@ -73,6 +73,11 @@ public class NodoLabel extends Nodo {
         return resultado;
     }
 
+    //Metodo que permite clonar a la instancia de label
+    public NodoLabel clonar() {
+        return new NodoLabel(this.expresion.clonar(), getLinea(), getColumna());
+    }
+
     //Metodo que retorna la configuracion que es
     @Override
     public String getString() {

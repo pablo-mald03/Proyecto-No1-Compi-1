@@ -35,6 +35,12 @@ public class NodoHexColor extends NodoColor {
         return String.format("%s", color != null ? color : "#000000");
     }
 
+    //Metodo que permite clonar el color
+    @Override
+    public NodoColor clonar() {
+        return new NodoHexColor(this.color, getLinea(), getColumna());
+    }
+
     //Metodo que permite obtener el color especificado en la expresion
     @Override
     public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

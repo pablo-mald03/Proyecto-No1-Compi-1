@@ -83,6 +83,11 @@ public class NodoHeight extends Nodo implements ValidarDatosForms {
         return resultado;
     }
 
+    //Metodo que permite clonar a la instancia de width
+    public NodoHeight clonar() {
+        return new NodoHeight(this.expresion.clonar(), getLinea(), getColumna());
+    }
+
     //Metodo que retorna la configuracion que es
     @Override
     public String getString() {

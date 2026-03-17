@@ -17,4 +17,7 @@ public abstract class NodoExpresion extends Nodo {
     //Metodo que permite validar si tiene comodines
     public abstract int contarComodines();
 
+    //Metodo que permite clonar a la expresion
+    public abstract NodoExpresion clonar();
+
 }

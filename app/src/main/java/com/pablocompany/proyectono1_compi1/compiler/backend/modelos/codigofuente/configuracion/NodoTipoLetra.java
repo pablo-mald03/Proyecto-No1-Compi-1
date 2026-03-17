@@ -39,6 +39,11 @@ public class NodoTipoLetra extends Nodo {
         return TipoVariable.VOID;
     }
 
+    //Metodo que permite clonar
+    public NodoTipoLetra clonar() {
+        return new NodoTipoLetra(this.letraTipo.toString(), getLinea(), getColumna());
+    }
+
     //Metodo que permite ejecutar la expresion que esta dentro del nodo de configuracion (PENDIENTE)
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

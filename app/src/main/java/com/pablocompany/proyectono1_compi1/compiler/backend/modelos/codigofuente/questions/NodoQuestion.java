@@ -13,6 +13,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.questiontipos.NodoOpenQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -93,6 +94,9 @@ public abstract class NodoQuestion extends NodoComponente {
             if (hslColor.getGreen() != null) hslColor.getGreen().buscarComodines(listaTotal);
         }
     }
+
+    //Metodo que permite generar una deep copy de las preguntas
+    public abstract NodoQuestion clonar();
 
 
     //Metodo que permite validar si tiene comodines la question

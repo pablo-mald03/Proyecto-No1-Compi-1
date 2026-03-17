@@ -73,4 +73,11 @@ public class NodoMenosUnario extends NodoExpresion {
     public int contarComodines() {
         return this.expresion.contarComodines();
     }
+
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        return new NodoMenosUnario(this.expresion.clonar(), getLinea(), getColumna());
+    }
+
 }

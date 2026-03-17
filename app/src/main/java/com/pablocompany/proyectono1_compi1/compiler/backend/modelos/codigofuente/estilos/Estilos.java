@@ -28,6 +28,10 @@ public class Estilos {
         this.textSize = textSize;
     }
 
+    public Estilos() {
+
+    }
+
     //Metodo que permite generar la bifurcacion de codigo que permite validar la aceptacion de comodines en los estilos de questions
     /*Rechaza comodines en SECTIONS Y TABLES*/
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
@@ -186,6 +190,16 @@ public class Estilos {
         return contador;
     }
 
+    //Metodo que permite clonar
+    public Estilos clonar() {
+        Estilos clon = new Estilos();
+
+        clon.backgroundColor = (this.backgroundColor != null) ? this.backgroundColor.clonar() : null;
+        clon.color = (this.color != null) ? this.color.clonar() : null;
+        clon.fontFamily = (this.fontFamily != null) ? this.fontFamily.clonar() : null;
+        clon.textSize = (this.textSize != null) ? this.textSize.clonar() : null;
+        return clon;
+    }
 
 
 }

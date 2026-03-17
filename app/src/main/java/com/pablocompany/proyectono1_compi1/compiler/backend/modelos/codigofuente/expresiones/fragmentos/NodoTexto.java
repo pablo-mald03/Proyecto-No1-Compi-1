@@ -29,6 +29,12 @@ public class NodoTexto extends NodoFragmento{
         return this;
     }
 
+    //Metodo que permite clonar el nodo
+    @Override
+    public NodoFragmento clonar() {
+        return new NodoTexto(this.contenido, getLinea(), getColumna());
+    }
+
     //Metodo que permite obtener como texto el contenido de la cadena
     @Override
     public String getString() {

@@ -61,6 +61,14 @@ public class NodoPresetColor extends NodoColor {
         }
     }
 
+
+    //Metodo que permite clonar el color
+    @Override
+    public NodoColor clonar() {
+        return new NodoPresetColor(this.colorPreset.toString(), getLinea(), getColumna());
+    }
+
+
     //Metodo que permite retornar los valores del color en formato String
     @Override
     public  String getString(){

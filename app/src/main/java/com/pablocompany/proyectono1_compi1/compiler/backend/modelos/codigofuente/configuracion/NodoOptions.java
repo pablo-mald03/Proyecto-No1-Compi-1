@@ -138,5 +138,22 @@ public class NodoOptions extends Nodo {
         return contadorComodines;
     }
 
+   //Metodo que permite clonar a una instancia de clase nodo options
+    public NodoOptions clonar() {
+        List<Nodo> nuevasOpciones = new ArrayList<>();
+
+        if (this.opciones != null) {
+            for (Nodo opcion : this.opciones) {
+                if (opcion instanceof NodoExpresion) {
+                    nuevasOpciones.add(((NodoExpresion) opcion).clonar());
+                } else {
+                    nuevasOpciones.add(opcion);
+                }
+            }
+        }
+
+        return new NodoOptions(nuevasOpciones, getLinea(), getColumna());
+    }
+
 }
 

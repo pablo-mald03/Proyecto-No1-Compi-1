@@ -142,6 +142,14 @@ public class NodoFuncionPokemon extends Nodo {
         return listaNodos;
     }
 
+    //Metodo que permite clonar a una instancia de clase nodo funcion pokemon
+    public NodoFuncionPokemon clonar() {
+        NodoExpresion offsetClon = (this.offset != null) ? this.offset.clonar() : null;
+        NodoExpresion limitClon = (this.limit != null) ? this.limit.clonar() : null;
+
+        return new NodoFuncionPokemon(offsetClon, limitClon, getLinea(), getColumna());
+    }
+
     @Override
     public String getString() {
         return "who_is_that_pokemon(NUMBER,"+ this.offset.getString() + "," + this.limit.getString() + ")";

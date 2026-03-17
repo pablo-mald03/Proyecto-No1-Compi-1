@@ -64,4 +64,11 @@ public class NodoAccesoVariable extends NodoExpresion {
     public String getString() {
         return this.id;
     }
+
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        return new NodoAccesoVariable(this.id, getLinea(), getColumna());
+    }
+
 }

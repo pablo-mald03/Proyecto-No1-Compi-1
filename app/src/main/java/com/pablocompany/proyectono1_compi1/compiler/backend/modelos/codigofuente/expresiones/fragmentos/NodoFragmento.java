@@ -9,5 +9,9 @@ public abstract class NodoFragmento extends Nodo {
         super(linea, columna);
     }
 
+
+    //Metodo que permite clonar el nodo
+    public abstract NodoFragmento clonar() ;
+
 }
 /*Created by P*/

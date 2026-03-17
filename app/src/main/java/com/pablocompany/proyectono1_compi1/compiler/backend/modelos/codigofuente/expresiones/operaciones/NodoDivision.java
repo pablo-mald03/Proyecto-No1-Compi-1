@@ -47,6 +47,12 @@ public class NodoDivision extends NodoExpresion {
         return TipoVariable.ERROR;
     }
 
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        return new NodoDivision(this.izquierda.clonar(), this.derecha.clonar(), getLinea(), getColumna());
+    }
+
     //Metodo que permite buscar comodines de forma recursiva en las expresiones
     @Override
     public void buscarComodines(List<NodoComodin> listaComodines){

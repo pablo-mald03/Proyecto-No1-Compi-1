@@ -430,9 +430,33 @@ public class NodoDropQuestion extends NodoQuestion {
         return new PreguntaDrop(alto, ancho,labelCalculado, listaOpciones, indiceCorrecto, estilosObjeto, getLinea(), getColumna());
     }
 
+    /*Metodo propio que permite clonar a una intancia de clase nodo drop question*/
+    public NodoQuestion clonar(){
+        NodoDropQuestion clon = new NodoDropQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
+
+        clon.width = (this.width != null) ? this.width.clonar() : null;
+        clon.height = (this.height != null) ? this.height.clonar() : null;
+        clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
+        clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
+
+        if (this.funcionPokemon instanceof NodoFuncionPokemon) {
+            clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();
+        } else {
+            clon.funcionPokemon = this.funcionPokemon;
+        }
+
+        if (this.respuestaCorrecta instanceof NodoExpresion) {
+            clon.respuestaCorrecta = ((NodoExpresion) this.respuestaCorrecta).clonar();
+        } else {
+            clon.respuestaCorrecta = this.respuestaCorrecta;
+        }
+
+        return clon;
+    }
+
     /*--Metodo utilizado para Reportar error--*/
     private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
-        listaErrores.add(new ErrorAnalisis(this.opciones.getString(), "Semantico",
+        listaErrores.add(new ErrorAnalisis("DROP_QUESTION", "Semantico",
                 mensaje, linea, columna));
         return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
     }

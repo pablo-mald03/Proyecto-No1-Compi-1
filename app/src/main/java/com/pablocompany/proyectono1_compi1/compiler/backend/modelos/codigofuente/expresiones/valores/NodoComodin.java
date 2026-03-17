@@ -43,7 +43,6 @@ public class NodoComodin extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (this.expresion == null) {
-           // System.out.println("¡CRASH! Comodín vacío en L:" + getLinea() + " C:" + getColumna());
             return new OnCompilacionError("Comodín sin valor inyectado", getLinea(), getColumna(), true);
         }
 
@@ -85,6 +84,12 @@ public class NodoComodin extends NodoExpresion {
             return this.expresion.contarComodines();
         }
         return 1;
+    }
+
+    //Metodo que permite clonar a la expresion de comodin
+    @Override
+    public  NodoExpresion clonar(){
+        return new NodoComodin(getLinea(), getColumna());
     }
 
 

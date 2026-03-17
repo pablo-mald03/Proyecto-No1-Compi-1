@@ -58,6 +58,12 @@ public class NodoResta extends NodoExpresion {
         }
     }
 
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        return new NodoResta(this.izquierda.clonar(), this.derecha.clonar(), getLinea(), getColumna());
+    }
+
     //Metodo propio que permite contar la cantidad de comodines que tiene la expresion
     @Override
     public int contarComodines() {

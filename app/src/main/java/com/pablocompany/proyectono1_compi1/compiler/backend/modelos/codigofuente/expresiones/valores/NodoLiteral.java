@@ -45,6 +45,12 @@ public class NodoLiteral extends NodoExpresion {
         return this.valor;
     }
 
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        return new NodoLiteral(this.valor, getLinea(), getColumna());
+    }
+
     //Metodo que permite buscar comodines de forma recursiva en las expresiones
     @Override
     public void buscarComodines(List<NodoComodin> listaComodines){

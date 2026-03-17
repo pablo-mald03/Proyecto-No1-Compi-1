@@ -23,6 +23,11 @@ public class NodoEmoji extends NodoFragmento {
 
     }
 
+    //Metodo que permite setear la cantidad de veces que se repetira el emoji
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
+    }
+
     //Metodo que permite validar semantica del valor que tiene la cadena
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
@@ -63,8 +68,15 @@ public class NodoEmoji extends NodoFragmento {
     //Se retorna a si mismo para poderlo reconocerlo por su superClase NodoCadena (PENDIENTE)
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-
         return this;
+    }
+
+    //Metodo que permite clonar el nodo
+    @Override
+    public NodoFragmento clonar() {
+        NodoEmoji clon = new NodoEmoji(this.tipo, this.valorTexto, getLinea(), getColumna());
+        clon.setCantidad(this.cantidad);
+        return clon;
     }
 
     //Metodo que retorna el valor del emoji (como cadena de texto. Tambien contiempla la cantidad de veces que retornara el emoji multiEstrella)

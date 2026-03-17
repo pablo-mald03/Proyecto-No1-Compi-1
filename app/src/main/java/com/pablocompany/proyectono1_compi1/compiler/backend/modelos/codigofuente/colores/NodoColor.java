@@ -40,6 +40,9 @@ public abstract class NodoColor {
     /*--Metodo propio de la clase que permite contar los comodines que tienen en el color--*/
     public abstract int contarComodines();
 
+    //Metodo que permite clonar el color
+    public abstract NodoColor clonar();
+
 }
 
 /*Created by P*/

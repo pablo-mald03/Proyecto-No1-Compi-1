@@ -33,6 +33,7 @@ public class NodoOpenQuestion extends NodoQuestion {
     public NodoOpenQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
         this.setConfiguraciones(config);
+
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
@@ -265,6 +266,20 @@ public class NodoOpenQuestion extends NodoQuestion {
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
         return new PreguntaAbierta(alto, ancho, ( labelTexto != null)? labelTexto.toString():null, estilosObjeto, getLinea(), getColumna());
+    }
+
+
+    /*Metodo propio que permite clonar a una intancia de clase nodo open question*/
+    @Override
+    public  NodoQuestion clonar(){
+        NodoOpenQuestion clon = new NodoOpenQuestion(this.tipoVariable, null, new ArrayList<>(), getLinea(), getColumna());
+
+        clon.label = (this.label != null) ? this.label.clonar():null;
+        clon.width = (this.width != null) ? this.width.clonar() : null;
+        clon.height = (this.height != null) ? this.height.clonar() : null;
+        clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
+
+        return clon;
     }
 
     //Metodo que retorna la representacion base de la variable

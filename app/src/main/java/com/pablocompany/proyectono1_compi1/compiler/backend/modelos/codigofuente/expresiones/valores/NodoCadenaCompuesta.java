@@ -8,6 +8,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //Clase que representa una secuencia de cadenas de texto en conjungo a emojis o solo textos
@@ -64,6 +65,19 @@ public class NodoCadenaCompuesta extends NodoExpresion {
 
         }
         return stringBuilder.toString();
+    }
+
+
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        List<NodoFragmento> nuevosFragmentos = new ArrayList<>();
+        if (this.fragmentos != null) {
+            for (NodoFragmento frag : this.fragmentos) {
+                nuevosFragmentos.add(frag.clonar());
+            }
+        }
+        return new NodoCadenaCompuesta(nuevosFragmentos, getLinea(), getColumna());
     }
 
     //Permite retornar el valor del texto

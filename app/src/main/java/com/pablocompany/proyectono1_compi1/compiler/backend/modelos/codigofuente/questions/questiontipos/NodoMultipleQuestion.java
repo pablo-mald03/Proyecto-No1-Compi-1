@@ -465,10 +465,41 @@ public class NodoMultipleQuestion extends NodoQuestion {
         return indicesCorrectos;
     }
 
+    /*Metodo propio que permite clonar a una intancia de clase nodo multiple question*/
+    @Override
+    public  NodoQuestion clonar(){
+
+        NodoMultipleQuestion clon = new NodoMultipleQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
+
+        clon.width = (this.width != null) ? this.width.clonar() : null;
+        clon.height = (this.height != null) ? this.height.clonar() : null;
+        clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
+        clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
+
+        if (this.funcionPokemon instanceof NodoFuncionPokemon) {
+            clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();
+        } else {
+            clon.funcionPokemon = this.funcionPokemon;
+        }
+
+        if (this.respuestasCorrectas != null) {
+            clon.respuestasCorrectas = new ArrayList<>();
+            for (Nodo r : this.respuestasCorrectas) {
+                if (r instanceof NodoExpresion) {
+                    clon.respuestasCorrectas.add(((NodoExpresion) r).clonar());
+                } else {
+                    clon.respuestasCorrectas.add(r);
+                }
+            }
+        }
+
+        return clon;
+    }
+
 
     /*--Metodo utilizado para Reportar error--*/
     private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
-        listaErrores.add(new ErrorAnalisis(this.opciones.getString(), "Semantico",
+        listaErrores.add(new ErrorAnalisis("MULTIPLE_QUESTION", "Semantico",
                 mensaje,linea, columna ));
         return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
     }

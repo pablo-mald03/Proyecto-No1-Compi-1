@@ -204,23 +204,6 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         return TipoVariable.SPECIAL;
     }
-/*
-    public List<TipoVariable> obtenerTiposEsperados() {
-
-        List<TipoVariable> tipos = new ArrayList<>();
-
-        List<NodoComodin> comodines = obtenerParametrosComodines();
-
-        for (NodoComodin c : comodines) {
-
-            TipoVariable tipo = c.getTipoEsperado();
-
-            tipos.add(tipo);
-        }
-
-        return tipos;
-    }*/
-
 
     //Metodo que permite validar si tiene comodines la select question
     @Override
@@ -416,9 +399,34 @@ public class NodoSelectQuestion extends NodoQuestion {
         return new PreguntaSelect(alto, ancho, listaOpciones,indiceCorrecto, estilosObjeto, getLinea(), getColumna());
     }
 
+
+    /*Metodo propio que permite clonar a una intancia de clase nodo select question*/
+    @Override
+    public NodoQuestion clonar(){
+        NodoSelectQuestion clon = new NodoSelectQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
+
+        clon.width = (this.width != null) ? this.width.clonar() : null;
+        clon.height = (this.height != null) ? this.height.clonar() : null;
+        clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
+        clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
+
+        if (this.funcionPokemon instanceof NodoFuncionPokemon) {
+            clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();
+        } else {
+            clon.funcionPokemon = this.funcionPokemon;
+        }
+
+        if (this.respuestaCorrecta instanceof NodoExpresion) {
+            clon.respuestaCorrecta = ((NodoExpresion) this.respuestaCorrecta).clonar();
+        } else {
+            clon.respuestaCorrecta = this.respuestaCorrecta;
+        }
+        return clon;
+    }
+
     /*--Metodo utilizado para Reportar error--*/
     private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
-        listaErrores.add(new ErrorAnalisis(this.opciones.getString(), "Semantico",
+        listaErrores.add(new ErrorAnalisis("SELECT_QUESTION", "Semantico",
                 mensaje,linea, columna ));
         return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
     }

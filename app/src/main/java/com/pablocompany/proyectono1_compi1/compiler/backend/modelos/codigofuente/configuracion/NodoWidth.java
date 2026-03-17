@@ -80,6 +80,11 @@ public class NodoWidth extends Nodo implements ValidarDatosForms {
         return resultado;
     }
 
+    //Metodo que permite clonar a la instancia de width
+    public NodoWidth clonar() {
+        return new NodoWidth(this.expresion.clonar(), getLinea(), getColumna());
+    }
+
     //Metodo que retorna la configuracion que es
     @Override
     public String getString() {

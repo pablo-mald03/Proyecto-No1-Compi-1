@@ -98,6 +98,12 @@ public class NodoSuma extends NodoExpresion {
         }
     }
 
+    //Metodo que permite clonar la expresion
+    @Override
+    public NodoExpresion clonar() {
+        return new NodoSuma(this.izquierda.clonar(), this.derecha.clonar(), getLinea(), getColumna());
+    }
+
 
     //Metodo que permite obtener el string de la expresion
     @Override

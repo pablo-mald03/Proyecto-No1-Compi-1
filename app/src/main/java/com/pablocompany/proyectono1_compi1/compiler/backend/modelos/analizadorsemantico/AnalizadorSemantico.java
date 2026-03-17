@@ -49,12 +49,6 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        this.validarComodinesResueltos();
-
-        if (!this.listadoErroresTotal.isEmpty()) {
-            return "";
-        }
-
         //Metodo que ejecuta los requests a la API
         this.ejecutarRequests(tablaSimbolos);
 
@@ -117,30 +111,6 @@ public class AnalizadorSemantico {
 
         return codigoIntermedioBuilder.toString();
 
-    }
-
-    //Pendiente
-    private void validarComodinesResueltos() {
-
-        for (Nodo nodo : astParser) {
-
-            if (nodo instanceof NodoQuestion) {
-
-                NodoQuestion question = (NodoQuestion) nodo;
-
-                int pendientes = question.contarComodines();
-
-                if (pendientes > 0) {
-                    this.listadoErroresTotal.add(
-                            new ErrorAnalisis("Comodines","Semantico",
-                                    "La pregunta tiene comodines sin sustituir: " + pendientes,
-                                    question.getLinea(),
-                                    question.getColumna()
-                            )
-                    );
-                }
-            }
-        }
     }
 
     /*Metodo utilizado para ejecutar pasadas*/

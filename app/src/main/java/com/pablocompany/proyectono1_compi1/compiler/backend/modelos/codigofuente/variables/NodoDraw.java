@@ -63,38 +63,6 @@ public class NodoDraw extends NodoComponente {
             }
         }
 
-        //PENDIENTE
-/*
-        NodoQuestion q = (NodoQuestion) s.getValor();
-
-        List<TipoVariable> tiposEsperados = q.obtenerTiposEsperados();
-        List<Nodo> params = this.parametros;
-
-        for (int i = 0; i < params.size(); i++) {
-
-            Nodo param = params.get(i);
-
-            TipoVariable tipoParam = param.validarSemantica(tabla, listaErrores);
-
-            if (i < tiposEsperados.size()) {
-
-                TipoVariable esperado = tiposEsperados.get(i);
-
-                if (tipoParam != esperado) {
-                    listaErrores.add(new ErrorAnalisis(
-                            this.id,
-                            "Semantico",
-                            "Parametro " + (i+1) + " no coincide. Esperado: "
-                                    + esperado + " pero vino: " + tipoParam,
-                            getLinea(),
-                            getColumna()
-                    ));
-                }
-            }
-        }
-*/
-
-
         return TipoVariable.SPECIAL;
     }
 
@@ -104,7 +72,7 @@ public class NodoDraw extends NodoComponente {
         this.ejecutar(tabla, errores);
     }
 
-    /*METODO EJECUTADO PPARA INYECTAR LOS PARAMETROS A LOS COMODINES QUE ESTAN DENTRO DE LA FUNCION*/
+    /*METODO EJECUTADO PPARA INYECTAR LOS PARAMETROS A LOS COMODINES QUE ESTAN DENTRO DE LA FUNCION Y GENERAR EL DINAMISMO*/
 
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
@@ -119,8 +87,14 @@ public class NodoDraw extends NodoComponente {
             return new OnCompilacionError("Draw invalido", getLinea(), getColumna(), true);
         }
 
-        NodoQuestion nodoQuestion = (NodoQuestion) variable.getValor();
-        int comodines = nodoQuestion.contarComodines();
+        NodoQuestion plantilla = (NodoQuestion) variable.getValor();
+
+        for (Nodo param : this.parametros) {
+            param.validarSemantica(tabla, listaErrores);
+        }
+
+
+        int comodines = plantilla.contarComodines();
         int totalParametros = this.parametros.size();
 
         if (comodines != totalParametros) {
@@ -138,11 +112,13 @@ public class NodoDraw extends NodoComponente {
             return new OnCompilacionError("Mismatch de parametros", getLinea(), getColumna(), true);
         }
 
+        NodoQuestion instanciaClonada = plantilla.clonar();
+
         if (comodines > 0) {
-            nodoQuestion.inyectarParametros(this.parametros, listaErrores);
+            instanciaClonada.inyectarParametros(this.parametros, listaErrores);
         }
 
-        return null;
+        return instanciaClonada.ejecutar(tabla, listaErrores);
     }
 
 

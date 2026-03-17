@@ -133,6 +133,18 @@ public class NodoHslColor extends NodoColor {
 
     }
 
+    //Metodo que permite clonar el color
+    @Override
+    public NodoColor clonar() {
+
+        return new NodoHslColor(
+                this.red.clonar(),
+                this.green.clonar(),
+                this.blue.clonar(),
+                getLinea(), getColumna()
+        );
+    }
+
 
     //Metodo que permite retornar el color en formato RGB (util en frontend)
     @Override
