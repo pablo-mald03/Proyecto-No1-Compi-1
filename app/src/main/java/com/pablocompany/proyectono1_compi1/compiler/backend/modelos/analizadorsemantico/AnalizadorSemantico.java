@@ -74,7 +74,6 @@ public class AnalizadorSemantico {
     /*Metodo que permite retornar el codigo intermedio listo para la ultima fase de compilacion*/
     private String codigoIntermedio(TablaSimbolos tablaSimbolos) throws TiempoEjecucionException {
 
-        System.out.println("llega despues de codigo intermedio");
 
         List<Formulario> codigoIntermedio = new ArrayList<>();
         for (Nodo nodo : astParser) {
@@ -94,14 +93,30 @@ public class AnalizadorSemantico {
             }
         }
 
-        System.out.println("llega despues de codigo intermedio");
+        return retornarCodigo(tablaSimbolos,codigoIntermedio);
+    }
+
+
+    private String retornarCodigo(TablaSimbolos tabla, List<Formulario> codigoIntermedio){
+
+        int contadorSeciones = 0;
+        int contadorTablas = 0;
+        int contadorPregutnas= 0;
+
+        int contadorAbiertas = 0;
+        int contadorDesplegables = 0;
+        int contadorSeleccion = 0;
+        int contadorMultiples = 0;
+
 
         StringBuilder codigoIntermedioBuilder = new StringBuilder();
         for (Formulario formulario : codigoIntermedio){
             codigoIntermedioBuilder.append(formulario.compilar());
+
         }
 
         return codigoIntermedioBuilder.toString();
+
     }
 
     //Pendiente

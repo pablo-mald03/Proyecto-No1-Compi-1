@@ -273,6 +273,12 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
         EstilosComponent estilosObjeto = (EstilosComponent) estilosObjetoProcesados;
 
 
+        Object orientacionProcesada = (this.orientation != null) ? this.orientation.ejecutar(tabla, listaErrores) : null;
+
+        if (orientacionProcesada instanceof OnCompilacionError) return orientacionProcesada;
+
+        TipoOrientacion orientacion = (TipoOrientacion) orientacionProcesada;
+
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
         Number x = (pointXConfig instanceof Number) ? (Number) pointXConfig : 0;
@@ -282,7 +288,7 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
 
         EstiloBorde bordeFinal = (bordeResultado instanceof EstiloBorde) ? (EstiloBorde) bordeResultado : null;
 
-        return new Seccion(alto, ancho, x, y, listaFinal, estilosObjeto, bordeFinal, getLinea(), getColumna());
+        return new Seccion(alto, ancho, x, y,orientacion, listaFinal, estilosObjeto, bordeFinal, getLinea(), getColumna());
 
     }
 

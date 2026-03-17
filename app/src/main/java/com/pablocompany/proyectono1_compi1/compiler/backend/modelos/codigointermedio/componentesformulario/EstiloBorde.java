@@ -27,4 +27,20 @@ public class EstiloBorde {
     public String getColor() {
         return color;
     }
+
+    //Metodo que permite retornar el borde en codigo compilado
+    public String crearBorde(){
+        StringBuilder borde = new StringBuilder();
+
+        borde.append("      <border");
+        borde.append(",").append(this.grosor.toString());
+        borde.append(",");
+        borde.append(this.tipoBorde.toString());
+        borde.append(",");
+        borde.append("color=");
+        borde.append(this.color);
+        borde.append("/>");
+        return borde.toString();
+
+    }
 }

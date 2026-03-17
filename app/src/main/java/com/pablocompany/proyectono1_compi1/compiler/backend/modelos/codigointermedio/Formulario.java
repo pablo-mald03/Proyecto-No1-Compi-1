@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.componentesformulario.EstilosComponent;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
@@ -27,5 +28,11 @@ public abstract class Formulario {
 
     //Metodo que retorna el codigo compilado del formulario
     public abstract String compilar();
+
+    //Metodo que permite heredar los estilos
+    public abstract void heredarEstilos(EstilosComponent estilos,Formulario componente);
+
+    //Metodo utilizado para heredar las configuraciones
+    public abstract void heredarConfiguraciones(Formulario componente);
 
 }

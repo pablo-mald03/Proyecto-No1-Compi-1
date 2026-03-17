@@ -345,6 +345,9 @@ public class NodoDropQuestion extends NodoQuestion {
 
         if (widthResultado instanceof OnCompilacionError) return widthResultado;
 
+        Object labelResultado = (this.label != null) ? this.label.ejecutar(tabla, listaErrores) : null;
+        if(labelResultado instanceof  OnCompilacionError) return labelResultado;
+
         Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
 
         if (heightResultado instanceof OnCompilacionError) return heightResultado;
@@ -395,6 +398,9 @@ public class NodoDropQuestion extends NodoQuestion {
 
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
+
+        String labelCalculado = (labelResultado instanceof String) ? (String) labelResultado : null;
+
         List<String> listaOpciones = (List<String>) opcionesResultado;
 
         Integer indiceCorrecto = -1;
@@ -421,7 +427,7 @@ public class NodoDropQuestion extends NodoQuestion {
         }
 
 
-        return new PreguntaDrop(alto, ancho, listaOpciones, indiceCorrecto, estilosObjeto, getLinea(), getColumna());
+        return new PreguntaDrop(alto, ancho,labelCalculado, listaOpciones, indiceCorrecto, estilosObjeto, getLinea(), getColumna());
     }
 
     /*--Metodo utilizado para Reportar error--*/

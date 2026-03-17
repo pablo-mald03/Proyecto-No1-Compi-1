@@ -50,4 +50,113 @@ public class EstilosComponent {
     public void setTextSize(Number textSize) {
         this.textSize = textSize;
     }
+
+
+
+
+
+
+    /*Metodo que permite contar si el codigo tiene estilos (basicos)*/
+    public boolean tieneEstilos(){
+
+        if(this.backgroundColor != null){
+            return true;
+        }
+
+        if(this.textSize != null){
+            return true;
+        }
+
+        if(this.color != null){
+            return true;
+        }
+
+        if(this.fontFamily != null){
+            return true;
+        }
+
+        return false;
+    }
+
+
+    //---Metodo que permite crear los estilos basicos de las preguntas o textos------
+    public String crearEstilosBasicos(){
+
+        StringBuilder estilos = new StringBuilder();
+
+        estilos.append("    <style>");
+        estilos.append("\n");
+        if(this.color != null){
+            estilos.append("        <color=");
+            estilos.append(this.color);
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.backgroundColor != null){
+            estilos.append("        <background color=");
+            estilos.append(this.backgroundColor);
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.fontFamily != null){
+            estilos.append("        <font family=");
+            estilos.append(this.fontFamily.toString());
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.textSize != null){
+            estilos.append("        <text size=");
+            estilos.append(this.textSize.toString());
+            estilos.append(">");
+            estilos.append("\n");
+        }
+
+        estilos.append("    </style>");
+
+        return estilos.toString();
+    }
+
+
+    //---Metodo que permite crear los estilos basicos de las preguntas o textos------
+    public String crearEstilosLayout(){
+
+        StringBuilder estilos = new StringBuilder();
+
+        estilos.append("    <style>");
+        estilos.append("\n");
+        if(this.color != null){
+            estilos.append("        <color=");
+            estilos.append(this.color);
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.backgroundColor != null){
+            estilos.append("        <background color=");
+            estilos.append(this.backgroundColor);
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.fontFamily != null){
+            estilos.append("        <font family=");
+            estilos.append(this.fontFamily.toString());
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.textSize != null){
+            estilos.append("        <text size=");
+            estilos.append(this.textSize.toString());
+            estilos.append(">");
+            estilos.append("\n");
+        }
+
+        return estilos.toString();
+    }
+
+
 }
