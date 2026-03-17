@@ -81,6 +81,9 @@ public class NodoComodin extends NodoExpresion {
     //Retorna uno porque si es un comodin
     @Override
     public int contarComodines() {
+        if (this.expresion != null) {
+            return this.expresion.contarComodines();
+        }
         return 1;
     }
 

@@ -82,6 +82,16 @@ public class NodoFuncionPokemon extends Nodo {
         return iterador;
     }
 
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines) {
+        if (this.offset != null) {
+            this.offset.buscarComodines(listaComodines);
+        }
+        if (this.limit != null) {
+            this.limit.buscarComodines(listaComodines);
+        }
+    }
+
     //Metodo que permite ejecutar el request de a la API para poder obtener los pokemon
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

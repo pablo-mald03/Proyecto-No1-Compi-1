@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -37,6 +38,11 @@ public abstract class Nodo {
 
     //Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)
     public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
+
+    }
+
+    //Metodo que permite buscar comodines en las preguntas (SEGUNDA PASADA)
+    public void buscarComodines(List<NodoComodin> listaComodines) {
 
     }
 

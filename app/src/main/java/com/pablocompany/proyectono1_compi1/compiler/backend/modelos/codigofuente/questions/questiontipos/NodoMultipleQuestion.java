@@ -315,11 +315,8 @@ public class NodoMultipleQuestion extends NodoQuestion {
         }
 
 
-        if (this.funcionPokemon != null && this.funcionPokemon instanceof NodoFuncionPokemon) {
-            NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
-
-            if (funcionPokemon.getOffset() != null) funcionPokemon.getOffset().buscarComodines(parametrosPregunta);
-            if (funcionPokemon.getLimit() != null) funcionPokemon.getLimit().buscarComodines(parametrosPregunta);
+        if (this.funcionPokemon != null) {
+            this.funcionPokemon.buscarComodines(parametrosPregunta);
         }
 
         if (this.opciones != null) {

@@ -5,6 +5,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.TiempoEje
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.NodoComponente;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.interfacesmodules.NodoVisitante;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions.NodoQuestion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.NodoDraw;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigointermedio.Formulario;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -48,9 +49,7 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        for (Nodo nodo : astParser) {
-            if (nodo != null) nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
-        }
+        this.validarComodinesResueltos();
 
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
@@ -64,8 +63,6 @@ public class AnalizadorSemantico {
         }
 
         /*Metodo de compilacion del codigo*/
-
-        String codigoCompilado = "";
         try {
             return codigoIntermedio(tablaSimbolos);
 
@@ -76,6 +73,8 @@ public class AnalizadorSemantico {
 
     /*Metodo que permite retornar el codigo intermedio listo para la ultima fase de compilacion*/
     private String codigoIntermedio(TablaSimbolos tablaSimbolos) throws TiempoEjecucionException {
+
+        System.out.println("llega despues de codigo intermedio");
 
         List<Formulario> codigoIntermedio = new ArrayList<>();
         for (Nodo nodo : astParser) {
@@ -95,8 +94,38 @@ public class AnalizadorSemantico {
             }
         }
 
-        //Pendiente
-        return "";
+        System.out.println("llega despues de codigo intermedio");
+
+        StringBuilder codigoIntermedioBuilder = new StringBuilder();
+        for (Formulario formulario : codigoIntermedio){
+            codigoIntermedioBuilder.append(formulario.compilar());
+        }
+
+        return codigoIntermedioBuilder.toString();
+    }
+
+    //Pendiente
+    private void validarComodinesResueltos() {
+
+        for (Nodo nodo : astParser) {
+
+            if (nodo instanceof NodoQuestion) {
+
+                NodoQuestion question = (NodoQuestion) nodo;
+
+                int pendientes = question.contarComodines();
+
+                if (pendientes > 0) {
+                    this.listadoErroresTotal.add(
+                            new ErrorAnalisis("Comodines","Semantico",
+                                    "La pregunta tiene comodines sin sustituir: " + pendientes,
+                                    question.getLinea(),
+                                    question.getColumna()
+                            )
+                    );
+                }
+            }
+        }
     }
 
     /*Metodo utilizado para ejecutar pasadas*/

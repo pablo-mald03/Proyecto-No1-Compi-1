@@ -42,7 +42,7 @@ public class NodoDraw extends NodoComponente {
             return TipoVariable.ERROR;
         }
 
-        if (simbolo.getTipo() != TipoVariable.SPECIAL) {
+        if (!(simbolo.getValor() instanceof NodoQuestion)) {
 
             listaErrores.add(new ErrorAnalisis(id, "Semantico",
                     "La función \"draw\" solo puede usarse con tipos special. \"" + id + "\" es: " + simbolo.getTipo().toString(),
@@ -62,6 +62,38 @@ public class NodoDraw extends NodoComponente {
                 }
             }
         }
+
+        //PENDIENTE
+/*
+        NodoQuestion q = (NodoQuestion) s.getValor();
+
+        List<TipoVariable> tiposEsperados = q.obtenerTiposEsperados();
+        List<Nodo> params = this.parametros;
+
+        for (int i = 0; i < params.size(); i++) {
+
+            Nodo param = params.get(i);
+
+            TipoVariable tipoParam = param.validarSemantica(tabla, listaErrores);
+
+            if (i < tiposEsperados.size()) {
+
+                TipoVariable esperado = tiposEsperados.get(i);
+
+                if (tipoParam != esperado) {
+                    listaErrores.add(new ErrorAnalisis(
+                            this.id,
+                            "Semantico",
+                            "Parametro " + (i+1) + " no coincide. Esperado: "
+                                    + esperado + " pero vino: " + tipoParam,
+                            getLinea(),
+                            getColumna()
+                    ));
+                }
+            }
+        }
+*/
+
 
         return TipoVariable.SPECIAL;
     }

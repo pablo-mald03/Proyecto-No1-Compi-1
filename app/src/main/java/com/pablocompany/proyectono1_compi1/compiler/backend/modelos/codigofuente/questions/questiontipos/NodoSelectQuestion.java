@@ -204,6 +204,22 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         return TipoVariable.SPECIAL;
     }
+/*
+    public List<TipoVariable> obtenerTiposEsperados() {
+
+        List<TipoVariable> tipos = new ArrayList<>();
+
+        List<NodoComodin> comodines = obtenerParametrosComodines();
+
+        for (NodoComodin c : comodines) {
+
+            TipoVariable tipo = c.getTipoEsperado();
+
+            tipos.add(tipo);
+        }
+
+        return tipos;
+    }*/
 
 
     //Metodo que permite validar si tiene comodines la select question
@@ -283,11 +299,8 @@ public class NodoSelectQuestion extends NodoQuestion {
         }
 
 
-        if (this.funcionPokemon != null && this.funcionPokemon instanceof NodoFuncionPokemon) {
-            NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
-
-            if (funcionPokemon.getOffset() != null) funcionPokemon.getOffset().buscarComodines(parametrosPregunta);
-            if (funcionPokemon.getLimit() != null) funcionPokemon.getLimit().buscarComodines(parametrosPregunta);
+        if (this.funcionPokemon != null) {
+            this.funcionPokemon.buscarComodines(parametrosPregunta);
         }
 
         if (this.opciones != null) {

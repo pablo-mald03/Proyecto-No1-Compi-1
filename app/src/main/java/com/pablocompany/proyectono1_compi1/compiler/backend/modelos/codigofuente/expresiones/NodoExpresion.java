@@ -17,5 +17,4 @@ public abstract class NodoExpresion extends Nodo {
     //Metodo que permite validar si tiene comodines
     public abstract int contarComodines();
 
-    public abstract void buscarComodines(List<NodoComodin> listaComodines);
 }
