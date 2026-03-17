@@ -36,6 +36,11 @@ public abstract class NodoQuestion extends NodoComponente {
         this.id = id;
     }
 
+    //Metodo que permite retornar el id de la question
+    public String getId() {
+        return id;
+    }
+
     //Metodo que permite procesar los estilos que vienen en la configuracion
     @Override
     protected  Estilos procesarEstilos(List<NodoEstilos> lista) {

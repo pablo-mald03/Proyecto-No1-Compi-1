@@ -55,6 +55,7 @@ public class AnalizadorSemantico {
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
+        System.out.println("pasa toda la fase de pasadas");
 
         /*Metodo de compilacion del codigo*/
         try {
@@ -68,10 +69,17 @@ public class AnalizadorSemantico {
     /*Metodo que permite retornar el codigo intermedio listo para la ultima fase de compilacion*/
     private String codigoIntermedio(TablaSimbolos tablaSimbolos) throws TiempoEjecucionException {
 
+        System.out.println("Llega a codigo intermedio");
 
         List<Formulario> codigoIntermedio = new ArrayList<>();
         for (Nodo nodo : astParser) {
             if (nodo != null) {
+
+                if (nodo instanceof NodoQuestion) {
+                    if (((NodoQuestion) nodo).getId() != null) {
+                        continue;
+                    }
+                }
 
                 Object resultado = nodo.ejecutar(tablaSimbolos, this.listadoErroresTotal);
 
@@ -86,6 +94,8 @@ public class AnalizadorSemantico {
                 }
             }
         }
+
+        System.out.println("sale de codigo intermedio");
 
         return retornarCodigo(tablaSimbolos,codigoIntermedio);
     }

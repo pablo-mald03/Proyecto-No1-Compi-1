@@ -43,6 +43,7 @@ public class NodoComodin extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (this.expresion == null) {
+            listaErrores.add(new ErrorAnalisis("?", "Semantico","El valor de la expresion \"comodin\" no ha sido asignado",getLinea(), getColumna()));
             return new OnCompilacionError("Comodín sin valor inyectado", getLinea(), getColumna(), true);
         }
 

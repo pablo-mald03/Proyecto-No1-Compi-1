@@ -390,8 +390,10 @@ public class NodoSelectQuestion extends NodoQuestion {
                 return reportarError(listaErrores,"Valor numerico entero requerido", getLinea(), getColumna());
             }
 
-            if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
-                return reportarError(listaErrores,"La respuesta correcta esta fuera de los indices de las \"opciones\" disponibles",getLinea(), getColumna());
+            if (!listaOpciones.isEmpty()) {
+                if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
+                    return reportarError(listaErrores, "La respuesta correcta esta fuera de los indices de las \"opciones\" disponibles", getLinea(), getColumna());
+                }
             }
         }
 

@@ -454,8 +454,11 @@ public class NodoMultipleQuestion extends NodoQuestion {
                     return reportarError(listaErrores, "Índice múltiple debe ser un valor numérico", getLinea(), getColumna());
                 }
 
-                if (indiceActual < 0 || indiceActual >= listaOpciones.size()) {
-                    return reportarError(listaErrores, "Índice de respuesta (" + indiceActual + ") fuera de rango", getLinea(), getColumna());
+                if (!listaOpciones.isEmpty()) {
+
+                    if (indiceActual < 0 || indiceActual >= listaOpciones.size()) {
+                        return reportarError(listaErrores, "Índice de respuesta (" + indiceActual + ") fuera de rango", getLinea(), getColumna());
+                    }
                 }
 
                 indicesCorrectos.add(indiceActual);
