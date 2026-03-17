@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -55,6 +56,12 @@ public class NodoMenosUnario extends NodoExpresion {
         OnCompilacionError error = new OnCompilacionError("El operador unario solo se puede aplicar a valores tipo \"number\"", getLinea(), getColumna(), false);
         error.reportar(listaErrores, (this.expresion != null) ? this.expresion.getString() : "UNARIO");
         return error;
+    }
+
+    //Metodo que permite buscar comodines de forma recursiva en las expresiones
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines){
+        this.expresion.buscarComodines(listaComodines);
     }
 
     @Override

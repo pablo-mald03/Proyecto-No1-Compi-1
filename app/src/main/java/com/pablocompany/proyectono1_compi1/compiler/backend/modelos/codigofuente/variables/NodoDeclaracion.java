@@ -35,16 +35,27 @@ public class NodoDeclaracion extends Nodo {
         }
 
 
-        //Valores iniciales de la variable (Solicitado)
-        Object valorInicial = (this.tipo == TipoVariable.NUMBER) ? 0.0 : "";
 
-        Simbolo nuevoSimbolo = new Simbolo(id, this.tipo, valorInicial, getLinea(), getColumna());
-        boolean insertado = tabla.insertar(nuevoSimbolo);
 
-        if (!insertado) {
-            listaErrores.add(new ErrorAnalisis(id, "Semantico",
-                    "La variable \"" + id + "\" ya ha sido definida en el ambito.", getLinea(), getColumna()));
-            return TipoVariable.ERROR;
+        Simbolo existente = tabla.buscar(id);
+
+        if (existente == null) {
+            //Valores iniciales de la variable (Solicitado)
+            Object valorInicial = (this.tipo == TipoVariable.NUMBER) ? 0.0 : "";
+
+            Simbolo nuevoSimbolo = new Simbolo(id, this.tipo, valorInicial, getLinea(), getColumna());
+
+            if (!tabla.insertar(nuevoSimbolo)) {
+                listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                        "Error fatal al insertar la variable \"" + id + "\".", getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
+        } else {
+            if (existente.getLinea() != this.getLinea() || existente.getColumna() != this.getColumna()) {
+                listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                        "La variable \"" + id + "\" ya ha sido definida en este ambito.", getLinea(), getColumna()));
+                return TipoVariable.ERROR;
+            }
         }
 
 

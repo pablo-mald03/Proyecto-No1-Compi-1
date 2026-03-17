@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -42,6 +43,11 @@ public class NodoLiteral extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         return this.valor;
+    }
+
+    //Metodo que permite buscar comodines de forma recursiva en las expresiones
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines){
     }
 
     //Metodo que permite obtener el valor como cadena de texto

@@ -75,51 +75,25 @@ public abstract class NodoQuestion extends NodoComponente {
 
     }
     /*Metodo utilizado para retornar los valores Comodin de un color*/
-    protected List<NodoComodin> obtenerParametrosComodinesColor(NodoColor color) {
+    protected void recolectarComodinesColor(NodoColor color, List<NodoComodin> listaTotal) {
+        if (color == null) return;
 
-        List<NodoComodin> parametrosPregunta = new ArrayList<>();
-        NodoComodin comodinRed = null;
-        NodoComodin comodinGreen = null;
-        NodoComodin comodinBlue = null;
-
+        // Ya no usamos extraerValor, usamos buscarComodines() que definimos en NodoExpresion
         if (color instanceof NodoRgbColor) {
-
             NodoRgbColor rgbColor = (NodoRgbColor) color;
-            comodinRed = extraerValor(rgbColor.getRed());
-            comodinGreen = extraerValor(rgbColor.getGreen());
-            comodinBlue = extraerValor(rgbColor.getBlue());
+            if (rgbColor.getRed() != null) rgbColor.getRed().buscarComodines(listaTotal);
+            if (rgbColor.getGreen() != null) rgbColor.getGreen().buscarComodines(listaTotal);
+            if (rgbColor.getBlue() != null) rgbColor.getBlue().buscarComodines(listaTotal);
         }
-
-        if (color instanceof NodoHslColor) {
+        else if (color instanceof NodoHslColor) {
             NodoHslColor hslColor = (NodoHslColor) color;
-            comodinRed = extraerValor(hslColor.getRed());
-            comodinGreen = extraerValor(hslColor.getGreen());
-            comodinBlue = extraerValor(hslColor.getBlue());
+            // Asumiendo que HSL también tiene 3 expresiones (Hue, Sat, Lit)
+            if (hslColor.getRed() != null) hslColor.getRed().buscarComodines(listaTotal);
+            if (hslColor.getBlue() != null) hslColor.getBlue().buscarComodines(listaTotal);
+            if (hslColor.getGreen() != null) hslColor.getGreen().buscarComodines(listaTotal);
         }
-
-        if (comodinRed != null && comodinRed.getExpresion() == null) {
-            parametrosPregunta.add(comodinRed);
-        }
-        if (comodinGreen != null && comodinGreen.getExpresion() == null) {
-            parametrosPregunta.add(comodinGreen);
-        }
-        if (comodinBlue != null && comodinBlue.getExpresion() == null) {
-            parametrosPregunta.add(comodinBlue);
-        }
-
-        return parametrosPregunta;
     }
 
-    /*Metodo que sirve para poder volver a meter los parametros en la pregunta*/
-
-
-    /*Metodo delegado para extraer el valor de una expresion en dado caso lo sea*/
-    protected NodoComodin extraerValor(Nodo nodo) {
-        if (nodo instanceof NodoComodin) {
-            return (NodoComodin) nodo;
-        }
-        return null;
-    }
 
     //Metodo que permite validar si tiene comodines la question
     public abstract int contarComodines();

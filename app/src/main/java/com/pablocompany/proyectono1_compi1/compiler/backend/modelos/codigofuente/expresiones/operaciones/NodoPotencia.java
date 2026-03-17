@@ -1,7 +1,9 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.operaciones;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores.NodoComodin;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
@@ -43,6 +45,17 @@ public class  NodoPotencia extends NodoExpresion {
         }
 
         return TipoVariable.ERROR;
+    }
+
+    //Metodo que permite buscar comodines de forma recursiva en las expresiones
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines){
+        if (izquierda != null) {
+            izquierda.buscarComodines(listaComodines);
+        }
+        if (derecha != null) {
+            derecha.buscarComodines(listaComodines);
+        }
     }
 
     //Metodo propio que permite contar la cantidad de comodines que tiene la expresion

@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.valores;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.variables.TipoVariable;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.tablasimbolos.TablaSimbolos;
@@ -42,9 +43,10 @@ public class NodoComodin extends NodoExpresion {
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
         if (this.expresion == null) {
-            System.out.println("¡CRASH! Comodín vacío en L:" + getLinea() + " C:" + getColumna());
+           // System.out.println("¡CRASH! Comodín vacío en L:" + getLinea() + " C:" + getColumna());
             return new OnCompilacionError("Comodín sin valor inyectado", getLinea(), getColumna(), true);
         }
+
         return this.expresion.ejecutar(tabla, listaErrores);
     }
 
@@ -67,6 +69,13 @@ public class NodoComodin extends NodoExpresion {
         }
 
         return "?";
+    }
+
+
+    //Metodo que permite buscar comodines de forma recursiva en las expresiones
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines){
+        listaComodines.add(this);
     }
 
     //Retorna uno porque si es un comodin

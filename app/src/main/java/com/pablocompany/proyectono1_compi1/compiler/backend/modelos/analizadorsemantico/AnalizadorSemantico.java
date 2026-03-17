@@ -41,8 +41,6 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        tablaSimbolos = new TablaSimbolos(tablaSimbolos);
-
         //Metodo que agrega los comodines en su lugar
         this.agregarComodines(tablaSimbolos);
 
@@ -50,19 +48,16 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        tablaSimbolos = ejecutarPasadasAnalisis();
-
-        tablaSimbolos = new TablaSimbolos(tablaSimbolos);
-
-        //Metodo que ejecuta los requests a la API
-        this.ejecutarRequests(tablaSimbolos);
+        for (Nodo nodo : astParser) {
+            if (nodo != null) nodo.validarSemantica(tablaSimbolos, this.listadoErroresTotal);
+        }
 
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
         }
 
-        //Tabla de simbolos final
-        tablaSimbolos = ejecutarPasadasAnalisis();
+        //Metodo que ejecuta los requests a la API
+        this.ejecutarRequests(tablaSimbolos);
 
         if (!this.listadoErroresTotal.isEmpty()) {
             return "";
@@ -72,18 +67,15 @@ public class AnalizadorSemantico {
 
         String codigoCompilado = "";
         try {
-            codigoCompilado = codigoIntermedio(tablaSimbolos);
-
+            return codigoIntermedio(tablaSimbolos);
 
         } catch (TiempoEjecucionException e) {
             return "";
         }
-
-        return codigoCompilado;
     }
 
     /*Metodo que permite retornar el codigo intermedio listo para la ultima fase de compilacion*/
-    private String codigoIntermedio(TablaSimbolos tablaSimbolos ) throws TiempoEjecucionException {
+    private String codigoIntermedio(TablaSimbolos tablaSimbolos) throws TiempoEjecucionException {
 
         List<Formulario> codigoIntermedio = new ArrayList<>();
         for (Nodo nodo : astParser) {
@@ -91,14 +83,13 @@ public class AnalizadorSemantico {
 
                 Object resultado = nodo.ejecutar(tablaSimbolos, this.listadoErroresTotal);
 
-                if(resultado instanceof OnCompilacionError){
+                if (resultado instanceof OnCompilacionError) {
                     throw new TiempoEjecucionException("Error en tiempo de ejecucion");
                 }
 
                 if (resultado instanceof Formulario) {
                     codigoIntermedio.add((Formulario) resultado);
-                }
-                else if (resultado instanceof List) {
+                } else if (resultado instanceof List) {
                     codigoIntermedio.addAll((List<Formulario>) resultado);
                 }
             }
@@ -118,7 +109,7 @@ public class AnalizadorSemantico {
             }
         }
 
-        return  tablaSimbolos;
+        return tablaSimbolos;
     }
 
     /*---Metodo delegado para poner los comodines que estaban en la funcion draw----*/

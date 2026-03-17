@@ -133,11 +133,18 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         /*---Registrar y validar existencia---*/
         if (id != null) {
-            Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
-
-            if (!tabla.insertar(simbolo)) {
-                listaErrores.add(new ErrorAnalisis(id, "Semántico",
-                        "La variable \"" + id + "\" ya ha sido definida.", getLinea(), getColumna()));
+            Simbolo existente = tabla.buscar(id);
+            if (existente == null) {
+                Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
+                if (!tabla.insertar(simbolo)) {
+                    listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                            "Error al definir la variable \"" + id + "\".", getLinea(), getColumna()));
+                }
+            } else {
+                if (existente.getValor() != this) {
+                    listaErrores.add(new ErrorAnalisis(id, "Semantico",
+                            "La variable \"" + id + "\" ya ha sido definida en este ambito.", getLinea(), getColumna()));
+                }
             }
         }
         return TipoVariable.SPECIAL;
@@ -276,88 +283,19 @@ public class NodoMultipleQuestion extends NodoQuestion {
     /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
     public void inyectarParametros(List<Nodo> parametros, List<ErrorAnalisis> listaErrores) {
 
-        List<NodoComodin> parametrosPregunta = obtenerParametrosComodines();
+        List<NodoComodin> comodinesEncontrados = obtenerParametrosComodines();
 
-        if (parametrosPregunta.isEmpty()) {
+        if (comodinesEncontrados.isEmpty()) {
             return;
         }
 
-        for (int i = 0; i < parametrosPregunta.size(); i++) {
+        for (int i = 0; i < comodinesEncontrados.size() && i < parametros.size(); i++) {
 
-            NodoComodin comodin = parametrosPregunta.get(i);
-            Nodo parametro = parametros.get(i);
+            NodoComodin comodinReal = comodinesEncontrados.get(i);
+            Nodo valorEntrante = parametros.get(i);
 
-            if (parametro instanceof NodoExpresion) {
-                NodoExpresion comodinParametro = (NodoExpresion) parametro;
-                comodin.darValorIncognita(comodinParametro);
-            }
-        }
-        setearParametros(parametrosPregunta);
-
-    }
-
-
-    /*---Metodo utilizado para retornar la lista de parametros comodin en la pregunta----*/
-    private void setearParametros(List<NodoComodin> parametrosPregunta) {
-        int iterador = 0;
-
-        if (this.width != null) {
-            NodoComodin comodin = extraerValor(this.width.getExpresion());
-            if (comodin != null && comodin.getExpresion() == null && iterador < parametrosPregunta.size()) {
-                iterador = this.width.setExpresion(parametrosPregunta, iterador);
-            }
-        }
-
-        if (this.height != null) {
-            NodoComodin comodin = extraerValor(this.height.getExpresion());
-            if (comodin != null && comodin.getExpresion() == null && iterador < parametrosPregunta.size()) {
-                iterador = this.height.setExpresion(parametrosPregunta, iterador);
-            }
-        }
-
-
-        if (this.funcionPokemon != null && this.funcionPokemon instanceof NodoFuncionPokemon) {
-            NodoFuncionPokemon fp = (NodoFuncionPokemon) this.funcionPokemon;
-
-            NodoComodin cOffset = extraerValor(fp.getOffset());
-            if (cOffset != null && cOffset.getExpresion() == null && iterador < parametrosPregunta.size()) {
-                iterador = fp.setOffset(parametrosPregunta, iterador);
-            }
-
-            NodoComodin cLimit = extraerValor(fp.getLimit());
-            if (cLimit != null && cLimit.getExpresion() == null && iterador < parametrosPregunta.size()) {
-                iterador = fp.setLimit(parametrosPregunta, iterador);
-            }
-        }
-
-        if (this.opciones != null && iterador < parametrosPregunta.size()) {
-            iterador = this.opciones.setOpciones(parametrosPregunta, iterador);
-        }
-
-        if (this.respuestasCorrectas != null) {
-            for (Nodo nodo : this.respuestasCorrectas) {
-                if (nodo instanceof NodoCorrect) {
-                    NodoCorrect respuestaCorrecta = (NodoCorrect) nodo;
-                    NodoComodin comodin = extraerValor(respuestaCorrecta.getExpresion());
-                    if (comodin != null && comodin.getExpresion() == null && iterador < parametrosPregunta.size()) {
-                        iterador = respuestaCorrecta.setExpresion(parametrosPregunta, iterador);
-                    }
-                }
-            }
-        }
-
-        if (this.estilos != null) {
-            if (this.estilos.getBackgroundColor() != null && iterador < parametrosPregunta.size()) {
-                iterador = this.estilos.setBackgroundColor(parametrosPregunta, iterador);
-            }
-            if (this.estilos.getColor() != null && iterador < parametrosPregunta.size()) {
-                iterador = this.estilos.setColor(parametrosPregunta, iterador);
-            }
-            if (this.estilos.getTextSize() != null) {
-                NodoComodin comodin = extraerValor(this.estilos.getTextSize());
-                if (comodin != null && comodin.getExpresion() == null && iterador < parametrosPregunta.size()) {
-                    iterador = this.estilos.setTextSize(parametrosPregunta, iterador);
-                }
+            if (valorEntrante instanceof NodoExpresion) {
+                comodinReal.darValorIncognita((NodoExpresion) valorEntrante);
             }
         }
     }
@@ -368,46 +306,26 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         List<NodoComodin> parametrosPregunta = new ArrayList<>();
 
-        if (this.width != null) {
-            NodoComodin comodin = extraerValor(this.width.getExpresion());
-            if (comodin != null && comodin.getExpresion() == null) {
-                parametrosPregunta.add(comodin);
-            }
+        if (this.width != null && this.width.getExpresion() != null ) {
+            this.width.getExpresion().buscarComodines(parametrosPregunta);
         }
 
-        if (this.height != null) {
-            NodoComodin comodin = extraerValor(this.height.getExpresion());
-            if (comodin != null && comodin.getExpresion() == null) {
-                parametrosPregunta.add(comodin);
-            }
+        if (this.height != null && this.height.getExpresion() != null) {
+            this.height.getExpresion().buscarComodines(parametrosPregunta);
         }
 
 
         if (this.funcionPokemon != null && this.funcionPokemon instanceof NodoFuncionPokemon) {
             NodoFuncionPokemon funcionPokemon = (NodoFuncionPokemon) this.funcionPokemon;
 
-            NodoExpresion offset = funcionPokemon.getOffset();
-            NodoExpresion limit = funcionPokemon.getLimit();
-
-            NodoComodin comodinOffset = extraerValor(offset);
-            NodoComodin comodinLimit = extraerValor(limit);
-
-            if (comodinOffset != null && comodinOffset.getExpresion() == null) {
-                parametrosPregunta.add(comodinOffset);
-            }
-
-            if (comodinLimit != null && comodinLimit.getExpresion() == null) {
-                parametrosPregunta.add(comodinLimit);
-            }
+            if (funcionPokemon.getOffset() != null) funcionPokemon.getOffset().buscarComodines(parametrosPregunta);
+            if (funcionPokemon.getLimit() != null) funcionPokemon.getLimit().buscarComodines(parametrosPregunta);
         }
 
         if (this.opciones != null) {
-            List<Nodo> parametrosOpciones = this.opciones.getOpciones();
-
-            for (Nodo parametro : parametrosOpciones) {
-                NodoComodin comodin = extraerValor(parametro);
-                if (comodin != null && comodin.getExpresion() == null) {
-                    parametrosPregunta.add(comodin);
+            for (Nodo opcion : this.opciones.getOpciones()) {
+                if (opcion instanceof NodoExpresion) {
+                    ((NodoExpresion) opcion).buscarComodines(parametrosPregunta);
                 }
             }
         }
@@ -415,45 +333,21 @@ public class NodoMultipleQuestion extends NodoQuestion {
         if (this.respuestasCorrectas != null) {
             for (Nodo nodo : this.respuestasCorrectas) {
                 if (nodo instanceof NodoCorrect) {
-                    NodoCorrect respuesta = (NodoCorrect) nodo;
-                    NodoExpresion expresion = respuesta.getExpresion();
-                    NodoComodin comodin = extraerValor(expresion);
-                    if (comodin != null && comodin.getExpresion() == null) {
-                        parametrosPregunta.add(comodin);
-                    }
+                    NodoExpresion exp = ((NodoCorrect) nodo).getExpresion();
+                    if (exp != null) exp.buscarComodines(parametrosPregunta);
                 }
             }
         }
-
 
         if (this.estilos != null) {
-
-            if (this.estilos.getBackgroundColor() != null) {
-                NodoColor color = this.estilos.getBackgroundColor();
-
-                List<NodoComodin> comodinesColor = obtenerParametrosComodinesColor(color);
-
-                if (!comodinesColor.isEmpty()) {
-                    parametrosPregunta.addAll(comodinesColor);
-                }
-            }
-
-            if (this.estilos.getColor() != null) {
-                NodoColor color = this.estilos.getColor();
-                List<NodoComodin> comodinesColor = obtenerParametrosComodinesColor(color);
-                if (!comodinesColor.isEmpty()) {
-                    parametrosPregunta.addAll(comodinesColor);
-                }
-            }
+            recolectarComodinesColor(this.estilos.getBackgroundColor(), parametrosPregunta);
+            recolectarComodinesColor(this.estilos.getColor(), parametrosPregunta);
 
             if (this.estilos.getTextSize() != null) {
-                NodoExpresion expresion = this.estilos.getTextSize();
-                NodoComodin comodin = extraerValor(expresion);
-                if (comodin != null && comodin.getExpresion() == null) {
-                    parametrosPregunta.add(comodin);
-                }
+                this.estilos.getTextSize().buscarComodines(parametrosPregunta);
             }
         }
+
         return parametrosPregunta;
     }
 
