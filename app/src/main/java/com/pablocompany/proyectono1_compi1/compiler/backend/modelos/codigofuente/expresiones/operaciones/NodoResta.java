@@ -81,11 +81,13 @@ public class NodoResta extends NodoExpresion {
 
         if (valorDerecho instanceof OnCompilacionError) return valorDerecho;
 
-        if (valorIzquierdo instanceof Double && valorDerecho instanceof Double) {
-            return (Double) valorIzquierdo - (Double) valorDerecho;
-        }
-        else if (valorIzquierdo instanceof Integer && valorDerecho instanceof Integer) {
-            return (Integer) valorIzquierdo - (Integer) valorDerecho;
+        if (valorIzquierdo instanceof Number && valorDerecho instanceof Number) {
+
+            if (valorIzquierdo instanceof Integer && valorDerecho instanceof Integer) {
+                return (Integer) valorIzquierdo - (Integer) valorDerecho;
+            }
+
+            return ((Number) valorIzquierdo).doubleValue() - ((Number) valorDerecho).doubleValue();
         }
 
         listaErrores.add(new ErrorAnalisis(this.getString(), "OnCompilacionError", "Solo se pueden restar valores numericos", super.getLinea(), super.getColumna()));

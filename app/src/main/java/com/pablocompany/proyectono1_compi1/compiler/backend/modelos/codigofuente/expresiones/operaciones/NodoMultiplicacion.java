@@ -80,13 +80,13 @@ public class NodoMultiplicacion extends NodoExpresion {
 
         Object valorDerecho = derecha.ejecutar(tabla, listaErrores);
 
-        if (valorDerecho instanceof OnCompilacionError) return valorDerecho;
+        if (valorIzquierdo instanceof Number && valorDerecho instanceof Number) {
 
-        if (valorIzquierdo instanceof Double && valorDerecho instanceof Double) {
-            return (Double) valorIzquierdo * (Double) valorDerecho;
-        }
-        else if (valorIzquierdo instanceof Integer && valorDerecho instanceof Integer) {
-            return (Integer) valorIzquierdo * (Integer) valorDerecho;
+            if (valorIzquierdo instanceof Integer && valorDerecho instanceof Integer) {
+                return ((Number) valorIzquierdo).intValue() * ((Number) valorDerecho).intValue();
+            }
+
+            return ((Number) valorIzquierdo).doubleValue() * ((Number) valorDerecho).doubleValue();
         }
 
         listaErrores.add(new ErrorAnalisis(this.getString(), "OnCompilacionError", "Solo se pueden multiplicar valores numericos", super.getLinea(), super.getColumna()));

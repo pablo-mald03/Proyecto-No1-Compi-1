@@ -49,13 +49,6 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        //Metodo que ejecuta los requests a la API
-        this.ejecutarRequests(tablaSimbolos);
-
-        if (!this.listadoErroresTotal.isEmpty()) {
-            return "";
-        }
-        System.out.println("pasa toda la fase de pasadas");
 
         /*Metodo de compilacion del codigo*/
         try {

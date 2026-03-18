@@ -83,17 +83,15 @@ public class  NodoPotencia extends NodoExpresion {
         if (valorDerecho instanceof OnCompilacionError) return valorDerecho;
 
         if (valorIzquierdo instanceof Number && valorDerecho instanceof Number) {
-
             double base = ((Number) valorIzquierdo).doubleValue();
             double exponente = ((Number) valorDerecho).doubleValue();
-
             double resultado = Math.pow(base, exponente);
 
-            if (valorIzquierdo instanceof Integer && valorDerecho instanceof Integer) {
+            if (resultado == (int) resultado && resultado <= Integer.MAX_VALUE && resultado >= Integer.MIN_VALUE) {
                 return (int) resultado;
             }
-            return resultado;
 
+            return resultado;
         }
 
 

@@ -352,6 +352,15 @@ public class NodoDropQuestion extends NodoQuestion {
 
         if (heightResultado instanceof OnCompilacionError) return heightResultado;
 
+        if (this.funcionPokemon != null) {
+            Object resultadoPokemon = this.funcionPokemon.ejecutar(tabla, listaErrores);
+            if (resultadoPokemon instanceof OnCompilacionError) return resultadoPokemon;
+
+            if(resultadoPokemon instanceof List){
+                this.opciones = new NodoOptions((List<Nodo>) resultadoPokemon, getLinea(), getColumna());
+            }
+        }
+
         Object opcionesResultado = (this.opciones != null) ? this.opciones.ejecutar(tabla, listaErrores) : new ArrayList<String>();
         if (opcionesResultado instanceof OnCompilacionError) return opcionesResultado;
 
