@@ -1,10 +1,12 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
 import android.net.Uri
+import android.os.Build
 import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -56,11 +58,16 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
@@ -114,6 +121,9 @@ import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 //------METODO PRINCIPAL QUE PERMITE MOSTRAR LA PANTALLA DEL EDITOR DE TEXTO-------
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,6 +148,11 @@ fun EditorScreen(
     //Control del teclado
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
+
+    //Atributos de guardado (Codigo compilado)
+    var showMetadataDialog by remember { mutableStateOf(false) }
+    var nombreAutor by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
 
     LaunchedEffect(hayErrores) {
         if (hayErrores) {
@@ -248,10 +263,9 @@ fun EditorScreen(
     }
 
     //Permite sobreescribir el formulario
-    fun sobrescribirFormulario() {
+    fun sobrescribirFormulario(codigo: String) {
 
         val uri = sharedFormViewModel.currentFileUri ?: return
-        val codigo = codigoPendiente ?: return
 
         context.contentResolver
             .openOutputStream(uri, "wt")
@@ -282,14 +296,139 @@ fun EditorScreen(
 
             confirmButton = {
                 TextButton(
+
+                    onClick = {
+                        showSaveFormDialog = false
+                        showMetadataDialog = true
+                    }
+
+                ) {
+                    Text("Guardar")
+                }
+            },
+
+            dismissButton = {
+                TextButton(
                     onClick = {
 
                         showSaveFormDialog = false
-                        if (sharedFormViewModel.currentFileUri != null) {
-                            sobrescribirFormulario()
-                            navController.navigate("form")
 
+                        val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            .format(Date())
+
+                        val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault())
+                            .format(Date())
+
+                        val header = """
+###
+    Author: android-app
+    Fecha: $fechaActual
+    Hora: $horaActual
+    Descripcion: ...
+
+""".trimIndent() + "\n"
+
+                        codigoPendiente?.let {
+
+                            val codigoFinal = header + it
+
+                            sharedFormViewModel.loadTemporary(codigoFinal)
+                            navController.navigate("form")
+                        }
+                    }
+                ) {
+                    Text("No guardar")
+                }
+            }
+        )
+    }
+
+    /*Metodo para ponerle el autor*/
+    if (showMetadataDialog) {
+
+        AlertDialog(
+            onDismissRequest = { showMetadataDialog = false },
+            containerColor = Color(0xFF180321),
+            titleContentColor = Color.White,
+            textContentColor = Color(0xFFCCCCCC),
+
+            title = {
+                Text("Información del formulario")
+            },
+
+            text = {
+                Column {
+
+                    OutlinedTextField(
+                        value = nombreAutor,
+                        onValueChange = { nombreAutor = it },
+                        label = { Text("Nombre del autor") },
+                        textStyle = LocalTextStyle.current.copy(color = Color.White),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFFBB86FC),
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = Color(0xFFBB86FC),
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = Color(0xFFBB86FC)
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = descripcion,
+                        onValueChange = { descripcion = it },
+                        label = { Text("Descripción") },
+                        textStyle = LocalTextStyle.current.copy(color = Color.White),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color(0xFFBB86FC),
+                            unfocusedBorderColor = Color.Gray,
+                            focusedLabelColor = Color(0xFFBB86FC),
+                            unfocusedLabelColor = Color.Gray,
+                            cursorColor = Color(0xFFBB86FC)
+                        )
+                    )
+                }
+            },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+
+                        showMetadataDialog = false
+
+                        val nombreFinal =
+                            if (nombreAutor.isBlank()) "android-app" else nombreAutor
+
+                        val descripcionFinal =
+                            if (descripcion.isBlank()) "..." else descripcion
+
+                        val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            .format(Date())
+
+                        val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault())
+                            .format(Date())
+
+                        val header = """
+###
+    Author: $nombreFinal
+    Fecha: $fechaActual
+    Hora: $horaActual
+    Descripcion: "$descripcionFinal"
+    
+""".trimIndent() + "\n"
+
+                        val codigoFinal = header + (codigoPendiente ?: "")
+
+                        if (sharedFormViewModel.currentFileUri != null) {
+                            sobrescribirFormulario(codigoFinal)
+                            navController.navigate("form")
                         } else {
+                            codigoPendiente = codigoFinal
                             saveFormLauncher.launch("Formulario.pkm")
                         }
                     }
@@ -300,20 +439,15 @@ fun EditorScreen(
 
             dismissButton = {
                 TextButton(
-                    onClick = {
-                        showSaveFormDialog = false
-                        codigoPendiente?.let {
-
-                            sharedFormViewModel.loadTemporary(it)
-                            navController.navigate("form")
-                        }
-                    }
+                    onClick = { showMetadataDialog = false }
                 ) {
-                    Text("No guardar")
+                    Text("Cancelar")
                 }
             }
         )
     }
+
+
     //=======Variables para poder ver si hay cambios sin guardar=====
 
 

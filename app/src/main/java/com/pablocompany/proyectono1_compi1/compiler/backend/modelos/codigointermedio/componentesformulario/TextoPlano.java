@@ -73,7 +73,7 @@ public class TextoPlano extends Formulario {
     /*Metodo utilizado para contabilizar la cantidad de componentes del formulario*/
     @Override
     public void contarComponentes(Integer [] contadoresReporte){
-
+        contadoresReporte[6]++;
     }
 
     //Metodo que permite retornar el codigo compilado

@@ -94,14 +94,15 @@ public class AnalizadorSemantico {
     //Metodo delegado para correr el codigo intermedio y retornar el codigo compilado
     private String retornarCodigo(TablaSimbolos tabla, List<Formulario> codigoIntermedio){
 
-        Integer [] contadoresReporte  = {0, 0, 0, 0, 0, 0};
+        Integer [] contadoresReporte  = {0, 0, 0, 0, 0, 0,0};
         /*
         * position 0 -> Secciones
         * position 1 -> Preguntas
         * position 2 -> Abiertas
         * position 3 -> Drop
-        * position 4 -> Multiple
-        * position 5 -> Text
+        * position 4 -> Seleccion
+        * position 5 -> Multiple
+        * position 6 -> Textos
         * */
 
 
@@ -124,6 +125,7 @@ public class AnalizadorSemantico {
         reporte.append("        Desplegables: ").append(contadoresReporte[3]).append("\n");
         reporte.append("        Seleccion: ").append(contadoresReporte[4]).append("\n");
         reporte.append("        Multiples: ").append(contadoresReporte[5]).append("\n");
+        reporte.append("        Textos (Abiertos): ").append(contadoresReporte[6]).append("\n");
         reporte.append("###").append("\n\n");
 
         String codigoCompilado = codigoIntermedioBuilder.toString();
