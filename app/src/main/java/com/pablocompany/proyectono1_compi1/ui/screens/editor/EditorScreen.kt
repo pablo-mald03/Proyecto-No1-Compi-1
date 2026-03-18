@@ -1470,6 +1470,219 @@ fun TemplatePickerDialog(
                     modifier = Modifier.fillMaxWidth()
                 ){
 
+                    // ===== FUNCIONES SPECIAL =====
+                    TemplateDropdownButton(
+                        title = "COMPONENTES",
+                        options = listOf(
+
+                            "TEXTO" to {
+                                onTemplateSelected("""
+TEXT [
+    width: 1, ${'$'}opcional 
+    height: 1, ${'$'}opcional
+    content: "contenido"
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "OPEN QUESTION" to {
+                                onTemplateSelected("""
+OPEN_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+    label: "texto"
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "DROP QUESTION" to {
+                                onTemplateSelected("""
+DROP_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+    label: "texto",
+
+    options: {"primera", "segunda"},
+
+    correct: 0
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "SELECT QUESTION" to {
+                                onTemplateSelected("""
+SELECT_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+
+    options: {"primera", "segunda"},
+
+    correct: 0
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "MULTIPLE QUESTION" to {
+                                onTemplateSelected("""
+MULTIPLE_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+
+    options: {"primera", "segunda"},
+
+    correct: {0, 1}
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+
+                        )
+                    )
+
+                    // ===== LAYOUTS =====
+                    TemplateDropdownButton(
+                        title = "LAYOUTS",
+                        options = listOf(
+
+                            "SECTION" to {
+                                onTemplateSelected("""
+SECTION [
+    width: 1,    ${'$'}Opcional
+    height: 1,  ${'$'}Opcional
+    
+    pointX: 0,
+    pointY: 0,
+    
+    orientation: VERTICAL,  ${'$'}Opcional  
+    
+    elements: {
+        ${'$'}Elementos
+    }
+    
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "TABLE" to {
+                                onTemplateSelected("""
+TABLE [
+    width: 1, ${'$'}Opcional
+    height: 1, ${'$'}Opcional
+    
+    pointX: 1,
+    pointY: 1,
+    
+    orientation: VERTICAL,
+    
+    elements: {
+        [
+            {
+                ${'$'}Elemento
+            }
+        ]
+    }
+    
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+                        )
+                    )
+
+                    // ===== CONFIGURACIONES =====
+                    TemplateDropdownButton(
+                        title = "CONFIGURACIONES",
+                        options = listOf(
+
+                            "STYLES" to {
+                                onTemplateSelected("""
+    styles [
+        "color": #000000,
+        "background color": #000000,
+        "font family": MONO,
+        "text size": 1
+    ]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "COLOR" to {
+                                onTemplateSelected("""
+        "color": #000000
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "BACKGROUND COLOR" to {
+                                onTemplateSelected("""
+        "background color": #000000
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "FONT FAMILY" to {
+                                onTemplateSelected("""
+        "font family": MONO
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "TEXT SIZE" to {
+                                onTemplateSelected("""
+        "text size": 1
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "BORDER" to {
+                                onTemplateSelected("""
+        "border": (1, DOTTED, #000000)
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+                        )
+                    )
+
+                    // ===== CONDICIONALES =====
+                    TemplateDropdownButton(
+                        title = "CONDICIONALES",
+                        options = listOf(
+
+                            "IF" to {
+                                onTemplateSelected("""
+IF (condicion) {
+    ${'$'}Contenido
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "IF - ELSE" to {
+                                onTemplateSelected("""
+IF (condicion) {
+    ${'$'}Contenido
+} ELSE {
+    
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "ELSE" to {
+                                onTemplateSelected("""
+ELSE {
+    ${'$'}Contenido 
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "ELSE IF" to {
+                                onTemplateSelected("""
+ELSE IF (condicion){
+    ${'$'}Contenido 
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+                        )
+                    )
+
                     // ===== CICLOS =====
                     TemplateDropdownButton(
                         title = "CICLOS",
@@ -1513,164 +1726,54 @@ FOR (i in 1..5) {
                         )
                     )
 
-                    // ===== CONDICIONALES =====
+                    // ===== ELEMENTOS =====
                     TemplateDropdownButton(
-                        title = "CONDICIONALES",
+                        title = "ELEMENTOS",
                         options = listOf(
 
-                            "IF" to {
+                            "FILAS" to {
                                 onTemplateSelected("""
-IF (condicion) {
-    ${'$'}Contenido
-}
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-
-                            "IF - ELSE" to {
-                                onTemplateSelected("""
-IF (condicion) {
-    ${'$'}Contenido
-} ELSE {
-    
-}
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-                            "ELSE" to {
-                                onTemplateSelected("""
-ELSE {
-    ${'$'}Contenido 
-}
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-                            "ELSE" to {
-                                onTemplateSelected("""
-ELSE IF (condicion){
-    ${'$'}Contenido 
-}
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            }
-                        )
-                    )
-
-                    // ===== FUNCIONES SPECIAL =====
-                    TemplateDropdownButton(
-                                title = "COMPONENTES",
-                        options = listOf(
-
-                            "TEXTO" to {
-                                onTemplateSelected("""
-TEXT [
-    width: 1, ${'$'}opcional 
-    height: 1, ${'$'}opcional
-    content: "contenido"
-]
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-
-                            "OPEN QUESTION" to {
-                                onTemplateSelected("""
-OPEN_QUESTION [
-    width: 1, ${'$'}opcional
-    height: 1, ${'$'}opcional
-    label: "texto"
-]
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-                            "DROP QUESTION" to {
-                                onTemplateSelected("""
-DROP_QUESTION [
-    width: 1, ${'$'}opcional
-    height: 1, ${'$'}opcional
-    label: "texto",
-
-    options: {"primera", "segunda"},
-
-    correct: 0
-]
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-                            "SELECT QUESTION" to {
-                                onTemplateSelected("""
-SELECT_QUESTION [
-    width: 1, ${'$'}opcional
-    height: 1, ${'$'}opcional
-    label: "texto",
-
-    options: {"primera", "segunda"},
-
-    correct: 0
-]
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-                            "MULTIPLE QUESTION" to {
-                                onTemplateSelected("""
-MULTIPLE_QUESTION [
-    width: 1, ${'$'}opcional
-    height: 1, ${'$'}opcional
-    label: "texto",
-
-    options: {"primera", "segunda"},
-
-    correct: {0, 1}
-]
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            }
-
-                        )
-                    )
-
-                    // ===== CONDICIONALES =====
-                    TemplateDropdownButton(
-                        title = "CONFIGURACIONES",
-                        options = listOf(
-
-                            "STYLES" to {
-                                onTemplateSelected("""
-    styles [
-        "color": #000000,
-        "background color": #000000,
-        "font family": MONO,
-        "text size": 1
+    [
+        {
+            ${'$'}Elemento
+        }
     ]
                                 """.trimIndent() + "\n")
                                 onDismiss()
                             },
-                            "COLOR" to {
+
+                            "COLUMNA" to {
                                 onTemplateSelected("""
-        "color": #000000
+    
+    {
+            ${'$'}Elemento
+    }
+    
                                 """.trimIndent() + "\n")
                                 onDismiss()
                             },
-                            "BACKGROUND COLOR" to {
+
+                            "ORIENTATION" to {
                                 onTemplateSelected("""
-        "background color": #000000
+    
+    orientation: VERTICAL,
+    
                                 """.trimIndent() + "\n")
                                 onDismiss()
                             },
-                            "FONT FAMILY" to {
+                            "FUNCION POKEMON" to {
                                 onTemplateSelected("""
-        "font family": MONO
+    
+    who_is_that_pokemon(NUMBER, 1, 5),
+    
                                 """.trimIndent() + "\n")
                                 onDismiss()
                             },
-                            "TEXT SIZE" to {
+                            "LABEL" to {
                                 onTemplateSelected("""
-        "text size": 1
-                                """.trimIndent() + "\n")
-                                onDismiss()
-                            },
-                            "BORDER" to {
-                                onTemplateSelected("""
-        "border": (1, DOTTED, #000000)
+                                    
+    label: "texto",
+    
                                 """.trimIndent() + "\n")
                                 onDismiss()
                             }
