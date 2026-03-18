@@ -17,6 +17,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -50,6 +51,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -89,6 +92,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
@@ -196,6 +200,10 @@ fun EditorScreen(
     //=======Variables para poder ver si hay cambios sin guardar=====
     var showSaveFormDialog by remember { mutableStateOf(false) }
     var codigoPendiente by remember { mutableStateOf<String?>(null) }
+
+    //Variable para mostrar el picker de colores
+    var showTemplateDialog by remember { mutableStateOf(false) }
+
 
     //====Permite guardar el archivo con el codigo compilado al darle a guardar
 
@@ -558,7 +566,7 @@ fun EditorScreen(
                             }
                         },
                         onAgregarClick = {//Pendiente definir bloques de codigo
-
+                            showTemplateDialog = true
                         },
                         onColorClick = {
                             showColorPicker = true
@@ -769,6 +777,35 @@ fun EditorScreen(
                     onDismiss = { showColorPicker = false },
                     onColorSelected = { formattedColor ->
                         viewModel.insertTextAtCursor(formattedColor)
+                    }
+                )
+            }
+
+            /*------INSERTADOR DE PLANTILLAS-------*/
+            if (showTemplateDialog) {
+                TemplatePickerDialog(
+                    onDismiss = { showTemplateDialog = false },
+                    onTemplateSelected = { template ->
+
+                        val current = viewModel.codeField.text
+                        val cursorPosition = viewModel.codeField.selection.start
+                        val safeCursor = cursorPosition.coerceIn(0, current.length)
+
+                        val templateToInsert = "\n$template"
+
+                        val nuevoTexto =
+                            current.substring(0, safeCursor) +
+                                    templateToInsert +
+                                    current.substring(safeCursor)
+
+                        val nuevaPosicion = safeCursor + templateToInsert.length
+
+                        viewModel.updateCodeField(
+                            TextFieldValue(
+                                text = nuevoTexto,
+                                selection = TextRange(nuevaPosicion)
+                            )
+                        )
                     }
                 )
             }
@@ -1394,6 +1431,306 @@ fun ColorPickerDialog(
             }
         }
     )
+}
+
+
+/*Metodo composable que permite manejar las plantillas de codigo de la app*/
+@Composable
+fun TemplatePickerDialog(
+    onDismiss: () -> Unit,
+    onTemplateSelected: (String) -> Unit
+) {
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF020226),
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cerrar", color = Color.White)
+            }
+        },
+        text = {
+
+            Column {
+
+                Text(
+                    text = "Insertar plantilla",
+                    color = Color.White,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Spacer(Modifier.height(16.dp))
+
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ){
+
+                    // ===== CICLOS =====
+                    TemplateDropdownButton(
+                        title = "CICLOS",
+                        options = listOf(
+
+                            "FOR" to {
+                                onTemplateSelected("""
+FOR (i = 0; i < 10; i = i + 1) {
+    ${'$'}Contenido
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "WHILE" to {
+                                onTemplateSelected("""
+WHILE (condicion) {
+    ${'$'}Contenido
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "DO-WHILE" to {
+                                onTemplateSelected("""
+DO {
+    ${'$'}Contenido
+} WHILE (condicion)
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "FOR-RANGO" to {
+                                onTemplateSelected("""
+FOR (i in 1..5) {
+    ${'$'}Contenido
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+                        )
+                    )
+
+                    // ===== CONDICIONALES =====
+                    TemplateDropdownButton(
+                        title = "CONDICIONALES",
+                        options = listOf(
+
+                            "IF" to {
+                                onTemplateSelected("""
+IF (condicion) {
+    ${'$'}Contenido
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "IF - ELSE" to {
+                                onTemplateSelected("""
+IF (condicion) {
+    ${'$'}Contenido
+} ELSE {
+    
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "ELSE" to {
+                                onTemplateSelected("""
+ELSE {
+    ${'$'}Contenido 
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "ELSE" to {
+                                onTemplateSelected("""
+ELSE IF (condicion){
+    ${'$'}Contenido 
+}
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+                        )
+                    )
+
+                    // ===== FUNCIONES SPECIAL =====
+                    TemplateDropdownButton(
+                                title = "COMPONENTES",
+                        options = listOf(
+
+                            "TEXTO" to {
+                                onTemplateSelected("""
+TEXT [
+    width: 1, ${'$'}opcional 
+    height: 1, ${'$'}opcional
+    content: "contenido"
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+
+                            "OPEN QUESTION" to {
+                                onTemplateSelected("""
+OPEN_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+    label: "texto"
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "DROP QUESTION" to {
+                                onTemplateSelected("""
+DROP_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+    label: "texto",
+
+    options: {"primera", "segunda"},
+
+    correct: 0
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "SELECT QUESTION" to {
+                                onTemplateSelected("""
+SELECT_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+    label: "texto",
+
+    options: {"primera", "segunda"},
+
+    correct: 0
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "MULTIPLE QUESTION" to {
+                                onTemplateSelected("""
+MULTIPLE_QUESTION [
+    width: 1, ${'$'}opcional
+    height: 1, ${'$'}opcional
+    label: "texto",
+
+    options: {"primera", "segunda"},
+
+    correct: {0, 1}
+]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+
+                        )
+                    )
+
+                    // ===== CONDICIONALES =====
+                    TemplateDropdownButton(
+                        title = "CONFIGURACIONES",
+                        options = listOf(
+
+                            "STYLES" to {
+                                onTemplateSelected("""
+    styles [
+        "color": #000000,
+        "background color": #000000,
+        "font family": MONO,
+        "text size": 1
+    ]
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "COLOR" to {
+                                onTemplateSelected("""
+        "color": #000000
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "BACKGROUND COLOR" to {
+                                onTemplateSelected("""
+        "background color": #000000
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "FONT FAMILY" to {
+                                onTemplateSelected("""
+        "font family": MONO
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "TEXT SIZE" to {
+                                onTemplateSelected("""
+        "text size": 1
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            },
+                            "BORDER" to {
+                                onTemplateSelected("""
+        "border": (1, DOTTED, #000000)
+                                """.trimIndent() + "\n")
+                                onDismiss()
+                            }
+                        )
+                    )
+
+                }
+            }
+        }
+    )
+}
+
+
+
+/*Metodo composable que permite mostrar las opciones como dropdown*/
+@Composable
+fun TemplateDropdownButton(
+    title: String,
+    options: List<Pair<String, () -> Unit>>
+) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+
+        Button(
+            onClick = { expanded = true },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF590613)
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(title, color = Color.White)
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .background(Color(0xFF121212))
+        ) {
+
+            options.forEach { (name, action) ->
+
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = name,
+                            color = Color.White,
+                            fontFamily = FontFamily.Monospace
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        action()
+                    }
+                )
+            }
+        }
+    }
 }
 
 //Retorna formato HSL de colores
