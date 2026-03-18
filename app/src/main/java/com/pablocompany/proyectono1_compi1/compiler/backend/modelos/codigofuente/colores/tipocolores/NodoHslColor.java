@@ -146,34 +146,6 @@ public class NodoHslColor extends NodoColor {
     }
 
 
-    //Metodo que permite retornar el color en formato RGB (util en frontend)
-    @Override
-    public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-
-        Object valorRed = (this.red != null) ? this.red.ejecutar(tabla, listaErrores) : null;
-        Object valorGreen = (this.green != null) ? this.green.ejecutar(tabla, listaErrores) : null;
-        Object valorBlue = (this.blue != null) ? this.blue.ejecutar(tabla, listaErrores) : null;
-
-        if (!(valorRed instanceof Number)) {
-            listaErrores.add(new ErrorAnalisis(red != null ? red.getString() : "null", "Semántico", "Valor RED debe ser numerico", red.getLinea(), red.getColumna()));
-            return null;
-        }
-        if (!(valorGreen instanceof Number)) {
-            listaErrores.add(new ErrorAnalisis(green != null ? green.getString() : "null", "Semántico", "Valor GREEN debe ser numerico", green.getLinea(), green.getColumna()));
-            return null;
-        }
-        if (!(valorBlue instanceof Number)) {
-            listaErrores.add(new ErrorAnalisis(blue != null ? blue.getString() : "null", "Semántico", "Valor BLUE debe ser numerico", blue.getLinea(), blue.getColumna()));
-            return null;
-        }
-
-        return new int[]{
-                ((Number) valorRed).intValue(),
-                ((Number) valorGreen).intValue(),
-                ((Number) valorBlue).intValue()
-        };
-    }
-
     //Metodo que permite retornar los valores del color en formato String
     @Override
     public String getString() {

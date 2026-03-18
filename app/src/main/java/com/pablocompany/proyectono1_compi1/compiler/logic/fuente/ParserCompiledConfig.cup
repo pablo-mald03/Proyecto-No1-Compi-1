@@ -78,25 +78,46 @@ terminal    ERROR, RESTA,
 
 
 /*======Apartado de tipado de tokens que vienen del lexer======*/
-terminal String ID,COLOR_HEX;
+terminal String COLOR_HEX;
 terminal Double DECIMAL;
 terminal Integer ENTERO;
 
-/*QUEMADO DE MOMENTO*/
+/*Created by Pablo*/
 
 
 /*======Apartado de tipado de tokens que vienen del lexer======*/
 
 /* No terminales, reglas que nosotros vamos a definir sintacticamente */
-non terminal compilado;
+
+/*--AST--*/
+
+non terminal CodigoInterpretado compilado;
 
 /* Símbolo inicial */
 start with compilado;
 
-/*QUEMADO DE MOMENTO*/
 
-compilado          ::=
+/*Created by Pablo*/
+
+/*Pendiente*/
+
+compilado           ::= cuerpo_etiquetas
                     ;
+
+cuerpo_etiquetas        ::=  cuerpo_etiquetas etiqueta
+                        | etiqueta
+                        ;
+
+etiqueta    ::=  etiqueta_tabla
+            | etiqueta_section
+            | etiqueta_pregunta
+            | etiqueta_text
+            ;
+
+etiqueta_tabla  ::= MENOR TABLE MAYOR content_tabla INICIO_ETIQUETA TABLE MAYOR
+                    ;
+
+/*Created by Pablo*/
 
 
 

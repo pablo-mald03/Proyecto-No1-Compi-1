@@ -41,16 +41,6 @@ public class NodoHexColor extends NodoColor {
         return new NodoHexColor(this.color, getLinea(), getColumna());
     }
 
-    //Metodo que permite obtener el color especificado en la expresion
-    @Override
-    public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-
-        int red = Integer.parseInt(this.color.substring(1,3), 16);
-        int green = Integer.parseInt(this.color.substring(3,5), 16);
-        int blue = Integer.parseInt(this.color.substring(5,7), 16);
-
-        return new int[]{red, green, blue};
-    }
 
     //Metodo que permite retornar los valores del color en formato String
     @Override

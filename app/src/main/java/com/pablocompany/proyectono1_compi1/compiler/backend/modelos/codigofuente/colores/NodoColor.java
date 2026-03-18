@@ -29,9 +29,6 @@ public abstract class NodoColor {
     //Metodo que permite retornar los valores del color en formato String
     public abstract String getString();
 
-    //Metodo principal que retorna el color en formato RGB (util en frontend)
-    public abstract int [] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
-
     public abstract Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores);
 
     //Metodo que permite validar la semantica dentro de un color

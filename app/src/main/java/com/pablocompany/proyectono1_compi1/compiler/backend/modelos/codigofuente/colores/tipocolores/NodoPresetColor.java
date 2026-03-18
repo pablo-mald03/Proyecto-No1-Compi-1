@@ -43,23 +43,6 @@ public class NodoPresetColor extends NodoColor {
 
     /*Metodos getter de las expresiones*/
 
-    //Metodo que permite retornar el color en formato RGB (util en frontend)
-    @Override
-    public int[] evaluarColor(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
-        switch (colorPreset) {
-            case RED:    return new int[]{255, 0, 0};
-            case BLUE:   return new int[]{0, 0, 255};
-            case GREEN:  return new int[]{0, 128, 0};
-            case PURPLE: return new int[]{128, 0, 128};
-            case SKY:    return new int[]{135, 206, 235};
-            case YELLOW: return new int[]{255, 255, 0};
-            case BLACK:  return new int[]{0, 0, 0};
-            case WHITE:  return new int[]{255, 255, 255};
-            default:
-                listaErrores.add(new ErrorAnalisis("Not Found", "Semántico", "Preset de color no valido", this.getLinea(), this.getColumna()));
-                return null;
-        }
-    }
 
 
     //Metodo que permite clonar el color

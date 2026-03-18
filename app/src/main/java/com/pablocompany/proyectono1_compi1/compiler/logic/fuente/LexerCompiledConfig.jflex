@@ -36,9 +36,6 @@ LineTerminator = \r\n|\r|\n
 WhiteSpace = [ \t\f]+
 Numero = [0-9]+
 Decimal = {Numero}"."{Numero}
-jletter = [:jletter:]
-jletterdigit = [:jletterdigit:]
-Id = {jletter}{jletterdigit}*
 
 //Metadatos
 
@@ -240,8 +237,6 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 {Numero} {return symbol(SymCompiled.ENTERO, Integer.parseInt(yytext()));}
 
-{Id} { return symbol(SymCompiled.ID, yytext()); }
-
 /*----RECONOCIMIENTO DE CADENAS DE TEXTO-----*/
 
 \"          { yybegin(STRING);
@@ -292,7 +287,6 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 [^]               {
                     reportError("Simbolo no existe en el lenguaje", yytext());
-                    return symbol(SymCompiled.ERROR, yytext());
                 }
 
 <<EOF>>         {
