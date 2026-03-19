@@ -10,6 +10,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 
 import java.util.List;
 
+//CLase que representa a la respuesta correcta de la pregunta
 public class NodoCorrect extends Nodo {
 
     //Atributos
@@ -85,6 +86,14 @@ public class NodoCorrect extends Nodo {
         }
 
         return resultado;
+    }
+
+    //Metodo que permite buscar los comodines dentro de la expresion
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines) {
+        if (this.expresion != null) {
+            this.expresion.buscarComodines(listaComodines);
+        }
     }
 
     //Metodo que retorna la configuracion que es

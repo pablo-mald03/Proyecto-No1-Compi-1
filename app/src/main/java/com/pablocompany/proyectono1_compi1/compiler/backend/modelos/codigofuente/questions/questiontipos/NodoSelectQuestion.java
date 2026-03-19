@@ -287,15 +287,11 @@ public class NodoSelectQuestion extends NodoQuestion {
         }
 
         if (this.opciones != null) {
-            for (Nodo opcion : this.opciones.getOpciones()) {
-                if (opcion instanceof NodoExpresion) {
-                    ((NodoExpresion) opcion).buscarComodines(parametrosPregunta);
-                }
-            }
+            this.opciones.buscarComodines(parametrosPregunta);
         }
 
-        if (this.respuestaCorrecta instanceof NodoExpresion) {
-            ((NodoExpresion) this.respuestaCorrecta).buscarComodines(parametrosPregunta);
+        if (this.respuestaCorrecta != null) {
+            this.respuestaCorrecta.buscarComodines(parametrosPregunta);
         }
 
         if (this.estilos != null) {
@@ -423,15 +419,18 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         if (this.funcionPokemon instanceof NodoFuncionPokemon) {
             clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();
-        } else {
-            clon.funcionPokemon = this.funcionPokemon;
         }
 
-        if (this.respuestaCorrecta instanceof NodoExpresion) {
-            clon.respuestaCorrecta = ((NodoExpresion) this.respuestaCorrecta).clonar();
-        } else {
-            clon.respuestaCorrecta = this.respuestaCorrecta;
+        if (this.respuestaCorrecta != null) {
+            if (this.respuestaCorrecta instanceof NodoExpresion) {
+                clon.respuestaCorrecta = ((NodoExpresion) this.respuestaCorrecta).clonar();
+            }
+            else if (this.respuestaCorrecta instanceof NodoCorrect) {
+                NodoExpresion expClonada = ((NodoCorrect)this.respuestaCorrecta).getExpresion().clonar();
+                clon.respuestaCorrecta = new NodoCorrect(expClonada, getLinea(), getColumna());
+            }
         }
+
         return clon;
     }
 

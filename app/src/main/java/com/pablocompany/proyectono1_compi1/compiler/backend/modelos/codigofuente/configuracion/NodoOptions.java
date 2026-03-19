@@ -155,5 +155,18 @@ public class NodoOptions extends Nodo {
         return new NodoOptions(nuevasOpciones, getLinea(), getColumna());
     }
 
+    //Metodo que permite buscar los comodines dentro de la expresion
+    @Override
+    public void buscarComodines(List<NodoComodin> listaComodines) {
+
+        if (this.opciones != null) {
+            for (Nodo opcion : opciones) {
+                if (opcion != null) {
+                    opcion.buscarComodines(listaComodines);
+                }
+            }
+        }
+    }
+
 }
 

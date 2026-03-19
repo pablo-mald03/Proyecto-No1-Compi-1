@@ -306,7 +306,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         List<NodoComodin> parametrosPregunta = new ArrayList<>();
 
-        if (this.width != null && this.width.getExpresion() != null ) {
+        if (this.width != null && this.width.getExpresion() != null) {
             this.width.getExpresion().buscarComodines(parametrosPregunta);
         }
 
@@ -320,18 +320,13 @@ public class NodoMultipleQuestion extends NodoQuestion {
         }
 
         if (this.opciones != null) {
-            for (Nodo opcion : this.opciones.getOpciones()) {
-                if (opcion instanceof NodoExpresion) {
-                    ((NodoExpresion) opcion).buscarComodines(parametrosPregunta);
-                }
-            }
+            this.opciones.buscarComodines(parametrosPregunta);
         }
 
         if (this.respuestasCorrectas != null) {
             for (Nodo nodo : this.respuestasCorrectas) {
-                if (nodo instanceof NodoCorrect) {
-                    NodoExpresion exp = ((NodoCorrect) nodo).getExpresion();
-                    if (exp != null) exp.buscarComodines(parametrosPregunta);
+                if (nodo != null) {
+                    nodo.buscarComodines(parametrosPregunta);
                 }
             }
         }
@@ -365,7 +360,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
             Object resultadoPokemon = this.funcionPokemon.ejecutar(tabla, listaErrores);
             if (resultadoPokemon instanceof OnCompilacionError) return resultadoPokemon;
 
-            if(resultadoPokemon instanceof List){
+            if (resultadoPokemon instanceof List) {
                 this.opciones = new NodoOptions((List<Nodo>) resultadoPokemon, getLinea(), getColumna());
             }
         }
@@ -378,15 +373,15 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         Object indicesCalculados = this.obtenerListaindices(tabla, listaErrores, listaOpciones);
 
-        if(indicesCalculados instanceof OnCompilacionError) return indicesCalculados;
+        if (indicesCalculados instanceof OnCompilacionError) return indicesCalculados;
 
 
         List<Integer> indicesCorrectos = new ArrayList<>();
 
-        if(indicesCalculados instanceof  List ){
+        if (indicesCalculados instanceof List) {
             indicesCorrectos = (List<Integer>) indicesCalculados;
 
-            if(indicesCorrectos.isEmpty()){
+            if (indicesCorrectos.isEmpty()) {
                 indicesCorrectos = null;
             }
         }
@@ -432,11 +427,11 @@ public class NodoMultipleQuestion extends NodoQuestion {
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
-        return new PreguntaMultiple(alto, ancho, listaOpciones,indicesCorrectos, estilosObjeto, getLinea(), getColumna());
+        return new PreguntaMultiple(alto, ancho, listaOpciones, indicesCorrectos, estilosObjeto, getLinea(), getColumna());
     }
 
     /*Metodo auxiliar que permite retornar el listado de indices correctos*/
-    private Object obtenerListaindices(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores,List<String> listaOpciones){
+    private Object obtenerListaindices(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, List<String> listaOpciones) {
 
         List<Integer> indicesCorrectos = new ArrayList<>();
 
@@ -450,16 +445,14 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
                 if (resultadoValor instanceof Integer || resultadoValor instanceof Long) {
                     indiceActual = ((Number) resultadoValor).intValue();
-                }
-                else if (resultadoValor instanceof Double) {
+                } else if (resultadoValor instanceof Double) {
                     double val = (Double) resultadoValor;
                     if (val == (int) val) {
                         indiceActual = (int) val;
                     } else {
                         return reportarError(listaErrores, "Indice múltiple debe ser entero sin decimales", getLinea(), getColumna());
                     }
-                }
-                else {
+                } else {
                     return reportarError(listaErrores, "Índice múltiple debe ser un valor numérico", getLinea(), getColumna());
                 }
 
@@ -479,7 +472,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
     /*Metodo propio que permite clonar a una intancia de clase nodo multiple question*/
     @Override
-    public  NodoQuestion clonar(){
+    public NodoQuestion clonar() {
 
         NodoMultipleQuestion clon = new NodoMultipleQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
 
@@ -496,11 +489,15 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         if (this.respuestasCorrectas != null) {
             clon.respuestasCorrectas = new ArrayList<>();
-            for (Nodo r : this.respuestasCorrectas) {
-                if (r instanceof NodoExpresion) {
-                    clon.respuestasCorrectas.add(((NodoExpresion) r).clonar());
-                } else {
-                    clon.respuestasCorrectas.add(r);
+            for (Nodo response : this.respuestasCorrectas) {
+                if (response == null) continue;
+
+                if (response instanceof NodoExpresion) {
+                    clon.respuestasCorrectas.add(((NodoExpresion) response).clonar());
+                }
+                else if (response instanceof NodoCorrect) {
+                    NodoExpresion expClonada = ((NodoCorrect) response).getExpresion().clonar();
+                    clon.respuestasCorrectas.add(new NodoCorrect(expClonada, response.getLinea(), response.getColumna()));
                 }
             }
         }
@@ -512,7 +509,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
     /*--Metodo utilizado para Reportar error--*/
     private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
         listaErrores.add(new ErrorAnalisis("MULTIPLE_QUESTION", "Semantico",
-                mensaje,linea, columna ));
+                mensaje, linea, columna));
         return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
     }
 
