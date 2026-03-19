@@ -246,7 +246,8 @@ class ServerViewModel(application: Application) : AndroidViewModel(application){
     //Metodo que permite subir un archivo al servidor (SE TIENE GUARDADO LOCAL)
     suspend fun uploadForm(
         fileUri: Uri,
-        fileName: String
+        fileName: String,
+        autor: String
     ): Boolean {
 
         val apiService = api ?: return false
@@ -254,14 +255,16 @@ class ServerViewModel(application: Application) : AndroidViewModel(application){
         return uploadUseCase.uploadForm(
             api = apiService,
             fileUri = fileUri,
-            fileName = fileName
+            fileName = fileName,
+            autor = autor
         )
     }
 
     //Metodo que permite subir un archivo al servidor (SE TIENE GUARDADO LOCAL)
     suspend fun uploadFormContent(
         content: String,
-        fileName: String
+        fileName: String,
+        autor: String
     ): Boolean {
 
         val apiService = api ?: return false
@@ -269,7 +272,8 @@ class ServerViewModel(application: Application) : AndroidViewModel(application){
         return uploadUseCase.uploadFormContent(
             api = apiService,
             content = content,
-            fileName = fileName
+            fileName = fileName,
+            autor = autor
         )
     }
 

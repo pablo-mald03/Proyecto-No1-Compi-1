@@ -246,7 +246,14 @@ fun FormScreen(
 
             DrawerFormContent(
 
-                onAbrirFormulario = { openFormLauncher.launch(arrayOf("application/octet-stream","text/plain"))},
+                onAbrirFormulario = {
+                    openFormLauncher.launch(
+                        arrayOf(
+                            "application/octet-stream",
+                            "text/plain"
+                        )
+                    )
+                },
 
                 onGuardarFormulario = {
                     guardarFormulario()
@@ -367,7 +374,11 @@ fun FormScreen(
                                         navController.navigate("answer")
 
                                     } else {
-                                        Toast.makeText(context, "No hay formulario interpretado", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "No hay formulario interpretado",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
 
                                 },
@@ -432,8 +443,10 @@ fun FormScreen(
                                             scope.launch { drawerState.open() }
                                         }
                                     ) {
-                                        Icon(Icons.Default.Menu, null,
-                                            tint = Color.White)
+                                        Icon(
+                                            Icons.Default.Menu, null,
+                                            tint = Color.White
+                                        )
                                     }
                                 }
                             )
@@ -636,7 +649,7 @@ fun DrawerFormContent(
     fileName: String,
     sharedFormViewModel: SharedFormViewModel,
     serverViewModel: ServerViewModel
-    ) {
+) {
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -705,6 +718,7 @@ fun DrawerFormContent(
     }
 
     /* ---------------- CONFIRMACION ---------------- */
+    var nombreAutor by remember { mutableStateOf("") }
 
     if (showConfirmUpload) {
 
@@ -720,7 +734,34 @@ fun DrawerFormContent(
             },
 
             text = {
-                Text("¿Deseas subir tu formulario al servidor?")
+                Column {
+
+                    Text("¿Deseas subir tu formulario al servidor?")
+
+                    Spacer(Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = nombreAutor,
+                        onValueChange = { nombreAutor = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = {
+                            Text("Autor (opcional)")
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+
+                            focusedBorderColor = Color(0xFFD0BCFF),
+                            unfocusedBorderColor = Color.LightGray,
+
+                            cursorColor = Color(0xFFD0BCFF),
+
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                        )
+                    )
+                }
             },
 
             confirmButton = {
@@ -732,9 +773,9 @@ fun DrawerFormContent(
                         if (formContent.isBlank()) {
 
                             Toast.makeText(
-                                    context,
-                                    "No hay código compilado para subir",
-                                    Toast.LENGTH_SHORT
+                                context,
+                                "No hay código compilado para subir",
+                                Toast.LENGTH_SHORT
                             ).show()
 
                             return@TextButton
@@ -757,11 +798,12 @@ fun DrawerFormContent(
                             val sanitizedFileName = sanitizeFileName(fileName)
 
                             scope.launch {
-                                //PENDIENTE LA INTEGRACION PARA PASAR EL NOMBRE DEL AUTOR :)
+                                val autorFinal = nombreAutor.ifBlank { "anonimo" }
 
                                 val success = serverViewModel.uploadForm(
                                     fileUri = currentFileUri,
-                                    fileName = sanitizedFileName
+                                    fileName = sanitizedFileName,
+                                    autor = autorFinal
                                 )
 
                                 uploadSuccess = success
@@ -812,6 +854,7 @@ fun DrawerFormContent(
 
             text = {
 
+
                 Column {
 
                     Text("Ingresa el nombre con el que se guardara en el servidor")
@@ -821,11 +864,27 @@ fun DrawerFormContent(
                     OutlinedTextField(
                         value = serverName,
                         onValueChange = { serverName = it },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = {
-                            Text("Nombre del formulario", color = Color(0xFFD0BCFF))
-                        },
+                        placeholder = { Text("Nombre del formulario") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+
+                            focusedBorderColor = Color(0xFFD0BCFF),
+                            unfocusedBorderColor = Color.LightGray,
+
+                            cursorColor = Color(0xFFD0BCFF),
+
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                        ),
+                    )
+
+                    Spacer(Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = nombreAutor,
+                        onValueChange = { nombreAutor = it },
+                        placeholder = { Text("Autor (opcional)") },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedTextColor = Color.White,
                             unfocusedTextColor = Color.White,
@@ -840,6 +899,7 @@ fun DrawerFormContent(
                         ),
                     )
                 }
+
             },
 
             confirmButton = {
@@ -848,12 +908,14 @@ fun DrawerFormContent(
                     onClick = {
 
                         val sanitizedName = sanitizeFileName(serverName)
+                        val autorFinal = nombreAutor.ifBlank { "anonimo" }
 
                         scope.launch {
 
                             val success = serverViewModel.uploadFormContent(
                                 content = formContent,
-                                fileName = sanitizedName
+                                fileName = sanitizedName,
+                                autor = autorFinal
                             )
 
                             uploadSuccess = success

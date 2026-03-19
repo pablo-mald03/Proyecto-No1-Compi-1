@@ -20,7 +20,8 @@ class UploadFormUseCase(
     suspend fun uploadForm(
         api: FormApiService,
         fileUri: Uri,
-        fileName: String
+        fileName: String,
+        autor:String
     ): Boolean {
 
         return try {
@@ -38,11 +39,12 @@ class UploadFormUseCase(
                 requestFile
             )
 
-            val autor = "app-movil"
+            val autorBody = autor
+                .ifBlank { "anonimo" }
                 .toRequestBody("text/plain".toMediaTypeOrNull())
 
             val response = api.uploadForm(
-                autor = autor,
+                autor = autorBody,
                 formulario = multipart
             )
 
@@ -58,7 +60,8 @@ class UploadFormUseCase(
     suspend fun uploadFormContent(
         api: FormApiService,
         content: String,
-        fileName: String
+        fileName: String,
+        autor:String
     ): Boolean {
 
         return try {
@@ -72,11 +75,12 @@ class UploadFormUseCase(
                 requestFile
             )
 
-            val autor = "app-movil"
+            val autorBody = autor
+                .ifBlank { "anonimo" }
                 .toRequestBody("text/plain".toMediaTypeOrNull())
 
             val response = api.uploadForm(
-                autor = autor,
+                autor = autorBody,
                 formulario = multipart
             )
 
