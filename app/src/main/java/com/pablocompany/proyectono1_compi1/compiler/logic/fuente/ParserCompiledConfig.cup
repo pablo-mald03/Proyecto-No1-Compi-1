@@ -7,6 +7,8 @@ import java.util.*;
 
 /*Imports de mis clases (P)*/
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.*;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.*;
@@ -138,7 +140,7 @@ terminal    RESTA,
             SECTION, TABLE, TEXT, ELEMENT, OPEN, DROP, SELECT, MULTIPLE,
             CIERRE_ETIQUETA, INICIO_ETIQUETA, MENOR, MAYOR, DIAGONAL,
             PARENT_APERTURA, PARENT_CIERRE,
-            CONFIG_DOCK,
+            SELECCIONA, PREGUNTA,
             INICIO_CADENA, FIN_CADENA
             ;
 
@@ -150,6 +152,7 @@ terminal Double DECIMAL;
 terminal Integer ENTERO;
 terminal String GROSOR_LINEA, LINE, TIPOGRAFIA;
 terminal String COLOR_PRESET;
+terminal String CONFIG_DOCK;
 
 
 terminal String EMOJI_SMILE, EMOJI_SAD, EMOJI_SERIOUS, EMOJI_HEART, EMOJI_STAR, EMOJI_MULTI_STAR, EMOJI_CAT, TEXTO_PLANO;
@@ -194,7 +197,6 @@ non terminal CompiledForm celda;
 
 /*No terminales utilizados pra poder procesar los estilos*/
 non terminal CompiledEstilos bloque_estilos;
-non terminal CompiledEstilos lista_propiedades;
 
 
 /*No terminal que reconoce a los colores disponibles*/
@@ -212,6 +214,12 @@ non terminal Number valor_numerico;
 
 /*No terminales de tipos de borde o linea*/
 non terminal String valor_borde;
+
+
+/*No terminales de tipos de borde o linea*/
+
+non terminal List<CompiledEstilos> lista_estilos;
+non terminal CompiledEstilos lista_propiedades;
 
 
 /*Created by Pablo*/
@@ -265,15 +273,16 @@ etiqueta_principal      ::=  etiqueta_tabla:tabla
 
 /*Produccion que permite crear una tabla*/
 
-etiqueta_tabla  ::= MENOR TABLE IGUAL /*PENDIENTE*/ MAYOR bloque_estilos:estilos MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
+etiqueta_tabla  ::= MENOR TABLE:tab IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_numerico:pointx COMA valor_numerico:pointy MAYOR lista_estilos:estilos MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
                     {:
-                        RESULT = new CompiledTable(-1, -1, 0, 0, filas, estilos);
+                        RESULT = new CompiledTable(w, h, pointx, pointy, filas, estilos,tableft, tabright);
                     :}
-                    | MENOR TABLE MAYOR MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
+                    | MENOR TABLE:tab IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_numerico:pointx COMA valor_numerico:pointy MAYOR MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
                     {:
-                        RESULT = new CompiledTable(-1, -1, 0, 0, filas, null);
+                        RESULT = new CompiledTable(w, h, pointx, pointy, filas, null,tableft, tabright);
                     :}
                     ;
+
 
 /*Produccion que permite evaluar a todas las filas que vengan dentro de la tabla*/
 
@@ -355,17 +364,48 @@ bloque_estilos      ::= MENOR STYLE MAYOR lista_propiedades:estilos INICIO_ETIQU
                     | error MAYOR
                     ;
 
+/*---Produccion que permite definir los estilos----*/
+
+lista_estilos    ::= lista_estilos:list lista_propiedades:est
+                    {:
+                        list.add(est);
+                        RESULT = list;
+                    :}
+                    | lista_propiedades:est
+                    {:
+                        List<CompiledEstilos> list = new ArrayList<>();
+                        list.add(est);
+                        RESULT = list;
+                    :}
+                    | lista_estilos:est error
+                    {:
+                        RESULT = est;
+                    :}
+                    ;
+
+
 /*---Produccion de estilos---*/
 
 lista_propiedades       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQUETA
-                            MENOR BACKGROUND COLOR_KEY IGUAL valor_color:color2 CIERRE_ETIQUETA
-                            MENOR FONT FAMILY IGUAL TIPOGRAFIA:tipo CIERRE_ETIQUETA
-                            MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
-                            MENOR BORDER COMA valor_numerico:num2 COMA valor_borde:grosor COMA COLOR_KEY IGUAL valor_color:colores3 CIERRE_ETIQUETA
                         {:
-                            RESULT = new CompiledEstilos(color1, color2, tipo, num1, new CompiledBorder(num2, grosor, colores3));
+                            RESULT = new CompiledBackground(color1);
                         :}
-
+                        | MENOR BACKGROUND COLOR_KEY IGUAL valor_color:color2 CIERRE_ETIQUETA
+                        {:
+                            RESULT = new CompiledTextColor(color2);
+                        :}
+                        | MENOR FONT FAMILY IGUAL TIPOGRAFIA:tipo CIERRE_ETIQUETA
+                        {:
+                            RESULT = new CompiledFontFamily(tipo);
+                        :}
+                        | MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
+                        {:
+                            RESULT = new CompiledTextSize(num1);
+                        :}
+                        | MENOR BORDER COMA valor_numerico:num2 COMA valor_borde:grosor COMA COLOR_KEY IGUAL valor_color:colores3 CIERRE_ETIQUETA
+                        {:
+                            RESULT = new CompiledBorder(num2, grosor, colores3);
+                        :}
                         ;
 
 /*---Produccion de propiedades de los tipos de borde---*/

@@ -1,6 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests;
 
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions;
 
 import java.util.List;
@@ -12,8 +12,8 @@ public class CompiledMultipleQuest extends CompiledQuestions {
     private List<Number> respuesta;
     private List<String> opciones;
 
-    public CompiledMultipleQuest(Number width, Number height, List<String> opciones, List<Number> respuesta, CompiledEstilos estilos) {
-        super(width, height, estilos);
+    public CompiledMultipleQuest(Number width, Number height, List<String> opciones, List<Number> respuesta, List<CompiledEstilos> estilos, int fila, int columna) {
+        super(width, height, estilos, fila, columna);
         this.respuesta = respuesta;
         this.opciones = opciones;
     }

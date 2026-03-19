@@ -1,6 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests;
 
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions;
 
 import java.util.List;
@@ -11,8 +11,8 @@ public class CompiledDropQuest extends CompiledQuestions {
     private Number respuesta;
     private List<String> opciones;
 
-    public CompiledDropQuest(Number width, Number height, List<String> opciones, Number respuesta, CompiledEstilos estilos) {
-        super(width, height, estilos);
+    public CompiledDropQuest(Number width, Number height, List<String> opciones, Number respuesta, List<CompiledEstilos> estilos, int fila, int columna) {
+        super(width, height, estilos, fila, columna);
         this.respuesta = respuesta;
         this.opciones = opciones;
     }

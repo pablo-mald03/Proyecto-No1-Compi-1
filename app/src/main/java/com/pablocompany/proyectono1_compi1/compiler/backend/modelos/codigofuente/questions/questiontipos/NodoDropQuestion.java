@@ -449,6 +449,7 @@ public class NodoDropQuestion extends NodoQuestion {
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
         clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
+        clon.label = (this.label != null) ? this.label.clonar() : null;
 
         if (this.funcionPokemon instanceof NodoFuncionPokemon) {
             clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();

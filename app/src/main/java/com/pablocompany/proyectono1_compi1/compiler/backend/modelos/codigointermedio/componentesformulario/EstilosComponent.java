@@ -86,19 +86,21 @@ public class EstilosComponent {
 
         estilos.append("    <style>");
         estilos.append("\n\n");
-        if(this.color != null){
+
+        if(this.backgroundColor != null){
             estilos.append("        <color=");
+            estilos.append(this.backgroundColor);
+            estilos.append("/>");
+            estilos.append("\n");
+        }
+
+        if(this.color != null){
+            estilos.append("        <background color=");
             estilos.append(this.color);
             estilos.append("/>");
             estilos.append("\n");
         }
 
-        if(this.backgroundColor != null){
-            estilos.append("        <background color=");
-            estilos.append(this.backgroundColor);
-            estilos.append("/>");
-            estilos.append("\n");
-        }
 
         if(this.fontFamily != null){
             estilos.append("        <font family=");

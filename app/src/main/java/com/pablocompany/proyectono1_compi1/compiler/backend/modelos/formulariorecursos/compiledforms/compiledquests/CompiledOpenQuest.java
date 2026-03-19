@@ -1,6 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests;
 
-import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.cadenastexto.CompiledCadenaTexto;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions;
 
@@ -12,8 +12,8 @@ public class CompiledOpenQuest extends CompiledQuestions {
     //Atributo
     public List<CompiledCadenaTexto> texto;
 
-    public CompiledOpenQuest(Number width, Number height, List<CompiledCadenaTexto> texto, CompiledEstilos estilos) {
-        super(width, height, estilos);
+    public CompiledOpenQuest(Number width, Number height, List<CompiledCadenaTexto> texto, List<CompiledEstilos> estilos, int fila, int columna) {
+        super(width, height, estilos, fila, columna);
         this.texto = texto;
     }
 

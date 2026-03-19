@@ -189,6 +189,10 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 "multiple"   { return symbol(SymCompiled.MULTIPLE); }
 
+"\"Selecciona\""   { return symbol(SymCompiled.SELECCIONA); }
+
+"\"pregunta\""   { return symbol(SymCompiled.PREGUNTA); }
+
 
 /*=====***--FIN DEL APARTADO DE ETIQUETAS COMPUESTAS--***====*/
 
