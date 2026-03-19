@@ -32,29 +32,90 @@ parser code {:
            return this.syntaxErrorListCompiled;
        }
 
-        //Metodo que permite retornar los errores sintacticos
-        public void syntax_error(Symbol cur_token) {
-           /* List<Integer> ids = expected_token_ids();
-            String encontrado = (cur_token.value != null) ? cur_token.value.toString() : sym.terminalNames[cur_token.sym];
+        //Metodo que permite retornar los errores sintacticos del interprete
+        public void syntax_error(Symbol simbolo) {
+            List<Integer> ids = expected_token_ids();
+            List<String> list = new ArrayList<>();
 
-            StringBuilder sugerencias = new StringBuilder();
-            if (!ids.isEmpty()) {
-                sugerencias.append(". Se esperaba: ");
-                for (int i = 0; i < ids.size(); i++) {
-                    sugerencias.append(traducirToken(sym.terminalNames[ids.get(i)]));
-                    if (i < ids.size() - 1) sugerencias.append(", ");
-                }
+            if (ids.isEmpty()) {
+                reportarErrorContextual(simbolo);
+                return;
             }
 
-            syntaxErrorListCompiled.add(new ErrorAnalisis(
+            for (Integer id : ids) {
+                list.add(traductor(symbl_name_from_id(id)));
+            }
+
+            String esperado = String.join(", ", list);
+            String encontrado = (simbolo.value != null) ? simbolo.value.toString() : traductor(symbl_name_from_id(simbolo.sym));
+
+            syntaxErrorList.add(new ErrorAnalisis(
                 encontrado,
-                cur_token.left,
-                cur_token.right,
-                "Sintáctico",
-                encontrado + "'" + sugerencias.toString()
-            ));*/
+                "Sintactico",
+                "Se esperaba: \"" + esperado + "\". Pero se encontro con: \"" + encontrado + "\"",
+                simbolo.left,
+                simbolo.right
+            ));
         }
 
+        public void unrecovered_syntax_error(Symbol simbolo) throws Exception {
+            String encontrado = (simbolo.value != null) ? simbolo.value.toString() : traductor(symbl_name_from_id(simbolo.sym));
+            syntaxErrorList.add(new ErrorAnalisis(
+                encontrado,
+                "Sintactico",
+                "No se pudo recuperar el analisis cerca de: \"" + encontrado + "\".",
+                simbolo.left,
+                simbolo.right
+            ));
+        }
+
+        private void reportarErrorContextual(Symbol simbolo) {
+
+            String tokenEncontrado = (simbolo.value != null) ? simbolo.value.toString() : symbl_name_from_id(simbolo.sym);
+
+            String mensaje = "Error de sintaxis cerca de \"" + tokenEncontrado + "\". ";
+
+            if (tokenEncontrado.equals("TABLE") || tokenEncontrado.equals("SECTION")) {
+
+                mensaje += "Asegurate de que la etiqueta este bien cerrada con \">\" o \"/>\".";
+
+            } else if (tokenEncontrado.equals("IGUAL")) {
+
+                mensaje += "Parece que faltan los parametros de layout (width, height, pointX, pointY).";
+
+            } else {
+
+                mensaje += "Revisa la estructura de las etiquetas anidadas.";
+
+            }
+
+            syntaxErrorList.add(new ErrorAnalisis(tokenEncontrado, "Sintactico", mensaje, simbolo.left, simbolo.right));
+        }
+
+        private String traductor(String nombre) {
+            switch (nombre) {
+                case "MENOR": return "\" < \"";
+                case "MAYOR": return "\" > \"";
+                case "IGUAL": return "\" = \"";
+                case "DIAGONAL": return "\" / \"";
+                case "CIERRE_ETIQUETA": return "\" /> \"";
+                case "INICIO_ETIQUETA": return "\" </ \"";
+                case "COMA": return "\" , \"";
+                case "PARENT_APERTURA": return "\" ( \"";
+                case "PARENT_CIERRE": return "\" ) \"";
+                case "LLAVE_APERTURA": return "\" { \"";
+                case "LLAVE_CIERRE": return "\" } \"";
+                case "COLOR_HEX": return "un color hexadecimal (ej: #FFFFFF)";
+                case "ENTERO": return "un valor numerico";
+                case "TEXTO_PLANO": return "texto";
+                case "TABLE": return "etiqueta <table>";
+                case "SECTION": return "etiqueta <section>";
+                case "LINE": return "etiqueta <line>";
+                case "ELEMENT": return "etiqueta <element>";
+                case "EOF": return "Final del documento";
+                default: return nombre.toLowerCase().replace("_", " ");
+            }
+        }
 
 :}
 
@@ -63,7 +124,7 @@ parser code {:
 -----------------------------------------------------------*/
 
 /* Terminales: tokens que el parser nos retorna */
-terminal    ERROR, RESTA,
+terminal    RESTA,
             IGUAL, COMA, LLAVE_APERTURA, LLAVE_CIERRE,
             STYLE, CONTENT, COLOR_KEY, BACKGROUND, FONT, FAMILY, SIZE, BORDER,
             SECTION, TABLE, TEXT, LINE, ELEMENT, OPEN, DROP, SELECT, MULTIPLE,
@@ -93,29 +154,153 @@ terminal Integer ENTERO;
 
 non terminal CodigoInterpretado compilado;
 
-/* Símbolo inicial */
+
+/*No terminales que representan al codigo de etiquetas*/
+
+
+/*No temrinales que representan a las etiquetas principales que dentro el interprete*/
+
+non terminal List<CompiledForm> cuerpo_etiquetas;
+non terminal CompiledContenedor etiqueta_principal;
+
+
+/*No terminales de etiquetas*/
+non terminal CompiledContenedor etiqueta;
+
+non terminal CompiledForm etiqueta_tabla;
+non terminal CompiledForm etiqueta_section;
+non terminal CompiledForm etiqueta_text;
+non terminal CompiledForm etiqueta_preguntas;
+
+
+/*No temrinales que representan a las etiquetas que iran dentro de etiquetas el interprete*/
+
+non terminal List<List<CompiledForm>> filas_tabla;
+non terminal List<CompiledForm> fila;
+non terminal List<CompiledForm> celdas_tabla;
+non terminal CompiledForm celda;
+
+
+/* Simbolo inicial */
 start with compilado;
+
 
 
 /*Created by Pablo*/
 
-/*Pendiente*/
 
-compilado           ::= cuerpo_etiquetas
+compilado           ::= cuerpo_etiquetas:list
+                    {:
+                        RESULT = new CodigoInterpretado(list);
+                    :}
                     ;
 
-cuerpo_etiquetas        ::=  cuerpo_etiquetas etiqueta
-                        | etiqueta
+/*Produccon del cuerpo de etiquetas*/
+cuerpo_etiquetas        ::=  cuerpo_etiquetas:list etiqueta_principal:e
+                        {:
+                            list.add(e);
+                            RESULT = list;
+                        :}
+                        | etiqueta_principal:e
+                        {:
+                            List<CompiledForm> list = new ArrayList<>();
+                            list.add(e);
+                            RESULT = list;
+                        :}
                         ;
 
-etiqueta    ::=  etiqueta_tabla
-            | etiqueta_section
-            | etiqueta_pregunta
-            | etiqueta_text
-            ;
 
-etiqueta_tabla  ::= MENOR TABLE MAYOR content_tabla INICIO_ETIQUETA TABLE MAYOR
+/*Produccion que representa al inicio del codigo interpretado*/
+
+etiqueta_principal      ::=  etiqueta_tabla:tabla
+                        {:
+                            RESULT = tabla;
+                        :}
+                        | etiqueta_section:sec
+                        {:
+                            RESULT = sec;
+                        :}
+                        ;
+
+/*Produccion que permite crear una tabla*/
+
+etiqueta_tabla  ::= MENOR TABLE MAYOR MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
+                    {:
+                        RESULT = new CompiledTable(-1, -1, 0, 0, filas, estilos);
+                    :}
                     ;
+
+/*Produccion que permite evaluar a todas las filas que vengan dentro de la tabla*/
+
+filas_tabla     ::=  filas_tabla:list fila:f
+                    {:
+                        list.add(f);
+                        RESULT = list;
+                    :}
+                    | fila:f
+                    {:
+                        List<List<CompiledForm>> list = new ArrayList<>();
+                        list.add(f);
+                        RESULT = list;
+                    :}
+                    ;
+
+/*Produccion que permite crear una fila*/
+
+fila        ::= MENOR LINE MAYOR celdas_tabla:fil INICIO_ETIQUETA LINE MAYOR
+                    {:
+                        RESULT = fil;
+                    :}
+                    ;
+
+/*Produccion que permite reconocer las columnas de la tabla*/
+
+celdas_tabla       ::=  celdas_tabla:list celda:c
+                    {:
+                        list.add(c);
+                        RESULT = list;
+                    :}
+                    | celda:c
+                    {:
+                        List<CompiledForm> list = new ArrayList<>();
+                        list.add(c);
+                        RESULT = list;
+                    :}
+                    ;
+
+/*Produccion que permite reconocer a las celdas*/
+
+celda         ::=  MENOR ELEMENT MAYOR etiqueta:e INICIO_ETIQUETA ELEMENT MAYOR
+                    {:
+                        RESULT = e;
+                    :}
+                    ;
+
+/*Produccion que representa a todos los elementos que pueden tener dentro unas secciones o tablas*/
+etiqueta                ::=  etiqueta_tabla:tabla
+                        {:
+                            RESULT = tabla;
+                        :}
+                        | etiqueta_section:sec
+                        {:
+                            RESULT = sec;
+                        :}
+                        | etiqueta_text:texto
+                        {:
+                            RESULT = texto;
+                        :}
+                        | etiqueta_preguntas:preguntas
+                        {:
+                            RESULT = preguntas;
+                        :}
+                        ;
+
+/*---Producciones para estilos-----*/
+
+
+
+
+
 
 /*Created by Pablo*/
 

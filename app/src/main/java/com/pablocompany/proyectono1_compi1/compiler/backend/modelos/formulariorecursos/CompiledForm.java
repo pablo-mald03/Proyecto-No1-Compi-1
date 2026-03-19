@@ -4,17 +4,17 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formularior
 public abstract class CompiledForm {
 
     //Atributos de la clase
-    private double width;
-    private double height;
+    private Number width;
+    private Number height;
 
-    private double pointX;
-    private double pointY;
+    private Number pointX;
+    private Number pointY;
 
     /*Atributo que representa todos los estilos de un componente*/
     private CompiledEstilos estilos;
 
     /*Constructor*/
-    public CompiledForm (double width, double height, double pointX, double pointY, CompiledEstilos estilos){
+    public CompiledForm (Number width, Number height, Number pointX, Number pointY, CompiledEstilos estilos){
         this.width = width;
         this.height = height;
         this.pointX = pointX;
@@ -24,19 +24,19 @@ public abstract class CompiledForm {
 
     /*Metodos getters*/
 
-    public double getWidth() {
+    public Number getWidth() {
         return this.width;
     }
 
-    public double getHeight() {
+    public Number getHeight() {
         return this.height;
     }
 
-    public double getPointX() {
+    public Number getPointX() {
         return this.pointX;
     }
 
-    public double getPointY() {
+    public Number getPointY() {
         return this.pointY;
     }
 

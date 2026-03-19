@@ -15,6 +15,10 @@ public class CompiledEstilos {
 
     private CompiledBorder borde;
 
+    /*Constructor vacio*/
+    public CompiledEstilos() {
+    }
+
     //Constructor para inicializar los atributos de layouts
     public CompiledEstilos(CompiledColor colorTexto, CompiledColor backgroundColor, String fontFamily, Number textSize, CompiledBorder borde) {
         this.backgroundColor = backgroundColor;

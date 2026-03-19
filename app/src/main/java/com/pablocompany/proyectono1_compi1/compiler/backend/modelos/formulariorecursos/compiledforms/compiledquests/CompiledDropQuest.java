@@ -1,0 +1,30 @@
+package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests;
+
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions;
+
+import java.util.List;
+
+//Clase que representa a una pregunta drop que puede tener un formulario
+public class CompiledDropQuest extends CompiledQuestions {
+
+    private Number respuesta;
+    private List<String> opciones;
+
+    public CompiledDropQuest(Number width, Number height, List<String> opciones, Number respuesta, CompiledEstilos estilos) {
+        super(width, height, estilos);
+        this.respuesta = respuesta;
+        this.opciones = opciones;
+    }
+
+    /*Metodos getter para obtener los atributos de la clase*/
+    public Number getRespuesta() {
+        return this.respuesta;
+    }
+
+    public List<String> getOpciones() {
+        return this.opciones;
+    }
+
+}
+/*Created by Pablo*/
