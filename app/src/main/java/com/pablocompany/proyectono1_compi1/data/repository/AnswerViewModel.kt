@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CodigoInterpretado
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.data.clases.ResultadoAnalisis
 
@@ -13,6 +14,15 @@ class AnswerViewModel : ViewModel() {
 
     //Permite tener el codigo procesado del formulario
     var codigoFormularioState = mutableStateOf("")
+
+    //Atributo que permite tener el codigo interpretado
+    var codigoFormularioStateInterprete by mutableStateOf<CodigoInterpretado?>(null)
+        private set
+
+    //Metodo que permite obtener el codigo interpretado
+    fun setCodigoProcesadoInterprete(codigo: CodigoInterpretado) {
+        codigoFormularioStateInterprete = codigo
+    }
 
     //Lista de errores (para poder compilar siempre es importante verificar si esta bien escrito)
 

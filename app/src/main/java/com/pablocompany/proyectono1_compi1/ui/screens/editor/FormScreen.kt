@@ -101,11 +101,17 @@ fun FormScreen(
     serverViewModel: ServerViewModel
 ) {
     //Variable que permite ir analizando el codigo de entrada
-    val analizarFormulario = remember { AnalizarFormularioUseCase() }
 
     val context = LocalContext.current
 
     val codigo = sharedFormViewModel.codigoCompilado
+    val interpretado = sharedFormViewModel.codigoInterpretado
+
+    //Obtener la lista de errores que se presentan en el analisis
+    val errores = sharedFormViewModel.listaErrores
+
+    /*Bloquea cuanto esta el parseo*/
+    val isParsing = sharedFormViewModel.isParsing
 
     val isModified = sharedFormViewModel.isModified
     val currentUri = sharedFormViewModel.currentFileUri
@@ -125,23 +131,10 @@ fun FormScreen(
         }
     }
 
-    //Obtener la lista de errores que se presentan en el analisis
-    val errores = sharedFormViewModel.listaErrores
 
     /* ---------------- Permite analizar al cargar--------- */
-    LaunchedEffect(codigo) {
-
-        if (codigo.isNullOrBlank()) {
-
-            sharedFormViewModel.limpiarResultado()
-            return@LaunchedEffect
-        }
-
-        val resultado = analizarFormulario.ejecutar(codigo)
-
-        sharedFormViewModel.setResultadoAnalisis(resultado)
-
-        if (resultado.errores.isNotEmpty()) {
+    LaunchedEffect(errores) {
+        if (errores.isNotEmpty()) {
             hayErrores = true
         }
     }
@@ -200,7 +193,11 @@ fun FormScreen(
 
             val name = getFileName(context, it)
 
-            sharedFormViewModel.loadFromFile(it, sharedFormViewModel.codigoProcesado ?: "",name)
+            sharedFormViewModel.loadFromFile(
+                it,
+                codigo ?: "",
+                name
+            )
         }
     }
 
@@ -306,8 +303,7 @@ fun FormScreen(
                         ) {
 
                             Text(
-                                text = if (sharedFormViewModel.codigoProcesado.isNotEmpty()){ sharedFormViewModel.codigoProcesado }
-                                else{"Sin código compilado" },
+                                text = sharedFormViewModel.codigoProcesado.ifBlank { "Sin codigo interpretado" },
                                 color = Color.White,
                                 fontFamily = FontFamily.Monospace,
                                 modifier = Modifier.fillMaxWidth(),
@@ -326,17 +322,19 @@ fun FormScreen(
 
                                 onClick = {
 
-                                    val resultado = analizarFormulario.ejecutar(codigo ?: "")
+                                    sharedFormViewModel.reanalizar()
 
-                                    sharedFormViewModel.setResultadoAnalisis(resultado)
-
-                                    if (resultado.errores.isNotEmpty()) {
+                                    if (errores.isNotEmpty()) {
                                         hayErrores = true
                                     }
                                 },
-
+                                enabled = interpretado != null && !isParsing,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF04643C)
+                                    containerColor = Color(0xFF04643C),
+                                    contentColor = Color.White,
+
+                                    disabledContainerColor = Color(0xFF96E181).copy(alpha = 0.3f),
+                                    disabledContentColor = Color.White.copy(alpha = 0.5f)
                                 ),
 
                                 shape = RoundedCornerShape(14.dp)
@@ -362,20 +360,25 @@ fun FormScreen(
 
                                 onClick = {
 
-                                    if (sharedFormViewModel.codigoProcesado.isNotBlank()) {
-                                        answerViewModel.setCodigoProcesado(
-                                            sharedFormViewModel.codigoProcesado
-                                        )
+                                    if (interpretado != null) {
+
+                                        answerViewModel.setCodigoProcesadoInterprete(interpretado)
+
                                         navController.navigate("answer")
-                                    }else{
-                                        Toast.makeText(context, "No hay formulario compilado para contestar", Toast.LENGTH_SHORT).show()
+
+                                    } else {
+                                        Toast.makeText(context, "No hay formulario interpretado", Toast.LENGTH_SHORT).show()
                                     }
 
                                 },
                                 modifier = Modifier.weight(1f),
-
+                                enabled = interpretado != null && !isParsing,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF0D47A1)
+                                    containerColor = Color(0xFF0D47A1),
+                                    contentColor = Color.White,
+
+                                    disabledContainerColor = Color(0xFF81A5E1).copy(alpha = 0.3f),
+                                    disabledContentColor = Color.White.copy(alpha = 0.5f)
                                 ),
 
                                 shape = RoundedCornerShape(14.dp)
@@ -460,7 +463,7 @@ fun FormScreen(
 
                         /* ----- PENDIENTE RECIBIR CODIGO DE BACKEND (QUEMADO) ----- */
 
-                        repeat(5) { index ->
+                        interpretado?.codigo?.forEach { componente ->
 
                             Card(
                                 modifier = Modifier
@@ -472,12 +475,11 @@ fun FormScreen(
                                 )
                             ) {
 
-                                Column(
-                                    Modifier.padding(16.dp)
-                                ) {
+                                Column(Modifier.padding(16.dp)) {
 
                                     Text(
-                                        "Campo $index",
+                                        //text = componente.id ?: "Campo",
+                                        text = "Campo",
                                         color = Color.White
                                     )
 
@@ -491,6 +493,8 @@ fun FormScreen(
                                 }
                             }
                         }
+
+                        /* ----- PENDIENTE RECIBIR CODIGO DE BACKEND (QUEMADO) ----- */
 
                         Spacer(Modifier.height(120.dp))
                     }

@@ -6,14 +6,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CodigoInterpretado
 import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.LexerCompiled
 import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.ParserCompiled
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.data.clases.ResultadoAnalisis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.StringReader
 
+//Clase que permite compartir datos entre pantallas
 class SharedFormViewModel : ViewModel() {
+
+    /*Atributos que permiten ejecutar el otro hilo para evitar que crashee la app*/
+    private var interpretJob: Job? = null
+
+    var isParsing by mutableStateOf(false)
+        private set
 
     /*Variable que permite guardar el codigo interpretado*/
     var codigoInterpretado by mutableStateOf<CodigoInterpretado?>(null)
@@ -42,6 +54,7 @@ class SharedFormViewModel : ViewModel() {
     var generadoDesdeEditor by mutableStateOf(false)
         private set
 
+    //Metodo que permite actualizar el contenido del formulario
     fun loadTemporary(codigoNuevo: String) {
         codigoCompilado = codigoNuevo
         isModified = true
@@ -50,6 +63,7 @@ class SharedFormViewModel : ViewModel() {
         interpretarCodigoCompilado(codigoNuevo)
     }
 
+    //Metodo que permite cargar un archivo
     fun loadFromFile(uri: Uri, contenido: String, name: String) {
         codigoCompilado = contenido
         currentFileUri = uri
@@ -77,12 +91,24 @@ class SharedFormViewModel : ViewModel() {
         isModified = false
     }
 
+    //Metodo que permite cerrar el formulario abierto
     fun limpiar() {
+
+        interpretJob?.cancel()
+
         codigoCompilado = null
+        codigoInterpretado = null
+        codigoProcesado = ""
+
+        listaErrores = emptyList()
+
         currentFileUri = null
         fileName = "Sin título"
+
         isModified = false
         generadoDesdeEditor = false
+
+        isParsing = false
     }
 
     //Metodos utilizados para desmarcar cuando se cerro desde el editor o cuando se guardo desde el editor
@@ -112,44 +138,65 @@ class SharedFormViewModel : ViewModel() {
     }
 
     /*Metodo utilizado para poder interpretar el codigo compilado*/
-    fun interpretarCodigoCompilado(codigo: String) {
+    private fun interpretarCodigoCompilado(codigo: String) {
 
-        try {
-            val reader = StringReader(codigo)
+        codigoProcesado = codigo
 
-            val lexer = LexerCompiled(reader)
-            val parser = ParserCompiled(lexer)
+        interpretJob?.cancel()
 
-            val resultado = parser.parse()
+        interpretJob = viewModelScope.launch {
 
-            val interpretado = resultado.value as? CodigoInterpretado
+            isParsing = true
 
-            val errores = parser.syntaxErrorList + lexer.lexicalErrors
+            try {
+                val resultado = withContext(Dispatchers.Default) {
 
-            if (errores.isNotEmpty() || interpretado == null) {
+                    val reader = StringReader(codigo)
+                    val lexer = LexerCompiled(reader)
+                    val parser = ParserCompiled(lexer)
+
+                    val parseResult = parser.parse()
+
+                    val interpretado = parseResult.value as? CodigoInterpretado
+
+                    /*Apartado de validar errores*/
+
+                    val errores = parser.syntaxErrorList + lexer.lexicalErrors
+
+                    Pair(interpretado, errores)
+                }
+
+                val (interpretado, errores) = resultado
+
+                if (errores.isNotEmpty() || interpretado == null) {
+                    codigoInterpretado = null
+                    listaErrores = errores
+                } else {
+                    codigoInterpretado = interpretado
+                    listaErrores = emptyList()
+                }
+
+            } catch (e: Exception) {
                 codigoInterpretado = null
-                listaErrores = errores
-            } else {
-                codigoInterpretado = interpretado
-                listaErrores = emptyList()
+                listaErrores = listOf(
+                    ErrorAnalisis(
+                        "Interpretacion",
+                        "Runtime",
+                        e.message ?: "Error interpretando codigo",
+                        -1,
+                        -1
+                    )
+                )
             }
 
-            Log.d("Interpretacion", "Interpretacion exitosa")
-            Log.d("Interpretacion", interpretado.toString())
-            Log.d("Interpretacion", "No hay errores?: ${listaErrores.isEmpty()}")
+            isParsing = false
+        }
+    }
 
-
-        } catch (e: Exception) {
-            codigoInterpretado = null
-            listaErrores = listOf(
-                ErrorAnalisis(
-                    "Interpretacion",
-                    "Runtime",
-                    e.message ?: "Error interpretando codigo compilado",
-                    -1,
-                    -1
-                )
-            )
+    /*Metodo para reanalizar el codigo*/
+    fun reanalizar() {
+        codigoCompilado?.let {
+            interpretarCodigoCompilado(it)
         }
     }
 
