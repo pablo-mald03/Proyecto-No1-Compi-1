@@ -13,7 +13,7 @@ public class CompiledHslColor extends CompiledColor {
     private Number blue;
     private Number green;
 
-    public CompiledHslColor(Number red, Number green, Number blue, TablaSimbolos tabla) {
+    public CompiledHslColor(Number red, Number green, Number blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;

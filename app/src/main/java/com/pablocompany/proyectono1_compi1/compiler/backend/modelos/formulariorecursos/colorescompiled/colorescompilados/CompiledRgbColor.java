@@ -9,7 +9,7 @@ public class CompiledRgbColor extends CompiledColor {
     private Number green;
     private Number blue;
 
-    public CompiledRgbColor(Number red, Number green, Number blue, TablaSimbolos tabla) {
+    public CompiledRgbColor(Number red, Number green, Number blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;

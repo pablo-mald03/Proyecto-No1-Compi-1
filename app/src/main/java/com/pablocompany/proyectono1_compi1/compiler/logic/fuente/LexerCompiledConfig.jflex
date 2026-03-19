@@ -115,6 +115,17 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 {HexColor} { return symbol(SymCompiled.COLOR_HEX, yytext()); }
 
+/*---RECONOCIMIENTO DE COLORES---*/
+
+"RED"       { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"BLUE"      { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"GREEN"     { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"PURPLE"    { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"SKY"       { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"YELLOW"    { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"BLACK"     { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+"WHITE"     { return symbol(SymCompiled.COLOR_PRESET, yytext()); }
+
 /*---FIN DEL APARTADO DE COLORES---*/
 
 

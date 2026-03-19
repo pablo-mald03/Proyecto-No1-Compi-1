@@ -12,14 +12,12 @@ public class CompiledSection extends CompiledContenedor {
 
     //Representa la orientacion de la seccion
     public TipoOrientacion orientation;
-
     private List<CompiledForm> elementos;
-
 
     public CompiledSection(Number width, Number height, Number pointX, Number pointY, String orientation,List<CompiledForm> elementos, CompiledEstilos estilos) {
         super(width, height, pointX, pointY,estilos);
         try{
-            this.orientation = TipoOrientacion.valueOf(orientation);
+            this.orientation = TipoOrientacion.valueOf(orientation.toUpperCase());
         }catch(Exception e){
             this.orientation = TipoOrientacion.VERTICAL;
         }

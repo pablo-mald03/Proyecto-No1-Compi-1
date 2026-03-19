@@ -10,8 +10,12 @@ public class CompiledPresetColor extends CompiledColor {
     //Atributos
     private TipoColor colorPreset;
 
-    public CompiledPresetColor(TipoColor colorPreset) {
-        this.colorPreset = colorPreset;
+    public CompiledPresetColor(String colorPreset) {
+        try{
+            this.colorPreset =TipoColor.valueOf(colorPreset.toUpperCase());
+        }catch (IllegalArgumentException e){
+            this.colorPreset = TipoColor.BLACK;
+        }
     }
 
     //Metodo que permite retornar el color en formato RGB (util en frontend)

@@ -20,21 +20,30 @@ public class CompiledEstilos {
     }
 
     //Constructor para inicializar los atributos de layouts
-    public CompiledEstilos(CompiledColor colorTexto, CompiledColor backgroundColor, String fontFamily, Number textSize, CompiledBorder borde) {
+    public CompiledEstilos(CompiledColor colorTexto, CompiledColor backgroundColor, String fontFamilia, Number textSize, CompiledBorder borde) {
         this.backgroundColor = backgroundColor;
         this.colorTexto = colorTexto;
-        this.fontFamily = TipoLetra.valueOf(fontFamily);
+        this.setTipoLetra(fontFamilia);
         this.textSize = textSize;
         this.borde = borde;
     }
 
     //Constructor para inicializar los atributos de componentes
-    public CompiledEstilos(CompiledColor colorTexto, CompiledColor backgroundColor, String fontFamily, Number textSize) {
+    public CompiledEstilos(CompiledColor colorTexto, CompiledColor backgroundColor, String fontFamilia, Number textSize) {
         this.backgroundColor = backgroundColor;
         this.colorTexto = colorTexto;
-        this.fontFamily = TipoLetra.valueOf(fontFamily);
+        this.setTipoLetra(fontFamilia);
         this.textSize = textSize;
         this.borde = null;
+    }
+
+    /*Metodo utilizado para reconocer el tipo de letra*/
+    private void setTipoLetra(String tipo) {
+        try {
+            this.fontFamily = TipoLetra.valueOf(tipo.toUpperCase());
+        } catch (Exception e) {
+            this.fontFamily = TipoLetra.MONO;
+        }
     }
 
     //Metodos getters de los atributos de la clase

@@ -8,53 +8,54 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.fuente;
 /** CUP generated class containing symbol constants. */
 public class SymCompiled {
   /* terminals */
-  public static final int EMOJI_MULTI_STAR = 39;
-  public static final int DIAGONAL = 28;
-  public static final int INICIO_CADENA = 42;
+  public static final int EMOJI_MULTI_STAR = 45;
+  public static final int DIAGONAL = 27;
+  public static final int INICIO_CADENA = 31;
   public static final int COLOR_KEY = 9;
-  public static final int ENTERO = 46;
-  public static final int GROSOR_LINEA = 33;
+  public static final int ENTERO = 35;
+  public static final int GROSOR_LINEA = 36;
   public static final int RESTA = 2;
-  public static final int PARENT_CIERRE = 30;
-  public static final int EMOJI_HEART = 37;
+  public static final int PARENT_CIERRE = 29;
+  public static final int EMOJI_HEART = 43;
   public static final int FONT = 11;
-  public static final int TIPOGRAFIA = 32;
-  public static final int EMOJI_SAD = 35;
-  public static final int CIERRE_ETIQUETA = 24;
+  public static final int TIPOGRAFIA = 38;
+  public static final int EMOJI_SAD = 41;
+  public static final int CIERRE_ETIQUETA = 23;
   public static final int IGUAL = 3;
-  public static final int CONFIG_DOCK = 31;
-  public static final int SELECT = 22;
-  public static final int EMOJI_STAR = 38;
+  public static final int CONFIG_DOCK = 30;
+  public static final int SELECT = 21;
+  public static final int EMOJI_STAR = 44;
   public static final int BACKGROUND = 10;
-  public static final int COLOR_HEX = 44;
-  public static final int DECIMAL = 45;
+  public static final int COLOR_HEX = 33;
   public static final int EOF = 0;
-  public static final int INICIO_ETIQUETA = 25;
+  public static final int INICIO_ETIQUETA = 24;
+  public static final int DECIMAL = 34;
   public static final int SIZE = 13;
   public static final int TABLE = 16;
   public static final int error = 1;
-  public static final int FIN_CADENA = 43;
+  public static final int FIN_CADENA = 32;
   public static final int COMA = 4;
-  public static final int LINE = 18;
-  public static final int MENOR = 26;
-  public static final int PARENT_APERTURA = 29;
-  public static final int MULTIPLE = 23;
-  public static final int MAYOR = 27;
-  public static final int EMOJI_SMILE = 34;
+  public static final int LINE = 37;
+  public static final int MENOR = 25;
+  public static final int PARENT_APERTURA = 28;
+  public static final int MULTIPLE = 22;
+  public static final int MAYOR = 26;
+  public static final int EMOJI_SMILE = 40;
   public static final int FAMILY = 12;
   public static final int CONTENT = 8;
   public static final int LLAVE_APERTURA = 5;
-  public static final int ELEMENT = 19;
-  public static final int TEXTO_PLANO = 41;
-  public static final int DROP = 21;
-  public static final int OPEN = 20;
+  public static final int ELEMENT = 18;
+  public static final int TEXTO_PLANO = 47;
+  public static final int DROP = 20;
+  public static final int OPEN = 19;
   public static final int BORDER = 14;
-  public static final int EMOJI_SERIOUS = 36;
+  public static final int EMOJI_SERIOUS = 42;
   public static final int LLAVE_CIERRE = 6;
+  public static final int COLOR_PRESET = 39;
   public static final int TEXT = 17;
   public static final int SECTION = 15;
   public static final int STYLE = 7;
-  public static final int EMOJI_CAT = 40;
+  public static final int EMOJI_CAT = 46;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -74,7 +75,6 @@ public class SymCompiled {
   "SECTION",
   "TABLE",
   "TEXT",
-  "LINE",
   "ELEMENT",
   "OPEN",
   "DROP",
@@ -88,8 +88,15 @@ public class SymCompiled {
   "PARENT_APERTURA",
   "PARENT_CIERRE",
   "CONFIG_DOCK",
-  "TIPOGRAFIA",
+  "INICIO_CADENA",
+  "FIN_CADENA",
+  "COLOR_HEX",
+  "DECIMAL",
+  "ENTERO",
   "GROSOR_LINEA",
+  "LINE",
+  "TIPOGRAFIA",
+  "COLOR_PRESET",
   "EMOJI_SMILE",
   "EMOJI_SAD",
   "EMOJI_SERIOUS",
@@ -97,12 +104,7 @@ public class SymCompiled {
   "EMOJI_STAR",
   "EMOJI_MULTI_STAR",
   "EMOJI_CAT",
-  "TEXTO_PLANO",
-  "INICIO_CADENA",
-  "FIN_CADENA",
-  "COLOR_HEX",
-  "DECIMAL",
-  "ENTERO"
+  "TEXTO_PLANO"
   };
 }
 

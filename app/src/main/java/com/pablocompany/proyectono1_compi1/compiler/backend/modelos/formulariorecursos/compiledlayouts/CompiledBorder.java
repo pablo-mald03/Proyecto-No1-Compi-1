@@ -11,10 +11,10 @@ public class CompiledBorder {
     private CompiledColor color;
     private TipoBorde tipo;
 
-    public CompiledBorder(Number width, String tipo,CompiledColor color) {
+    public CompiledBorder(Number width, String tipos,CompiledColor color) {
         this.width = width;
         this.color = color;
-        this.tipo = TipoBorde.valueOf(tipo);
+        this.tipo = TipoBorde.valueOf(tipos.toUpperCase());
     }
 
     public Number getWidth() {
