@@ -1,14 +1,23 @@
 package com.pablocompany.proyectono1_compi1.data.repository
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CodigoInterpretado
+import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.LexerCompiled
+import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.ParserCompiled
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.data.clases.ResultadoAnalisis
+import java.io.StringReader
 
 class SharedFormViewModel : ViewModel() {
+
+    /*Variable que permite guardar el codigo interpretado*/
+    var codigoInterpretado by mutableStateOf<CodigoInterpretado?>(null)
+        private set
 
     //Codigo ya procesado que se pasara a la consola de la UI
     var codigoProcesado by mutableStateOf<String>("")
@@ -37,6 +46,8 @@ class SharedFormViewModel : ViewModel() {
         codigoCompilado = codigoNuevo
         isModified = true
         generadoDesdeEditor = true
+
+        interpretarCodigoCompilado(codigoNuevo)
     }
 
     fun loadFromFile(uri: Uri, contenido: String, name: String) {
@@ -45,6 +56,8 @@ class SharedFormViewModel : ViewModel() {
         fileName = name
         isModified = false
         generadoDesdeEditor = false
+
+        interpretarCodigoCompilado(contenido)
     }
 
     //Exclusivo del editorScreen
@@ -97,4 +110,47 @@ class SharedFormViewModel : ViewModel() {
     fun getCodigoParaSubir(): String {
         return codigoProcesado
     }
+
+    /*Metodo utilizado para poder interpretar el codigo compilado*/
+    fun interpretarCodigoCompilado(codigo: String) {
+
+        try {
+            val reader = StringReader(codigo)
+
+            val lexer = LexerCompiled(reader)
+            val parser = ParserCompiled(lexer)
+
+            val resultado = parser.parse()
+
+            val interpretado = resultado.value as? CodigoInterpretado
+
+            val errores = parser.syntaxErrorList + lexer.lexicalErrors
+
+            if (errores.isNotEmpty() || interpretado == null) {
+                codigoInterpretado = null
+                listaErrores = errores
+            } else {
+                codigoInterpretado = interpretado
+                listaErrores = emptyList()
+            }
+
+            Log.d("Interpretacion", "Interpretacion exitosa")
+            Log.d("Interpretacion", interpretado.toString())
+            Log.d("Interpretacion", "No hay errores?: ${listaErrores.isEmpty()}")
+
+
+        } catch (e: Exception) {
+            codigoInterpretado = null
+            listaErrores = listOf(
+                ErrorAnalisis(
+                    "Interpretacion",
+                    "Runtime",
+                    e.message ?: "Error interpretando codigo compilado",
+                    -1,
+                    -1
+                )
+            )
+        }
+    }
+
 }

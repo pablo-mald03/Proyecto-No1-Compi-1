@@ -397,6 +397,10 @@ celda               ::=  MENOR ELEMENT MAYOR etiqueta:e INICIO_ETIQUETA ELEMENT 
                     {:
                         RESULT = e;
                     :}
+                    | MENOR ELEMENT error MAYOR
+                    {:
+                        RESULT = new CompiledText(0, 0, null, null, 0, 0);
+                    :}
                     ;
 
 
@@ -432,7 +436,6 @@ etiqueta                ::=  etiqueta_tabla:tabla
                             RESULT = multQ;
                         :}
                         ;
-
 
 
 
@@ -586,7 +589,7 @@ bloque_estilos_quests      ::= MENOR STYLE MAYOR lista_estilos_quests:estilos IN
 
 /*---Produccion que permite definir los estilos----*/
 
-lista_estilos    ::= lista_estilos:list lista_propiedades:est
+lista_estilos       ::= lista_estilos:list lista_propiedades:est
                     {:
                         list.add(est);
                         RESULT = list;
@@ -632,21 +635,21 @@ lista_propiedades       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQ
 /*---Produccion que permite definir los estilos de preguntas----*/
 
 lista_estilos_quests    ::= lista_estilos_quests:list lista_propiedades_quests:est
-                    {:
-                        list.add(est);
-                        RESULT = list;
-                    :}
-                    | lista_propiedades_quests:est
-                    {:
-                        List<CompiledEstilos> list = new ArrayList<>();
-                        list.add(est);
-                        RESULT = list;
-                    :}
-                    | lista_estilos_quests:est error
-                    {:
-                        RESULT = est;
-                    :}
-                    ;
+                        {:
+                            list.add(est);
+                            RESULT = list;
+                        :}
+                        | lista_propiedades_quests:est
+                        {:
+                            List<CompiledEstilos> list = new ArrayList<>();
+                            list.add(est);
+                            RESULT = list;
+                        :}
+                        | lista_estilos_quests:est error
+                        {:
+                            RESULT = est;
+                        :}
+                        ;
 
 
 
@@ -716,6 +719,14 @@ valor_numerico      ::= ENTERO:entero
                     | DECIMAL:dec
                     {:
                         RESULT = dec;
+                    :}
+                    | RESTA ENTERO:e
+                    {:
+                        RESULT = e * -1;
+                    :}
+                    | RESTA DECIMAL:d
+                    {:
+                        RESULT = d * -1;
                     :}
                     ;
 
