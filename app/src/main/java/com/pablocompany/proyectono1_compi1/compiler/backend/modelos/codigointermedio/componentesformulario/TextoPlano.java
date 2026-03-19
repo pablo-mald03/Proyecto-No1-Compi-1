@@ -83,7 +83,7 @@ public class TextoPlano extends Formulario {
 
         StringBuilder estilosEtiquetaBasicos = new StringBuilder();
 
-        estilosEtiquetaBasicos.append("<open=");
+        estilosEtiquetaBasicos.append("<text=");
         estilosEtiquetaBasicos.append(this.width != null ? this.width.toString() : "-1").append(",");
         estilosEtiquetaBasicos.append(this.height != null ? this.height : "-1").append(",");
         estilosEtiquetaBasicos.append("\"").append(this.texto).append("\"");
@@ -92,7 +92,7 @@ public class TextoPlano extends Formulario {
             estilosEtiquetaBasicos.append(">\n\n");
             estilosEtiquetaBasicos.append(this.estilos.crearEstilosBasicos());
             estilosEtiquetaBasicos.append("\n\n");
-            estilosEtiquetaBasicos.append("</open>");
+            estilosEtiquetaBasicos.append("</text>");
         } else {
             estilosEtiquetaBasicos.append("/>\n\n");
         }

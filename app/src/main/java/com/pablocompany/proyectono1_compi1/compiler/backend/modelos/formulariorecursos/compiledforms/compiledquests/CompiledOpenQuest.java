@@ -10,15 +10,15 @@ import java.util.List;
 public class CompiledOpenQuest extends CompiledQuestions {
 
     //Atributo
-    public List<CompiledCadenaTexto> texto;
+    private CompiledCadenaTexto texto;
 
-    public CompiledOpenQuest(Number width, Number height, List<CompiledCadenaTexto> texto, List<CompiledEstilos> estilos, int fila, int columna) {
+    public CompiledOpenQuest(Number width, Number height, CompiledCadenaTexto texto, List<CompiledEstilos> estilos, int fila, int columna) {
         super(width, height, estilos, fila, columna);
         this.texto = texto;
     }
 
     /*Metodo getter del texto*/
-    public List<CompiledCadenaTexto> getTexto() {
+    public CompiledCadenaTexto getTexto() {
         return this.texto;
     }
 

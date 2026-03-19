@@ -8,56 +8,53 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.fuente;
 /** CUP generated class containing symbol constants. */
 public class SymCompiled {
   /* terminals */
-  public static final int EMOJI_MULTI_STAR = 47;
-  public static final int DIAGONAL = 27;
-  public static final int INICIO_CADENA = 32;
+  public static final int EMOJI_MULTI_STAR = 44;
+  public static final int INICIO_CADENA = 29;
   public static final int COLOR_KEY = 9;
-  public static final int ENTERO = 36;
-  public static final int GROSOR_LINEA = 37;
+  public static final int ENTERO = 33;
+  public static final int GROSOR_LINEA = 34;
   public static final int RESTA = 2;
-  public static final int PARENT_CIERRE = 29;
-  public static final int EMOJI_HEART = 45;
+  public static final int PARENT_CIERRE = 28;
+  public static final int EMOJI_HEART = 42;
   public static final int FONT = 11;
-  public static final int TIPOGRAFIA = 39;
-  public static final int EMOJI_SAD = 43;
+  public static final int TIPOGRAFIA = 36;
+  public static final int EMOJI_SAD = 40;
   public static final int CIERRE_ETIQUETA = 23;
   public static final int IGUAL = 3;
-  public static final int CONFIG_DOCK = 41;
-  public static final int PREGUNTA = 31;
+  public static final int CONFIG_DOCK = 38;
   public static final int SELECT = 21;
-  public static final int EMOJI_STAR = 46;
+  public static final int EMOJI_STAR = 43;
   public static final int BACKGROUND = 10;
-  public static final int COLOR_HEX = 34;
-  public static final int DECIMAL = 35;
+  public static final int COLOR_HEX = 31;
   public static final int EOF = 0;
   public static final int INICIO_ETIQUETA = 24;
+  public static final int DECIMAL = 32;
   public static final int SIZE = 13;
   public static final int TABLE = 16;
   public static final int error = 1;
-  public static final int FIN_CADENA = 33;
+  public static final int FIN_CADENA = 30;
   public static final int COMA = 4;
-  public static final int LINE = 38;
+  public static final int LINE = 35;
   public static final int MENOR = 25;
-  public static final int PARENT_APERTURA = 28;
+  public static final int PARENT_APERTURA = 27;
   public static final int MULTIPLE = 22;
   public static final int MAYOR = 26;
-  public static final int SELECCIONA = 30;
-  public static final int EMOJI_SMILE = 42;
+  public static final int EMOJI_SMILE = 39;
   public static final int FAMILY = 12;
   public static final int CONTENT = 8;
   public static final int LLAVE_APERTURA = 5;
   public static final int ELEMENT = 18;
-  public static final int TEXTO_PLANO = 49;
+  public static final int TEXTO_PLANO = 46;
   public static final int DROP = 20;
   public static final int OPEN = 19;
   public static final int BORDER = 14;
-  public static final int EMOJI_SERIOUS = 44;
+  public static final int EMOJI_SERIOUS = 41;
   public static final int LLAVE_CIERRE = 6;
-  public static final int COLOR_PRESET = 40;
+  public static final int COLOR_PRESET = 37;
   public static final int TEXT = 17;
   public static final int SECTION = 15;
   public static final int STYLE = 7;
-  public static final int EMOJI_CAT = 48;
+  public static final int EMOJI_CAT = 45;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
@@ -86,11 +83,8 @@ public class SymCompiled {
   "INICIO_ETIQUETA",
   "MENOR",
   "MAYOR",
-  "DIAGONAL",
   "PARENT_APERTURA",
   "PARENT_CIERRE",
-  "SELECCIONA",
-  "PREGUNTA",
   "INICIO_CADENA",
   "FIN_CADENA",
   "COLOR_HEX",

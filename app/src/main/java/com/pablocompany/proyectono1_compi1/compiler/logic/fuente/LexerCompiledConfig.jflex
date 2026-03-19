@@ -189,10 +189,6 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
 "multiple"   { return symbol(SymCompiled.MULTIPLE); }
 
-"\"Selecciona\""   { return symbol(SymCompiled.SELECCIONA); }
-
-"\"pregunta\""   { return symbol(SymCompiled.PREGUNTA); }
-
 
 /*=====***--FIN DEL APARTADO DE ETIQUETAS COMPUESTAS--***====*/
 
@@ -211,8 +207,6 @@ HexColor = "#"[0-9A-Fa-f]{6}
 "<"      { return symbol(SymCompiled.MENOR); }
 
 ">"      { return symbol(SymCompiled.MAYOR); }
-
-"/"      { return symbol(SymCompiled.DIAGONAL); }
 
 
 /*------*****--------FIN DEL APARTADO DE SIMBOLOS ESPECIALES--------*****------*/

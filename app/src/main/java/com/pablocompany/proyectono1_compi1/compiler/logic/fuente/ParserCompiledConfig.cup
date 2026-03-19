@@ -138,9 +138,8 @@ terminal    RESTA,
             IGUAL, COMA, LLAVE_APERTURA, LLAVE_CIERRE,
             STYLE, CONTENT, COLOR_KEY, BACKGROUND, FONT, FAMILY, SIZE, BORDER,
             SECTION, TABLE, TEXT, ELEMENT, OPEN, DROP, SELECT, MULTIPLE,
-            CIERRE_ETIQUETA, INICIO_ETIQUETA, MENOR, MAYOR, DIAGONAL,
+            CIERRE_ETIQUETA, INICIO_ETIQUETA, MENOR, MAYOR,
             PARENT_APERTURA, PARENT_CIERRE,
-            SELECCIONA, PREGUNTA,
             INICIO_CADENA, FIN_CADENA
             ;
 
@@ -184,9 +183,7 @@ non terminal CompiledForm etiqueta;
 
 non terminal CompiledTable etiqueta_tabla;
 non terminal CompiledSection etiqueta_section;
-non terminal CompiledText etiqueta_text;
-non terminal CompiledQuestions etiqueta_preguntas;
-
+non terminal List<CompiledForm> etiquetas_sections;
 
 /*No terminales que representan a las etiquetas que iran dentro de etiquetas el interprete*/
 
@@ -196,7 +193,8 @@ non terminal List<CompiledForm> celdas_tabla;
 non terminal CompiledForm celda;
 
 /*No terminales utilizados pra poder procesar los estilos*/
-non terminal CompiledEstilos bloque_estilos;
+non terminal List<CompiledEstilos> bloque_estilos;
+non terminal List<CompiledEstilos> bloque_estilos_quests;
 
 
 /*No terminal que reconoce a los colores disponibles*/
@@ -222,8 +220,32 @@ non terminal List<CompiledEstilos> lista_estilos;
 non terminal CompiledEstilos lista_propiedades;
 
 
-/*Created by Pablo*/
+/*No terminales de tipos de estilos de preguntas*/
 
+non terminal List<CompiledEstilos> lista_estilos_quests;
+non terminal CompiledEstilos lista_propiedades_quests;
+
+
+/*---Producciones de los tipos de preguntas---*/
+
+non terminal CompiledDropQuest etiqueta_drop;
+non terminal CompiledOpenQuest etiqueta_open;
+non terminal CompiledText etiqueta_text;
+non terminal CompiledSelectQuest etiqueta_select;
+non terminal CompiledMultipleQuest etiqueta_multiple;
+
+
+
+/*----Producciones de opciones----*/
+
+non terminal List<CompiledCadenaTexto> lista_opciones;
+
+non terminal List<Number> lista_respuestas;
+
+non terminal List<Number>  valores_respuestas;
+
+
+/*Created by Pablo*/
 
 
 /* Simbolo inicial */
@@ -271,9 +293,47 @@ etiqueta_principal      ::=  etiqueta_tabla:tabla
                         :}
                         ;
 
-/*Produccion que permite crear una tabla*/
 
-etiqueta_tabla  ::= MENOR TABLE:tab IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_numerico:pointx COMA valor_numerico:pointy MAYOR lista_estilos:estilos MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
+
+/*Produccion que permite interpretar una section*/
+
+etiqueta_section        ::= MENOR SECTION:sec IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_numerico:pointx COMA valor_numerico:pointy COMA CONFIG_DOCK:orient MAYOR
+                            bloque_estilos:estilos MENOR CONTENT MAYOR etiquetas_sections:et  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA SECTION MAYOR
+                        {:
+                            RESULT = new CompiledSection(w, h, pointx, pointy,orient,et, estilos,secleft, secright);
+                        :}
+                        | MENOR SECTION:sec IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_numerico:pointx COMA valor_numerico:pointy COMA CONFIG_DOCK:orient MAYOR
+                            MENOR CONTENT MAYOR etiquetas_sections:et  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA SECTION MAYOR
+                        {:
+                            RESULT = new CompiledSection(w, h, pointx, pointy,orient,et, null,secleft, secright);
+                        :}
+                        ;
+
+
+
+/*--Produccion que permite interpretar a los valores que puede tener una section--*/
+
+etiquetas_sections        ::=  etiquetas_sections:list etiqueta:e
+                            {:
+                                list.add(e);
+                                RESULT = list;
+                            :}
+                            | etiqueta:e
+                            {:
+                                List<CompiledForm> list = new ArrayList<>();
+                                list.add(e);
+                                RESULT = list;
+                            :}
+                            | etiquetas_sections:list error
+                            {:
+                                RESULT = list;
+                            :}
+                            ;
+
+
+/*Produccion que permite interpretar una tabla*/
+
+etiqueta_tabla  ::= MENOR TABLE:tab IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_numerico:pointx COMA valor_numerico:pointy MAYOR bloque_estilos:estilos MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
                     {:
                         RESULT = new CompiledTable(w, h, pointx, pointy, filas, estilos,tableft, tabright);
                     :}
@@ -282,6 +342,7 @@ etiqueta_tabla  ::= MENOR TABLE:tab IGUAL valor_numerico:w COMA valor_numerico:h
                         RESULT = new CompiledTable(w, h, pointx, pointy, filas, null,tableft, tabright);
                     :}
                     ;
+
 
 
 /*Produccion que permite evaluar a todas las filas que vengan dentro de la tabla*/
@@ -303,13 +364,17 @@ filas_tabla     ::=  filas_tabla:list fila:f
                     :}
                     ;
 
+
+
 /*Produccion que permite crear una fila*/
 
-fila        ::= MENOR LINE MAYOR celdas_tabla:fil INICIO_ETIQUETA LINE MAYOR
+fila                ::= MENOR LINE MAYOR celdas_tabla:fil INICIO_ETIQUETA LINE MAYOR
                     {:
                         RESULT = fil;
                     :}
                     ;
+
+
 
 /*Produccion que permite reconocer las columnas de la tabla*/
 
@@ -328,13 +393,16 @@ celdas_tabla       ::=  celdas_tabla:list celda:c
 
 /*Produccion que permite reconocer a las celdas*/
 
-celda         ::=  MENOR ELEMENT MAYOR etiqueta:e INICIO_ETIQUETA ELEMENT MAYOR
+celda               ::=  MENOR ELEMENT MAYOR etiqueta:e INICIO_ETIQUETA ELEMENT MAYOR
                     {:
                         RESULT = e;
                     :}
                     ;
 
+
+
 /*Produccion que representa a todos los elementos que pueden tener dentro unas secciones o tablas*/
+
 etiqueta                ::=  etiqueta_tabla:tabla
                         {:
                             RESULT = tabla;
@@ -347,22 +415,174 @@ etiqueta                ::=  etiqueta_tabla:tabla
                         {:
                             RESULT = texto;
                         :}
-                        | etiqueta_preguntas:preguntas
+                        | etiqueta_open:openQ
                         {:
-                            RESULT = preguntas;
+                            RESULT = openQ;
+                        :}
+                        | etiqueta_drop: dropQ
+                        {:
+                            RESULT = dropQ;
+                        :}
+                        | etiqueta_select:selQ
+                        {:
+                            RESULT = selQ;
+                        :}
+                        | etiqueta_multiple:multQ
+                        {:
+                            RESULT = multQ;
                         :}
                         ;
+
+
+
+
+/*-*----*-----*-----Producciones para los textos----*------*-----*-*/
+
+etiqueta_text       ::= MENOR TEXT:txt IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad CIERRE_ETIQUETA
+                    {:
+                        RESULT = new CompiledText(w, h, cad, null, txtleft, txtright);
+                    :}
+                    | MENOR TEXT:txt IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad MAYOR
+                        bloque_estilos_quests:est INICIO_ETIQUETA TEXT MAYOR
+                    {:
+                        RESULT = new CompiledText(w, h, cad, est, txtleft, txtright);
+                    :}
+                    ;
+
+
+
+
+/*-*----*-----*-----Producciones para las preguntas open----*------*-----*-*/
+
+etiqueta_open       ::= MENOR OPEN:op IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad CIERRE_ETIQUETA
+                    {:
+                        RESULT = new CompiledOpenQuest(w, h, cad, null, opleft, opright);
+                    :}
+                    | MENOR OPEN:op IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad MAYOR
+                        bloque_estilos_quests:est INICIO_ETIQUETA OPEN MAYOR
+                    {:
+                        RESULT = new CompiledOpenQuest(w, h, cad, est, opleft, opright);
+                    :}
+                    ;
+
+
+/*-*----*-----*-----Producciones para las preguntas drop----*------*-----*-*/
+
+etiqueta_drop           ::= MENOR DROP:dr IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad COMA
+                                LLAVE_APERTURA lista_opciones:ops LLAVE_CIERRE COMA valor_numerico:def CIERRE_ETIQUETA
+                        {:
+                            RESULT = new CompiledDropQuest(w, h,cad, ops, def, null, drleft, drright);
+                        :}
+                        | MENOR DROP:dr IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad COMA
+                            LLAVE_APERTURA lista_opciones:ops LLAVE_CIERRE COMA valor_numerico:def MAYOR
+                            bloque_estilos_quests:est INICIO_ETIQUETA DROP MAYOR
+                        {:
+                            RESULT = new CompiledDropQuest(w, h,cad, ops, def, est, drleft, drright);
+                        :}
+                        ;
+
+
+/*-*----*-----*-----Producciones para las preguntas select----*------*-----*-*/
+
+etiqueta_select           ::= MENOR SELECT:sele IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad COMA
+                                LLAVE_APERTURA lista_opciones:ops LLAVE_CIERRE COMA valor_numerico:def CIERRE_ETIQUETA
+                            {:
+                                RESULT = new CompiledSelectQuest(w, h,cad, ops, def, null, seleleft, seleright);
+                            :}
+                            | MENOR SELECT:sele IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad COMA
+                                LLAVE_APERTURA lista_opciones:ops LLAVE_CIERRE COMA valor_numerico:def MAYOR
+                                bloque_estilos_quests:est INICIO_ETIQUETA SELECT MAYOR
+                            {:
+                                RESULT = new CompiledSelectQuest(w, h,cad, ops, def, est, seleleft, seleright);
+                            :}
+                            ;
+
+
+/*-*----*-----*-----Producciones para las preguntas multiple----*------*-----*-*/
+
+etiqueta_multiple       ::= MENOR MULTIPLE:mult IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad COMA
+                            LLAVE_APERTURA lista_opciones:ops LLAVE_CIERRE COMA
+                            lista_respuestas:res CIERRE_ETIQUETA
+                        {:
+                            RESULT = new CompiledMultipleQuest(w, h,cad, ops, res, null, multleft, multright);
+                        :}
+                        | MENOR MULTIPLE:mult IGUAL valor_numerico:w COMA valor_numerico:h COMA valor_cadena:cad COMA
+                          LLAVE_APERTURA lista_opciones:ops LLAVE_CIERRE COMA lista_respuestas:res MAYOR
+                          bloque_estilos_quests:est INICIO_ETIQUETA MULTIPLE MAYOR
+                        {:
+                            RESULT = new CompiledMultipleQuest(w, h,cad, ops, res, est, multleft, multright);
+                        :}
+                        ;
+
+
+
+/*----Lista de opciones que puede tener la drop question-----*/
+
+lista_opciones      ::= lista_opciones:list COMA valor_cadena:cad
+                    {:
+                        list.add(cad);
+                        RESULT = list;
+                    :}
+                    | valor_cadena:cad
+                    {:
+                        List<CompiledCadenaTexto> list = new ArrayList<>();
+                        list.add(cad);
+                        RESULT = list;
+                    :}
+                    ;
+
+
+
+/*----Lista de respuestas que puede tener la multiple question-----*/
+
+lista_respuestas        ::= LLAVE_APERTURA valores_respuestas:list LLAVE_CIERRE
+                        {:
+                            RESULT = list;
+                        :}
+                        | LLAVE_APERTURA LLAVE_CIERRE
+                        {:
+                            RESULT = new ArrayList<Number>();
+                        :}
+                        ;
+
+
+
+/*----Lista de las diferentes respuestas que puede tener la multiple question-----*/
+
+valores_respuestas      ::= valores_respuestas:list COMA valor_numerico:num
+                        {:
+                            list.add(num);
+                            RESULT = list;
+                        :}
+                        | valor_numerico:num
+                        {:
+                            List<Number> list = new ArrayList<>();
+                            list.add(num);
+                            RESULT = list;
+                        :}
+                        ;
+
+
+/*-*----*-----*-----Producciones para las preguntas----*------*-----*-*/
+
 
 /*-----Producciones para estilos de layouts (tablas o sections)-----*/
 
 /*---Produccion principal----*/
 
-bloque_estilos      ::= MENOR STYLE MAYOR lista_propiedades:estilos INICIO_ETIQUETA STYLE MAYOR
+bloque_estilos      ::= MENOR STYLE MAYOR lista_estilos:estilos INICIO_ETIQUETA STYLE MAYOR
                     {:
                         RESULT = estilos;
                     :}
                     | error MAYOR
                     ;
+
+bloque_estilos_quests      ::= MENOR STYLE MAYOR lista_estilos_quests:estilos INICIO_ETIQUETA STYLE MAYOR
+                            {:
+                                RESULT = estilos;
+                            :}
+                            | error MAYOR
+                            ;
 
 /*---Produccion que permite definir los estilos----*/
 
@@ -407,6 +627,50 @@ lista_propiedades       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQ
                             RESULT = new CompiledBorder(num2, grosor, colores3);
                         :}
                         ;
+
+
+/*---Produccion que permite definir los estilos de preguntas----*/
+
+lista_estilos_quests    ::= lista_estilos_quests:list lista_propiedades_quests:est
+                    {:
+                        list.add(est);
+                        RESULT = list;
+                    :}
+                    | lista_propiedades_quests:est
+                    {:
+                        List<CompiledEstilos> list = new ArrayList<>();
+                        list.add(est);
+                        RESULT = list;
+                    :}
+                    | lista_estilos_quests:est error
+                    {:
+                        RESULT = est;
+                    :}
+                    ;
+
+
+
+/*---Produccion de estilos de preguntas---*/
+
+lista_propiedades_quests       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQUETA
+                                {:
+                                    RESULT = new CompiledBackground(color1);
+                                :}
+                                | MENOR BACKGROUND COLOR_KEY IGUAL valor_color:color2 CIERRE_ETIQUETA
+                                {:
+                                    RESULT = new CompiledTextColor(color2);
+                                :}
+                                | MENOR FONT FAMILY IGUAL TIPOGRAFIA:tipo CIERRE_ETIQUETA
+                                {:
+                                    RESULT = new CompiledFontFamily(tipo);
+                                :}
+                                | MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
+                                {:
+                                    RESULT = new CompiledTextSize(num1);
+                                :}
+                                ;
+
+
 
 /*---Produccion de propiedades de los tipos de borde---*/
 
