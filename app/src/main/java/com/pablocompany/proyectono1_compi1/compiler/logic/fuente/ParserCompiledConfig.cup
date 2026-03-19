@@ -7,6 +7,10 @@ import java.util.*;
 
 /*Imports de mis clases (P)*/
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.*;
 
 /*------------------------------------------------------
                         CUP
@@ -49,7 +53,7 @@ parser code {:
             String esperado = String.join(", ", list);
             String encontrado = (simbolo.value != null) ? simbolo.value.toString() : traductor(symbl_name_from_id(simbolo.sym));
 
-            syntaxErrorList.add(new ErrorAnalisis(
+            syntaxErrorListCompiled.add(new ErrorAnalisis(
                 encontrado,
                 "Sintactico",
                 "Se esperaba: \"" + esperado + "\". Pero se encontro con: \"" + encontrado + "\"",
@@ -60,7 +64,7 @@ parser code {:
 
         public void unrecovered_syntax_error(Symbol simbolo) throws Exception {
             String encontrado = (simbolo.value != null) ? simbolo.value.toString() : traductor(symbl_name_from_id(simbolo.sym));
-            syntaxErrorList.add(new ErrorAnalisis(
+            syntaxErrorListCompiled.add(new ErrorAnalisis(
                 encontrado,
                 "Sintactico",
                 "No se pudo recuperar el analisis cerca de: \"" + encontrado + "\".",
@@ -89,7 +93,7 @@ parser code {:
 
             }
 
-            syntaxErrorList.add(new ErrorAnalisis(tokenEncontrado, "Sintactico", mensaje, simbolo.left, simbolo.right));
+            syntaxErrorListCompiled.add(new ErrorAnalisis(tokenEncontrado, "Sintactico", mensaje, simbolo.left, simbolo.right));
         }
 
         private String traductor(String nombre) {
@@ -165,20 +169,28 @@ non terminal CompiledContenedor etiqueta_principal;
 
 
 /*No terminales de etiquetas*/
-non terminal CompiledContenedor etiqueta;
 
-non terminal CompiledForm etiqueta_tabla;
-non terminal CompiledForm etiqueta_section;
-non terminal CompiledForm etiqueta_text;
-non terminal CompiledForm etiqueta_preguntas;
+non terminal CompiledForm etiqueta;
+
+non terminal CompiledTable etiqueta_tabla;
+non terminal CompiledSection etiqueta_section;
+non terminal CompiledText etiqueta_text;
+non terminal CompiledQuestions etiqueta_preguntas;
 
 
-/*No temrinales que representan a las etiquetas que iran dentro de etiquetas el interprete*/
+/*No terminales que representan a las etiquetas que iran dentro de etiquetas el interprete*/
 
 non terminal List<List<CompiledForm>> filas_tabla;
 non terminal List<CompiledForm> fila;
 non terminal List<CompiledForm> celdas_tabla;
 non terminal CompiledForm celda;
+
+/*No terminales utilizados pra poder procesar los estilos*/
+non terminal CompiledEstilos bloque_estilos;
+non terminal CompiledEstilos lista_propiedades;
+non terminal String propiedad;
+
+
 
 
 /* Simbolo inicial */
@@ -224,9 +236,13 @@ etiqueta_principal      ::=  etiqueta_tabla:tabla
 
 /*Produccion que permite crear una tabla*/
 
-etiqueta_tabla  ::= MENOR TABLE MAYOR MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
+etiqueta_tabla  ::= MENOR TABLE MAYOR bloque_estilos:estilos MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
                     {:
                         RESULT = new CompiledTable(-1, -1, 0, 0, filas, estilos);
+                    :}
+                    | MENOR TABLE MAYOR MENOR CONTENT MAYOR filas_tabla:filas  INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR
+                    {:
+                        RESULT = new CompiledTable(-1, -1, 0, 0, filas, null);
                     :}
                     ;
 
@@ -295,21 +311,40 @@ etiqueta                ::=  etiqueta_tabla:tabla
                         :}
                         ;
 
-/*---Producciones para estilos-----*/
+/*-----Producciones para estilos de layouts (tablas o sections)-----*/
 
+/*---Produccion principal----*/
 
+bloque_estilos      ::= MENOR STYLE MAYOR lista_propiedades:estilos INICIO_ETIQUETA STYLE MAYOR
+                    {:
+                        RESULT = estilos;
+                    :}
+                    ;
+
+/*---Produccion de estilos---*/
+
+lista_propiedades       ::= lista_propiedades:list propiedad:prop
+                        {:
+                            RESULT = list;
+                        :}
+                        | propiedad:prop
+                        {:
+                            CompiledEstilos est = new CompiledEstilos();
+
+                            RESULT = est;
+                        :}
+                        ;
+
+/*---Produccion de propiedades---*/
+
+propiedad           ::=  MENOR COLOR_KEY MAYOR COLOR_HEX:hex MAYOR
+                    {:
+                        RESULT = hex;
+                    :}
+                    ;
 
 
 
 
 /*Created by Pablo*/
-
-
-
-
-
-
-
-
-
 

@@ -66,6 +66,12 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
+        validarObligatorio(countWidth, "width", listaErrores);
+        validarObligatorio(countHeight, "height", listaErrores);
+        validarObligatorio(countPointX, "pointX", listaErrores);
+        validarObligatorio(countPointY, "pointY", listaErrores);
+        validarObligatorio(countElements, "elements", listaErrores);
+
         validarDuplicado(countWidth, "width", listaErrores);
         validarDuplicado(countHeight, "height", listaErrores);
         validarDuplicado(countPointX, "pointX", listaErrores);
@@ -125,6 +131,15 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
         }
 
         return TipoVariable.VOID;
+    }
+
+    // Metodo que valida que el atributo haya sido definido al menos una vez
+    private void validarObligatorio(int contador, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador == 0) {
+            listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" es obligatorio y no ha sido definido en la \"TABLE\".",
+                    getLinea(), getColumna()));
+        }
     }
 
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)

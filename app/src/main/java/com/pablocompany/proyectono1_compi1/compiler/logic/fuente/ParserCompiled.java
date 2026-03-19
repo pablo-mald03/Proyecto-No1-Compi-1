@@ -8,6 +8,10 @@ package com.pablocompany.proyectono1_compi1.compiler.logic.fuente;
 import java_cup.runtime.*;
 import java.util.*;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.*;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.*;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -33,12 +37,13 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\021\000\002\002\004\000\002\002\003\000\002\003" +
+    "\000\026\000\002\002\004\000\002\002\003\000\002\003" +
     "\004\000\002\003\003\000\002\004\003\000\002\004\003" +
-    "\000\002\006\017\000\002\012\004\000\002\012\003\000" +
-    "\002\013\011\000\002\014\004\000\002\014\003\000\002" +
-    "\015\011\000\002\005\003\000\002\005\003\000\002\005" +
-    "\003\000\002\005\003" });
+    "\000\002\006\020\000\002\006\017\000\002\012\004\000" +
+    "\002\012\003\000\002\013\011\000\002\014\004\000\002" +
+    "\014\003\000\002\015\011\000\002\005\003\000\002\005" +
+    "\003\000\002\005\003\000\002\005\003\000\002\016\011" +
+    "\000\002\017\004\000\002\017\003\000\002\020\007" });
 
   /** Access to production table. */
   public short[][] production_table() {return _production_table;}
@@ -46,29 +51,41 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\053\000\004\034\006\001\002\000\006\002\000\034" +
-    "\006\001\002\000\004\002\054\001\002\000\004\022\012" +
+    "\000\103\000\004\034\006\001\002\000\006\002\000\034" +
+    "\006\001\002\000\004\002\104\001\002\000\004\022\012" +
     "\001\002\000\006\002\ufffc\034\ufffc\001\002\000\006\002" +
     "\ufffe\034\ufffe\001\002\000\006\002\ufffd\034\ufffd\001\002" +
-    "\000\004\035\013\001\002\000\004\034\014\001\002\000" +
-    "\004\012\015\001\002\000\004\035\016\001\002\000\004" +
-    "\034\020\001\002\000\006\033\045\034\020\001\002\000" +
-    "\004\024\022\001\002\000\006\033\ufff9\034\ufff9\001\002" +
-    "\000\004\035\023\001\002\000\004\034\026\001\002\000" +
-    "\006\033\041\034\026\001\002\000\006\033\ufff6\034\ufff6" +
-    "\001\002\000\004\025\027\001\002\000\004\035\030\001" +
-    "\002\000\004\034\006\001\002\000\004\033\036\001\002" +
-    "\000\004\033\ufff2\001\002\000\004\033\ufff3\001\002\000" +
-    "\004\033\ufff1\001\002\000\004\033\ufff4\001\002\000\004" +
-    "\025\037\001\002\000\004\035\040\001\002\000\006\033" +
-    "\ufff5\034\ufff5\001\002\000\004\024\043\001\002\000\006" +
-    "\033\ufff7\034\ufff7\001\002\000\004\035\044\001\002\000" +
-    "\006\033\ufff8\034\ufff8\001\002\000\004\012\047\001\002" +
-    "\000\006\033\ufffa\034\ufffa\001\002\000\004\035\050\001" +
-    "\002\000\004\033\051\001\002\000\004\022\052\001\002" +
-    "\000\004\035\053\001\002\000\010\002\ufffb\033\ufffb\034" +
-    "\ufffb\001\002\000\004\002\001\001\002\000\006\002\uffff" +
-    "\034\uffff\001\002" });
+    "\000\004\035\013\001\002\000\004\034\015\001\002\000" +
+    "\004\034\072\001\002\000\006\011\017\012\016\001\002" +
+    "\000\004\035\034\001\002\000\004\035\020\001\002\000" +
+    "\004\034\023\001\002\000\006\033\031\034\023\001\002" +
+    "\000\006\033\uffed\034\uffed\001\002\000\004\013\024\001" +
+    "\002\000\004\035\025\001\002\000\004\056\026\001\002" +
+    "\000\004\035\027\001\002\000\006\033\uffec\034\uffec\001" +
+    "\002\000\006\033\uffee\034\uffee\001\002\000\004\011\032" +
+    "\001\002\000\004\035\033\001\002\000\004\034\uffef\001" +
+    "\002\000\004\034\036\001\002\000\006\033\063\034\036" +
+    "\001\002\000\004\024\040\001\002\000\006\033\ufff8\034" +
+    "\ufff8\001\002\000\004\035\041\001\002\000\004\034\044" +
+    "\001\002\000\006\033\057\034\044\001\002\000\006\033" +
+    "\ufff5\034\ufff5\001\002\000\004\025\045\001\002\000\004" +
+    "\035\046\001\002\000\004\034\006\001\002\000\004\033" +
+    "\054\001\002\000\004\033\ufff1\001\002\000\004\033\ufff0" +
+    "\001\002\000\004\033\ufff2\001\002\000\004\033\ufff3\001" +
+    "\002\000\004\025\055\001\002\000\004\035\056\001\002" +
+    "\000\006\033\ufff4\034\ufff4\001\002\000\004\024\061\001" +
+    "\002\000\006\033\ufff6\034\ufff6\001\002\000\004\035\062" +
+    "\001\002\000\006\033\ufff7\034\ufff7\001\002\000\004\012" +
+    "\065\001\002\000\006\033\ufff9\034\ufff9\001\002\000\004" +
+    "\035\066\001\002\000\004\033\067\001\002\000\004\022" +
+    "\070\001\002\000\004\035\071\001\002\000\010\002\ufffa" +
+    "\033\ufffa\034\ufffa\001\002\000\004\012\073\001\002\000" +
+    "\004\035\074\001\002\000\004\034\036\001\002\000\006" +
+    "\033\076\034\036\001\002\000\004\012\077\001\002\000" +
+    "\004\035\100\001\002\000\004\033\101\001\002\000\004" +
+    "\022\102\001\002\000\004\035\103\001\002\000\010\002" +
+    "\ufffb\033\ufffb\034\ufffb\001\002\000\004\002\001\001\002" +
+    "\000\006\002\uffff\034\uffff\001\002" });
 
   /** Access to parse-action table. */
   public short[][] action_table() {return _action_table;}
@@ -76,23 +93,31 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
   /** <code>reduce_goto</code> table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\053\000\014\002\004\003\003\004\007\006\010\007" +
-    "\006\001\001\000\010\004\054\006\010\007\006\001\001" +
+    "\000\103\000\014\002\004\003\003\004\007\006\010\007" +
+    "\006\001\001\000\010\004\104\006\010\007\006\001\001" +
     "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\004" +
+    "\016\013\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\006\017\020\020\021" +
+    "\001\001\000\004\020\027\001\001\000\002\001\001\000" +
     "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\006\012" +
-    "\016\013\020\001\001\000\004\013\045\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\006\014" +
-    "\023\015\024\001\001\000\004\015\041\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\014\005" +
-    "\030\006\034\007\032\010\031\011\033\001\001\000\002" +
     "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\006\012\034" +
+    "\013\036\001\001\000\004\013\063\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\006\014\041" +
+    "\015\042\001\001\000\004\015\057\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\014\005\046" +
+    "\006\052\007\051\010\047\011\050\001\001\000\002\001" +
     "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
     "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
     "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
     "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
     "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001" });
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\006\012\074\013\036\001\001\000\004" +
+    "\013\063\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001\000\002\001\001\000\002\001\001" });
 
   /** Access to <code>reduce_goto</code> table. */
   public short[][] reduce_table() {return _reduce_table;}
@@ -168,7 +193,7 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
             String esperado = String.join(", ", list);
             String encontrado = (simbolo.value != null) ? simbolo.value.toString() : traductor(symbl_name_from_id(simbolo.sym));
 
-            syntaxErrorList.add(new ErrorAnalisis(
+            syntaxErrorListCompiled.add(new ErrorAnalisis(
                 encontrado,
                 "Sintactico",
                 "Se esperaba: \"" + esperado + "\". Pero se encontro con: \"" + encontrado + "\"",
@@ -179,7 +204,7 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
 
         public void unrecovered_syntax_error(Symbol simbolo) throws Exception {
             String encontrado = (simbolo.value != null) ? simbolo.value.toString() : traductor(symbl_name_from_id(simbolo.sym));
-            syntaxErrorList.add(new ErrorAnalisis(
+            syntaxErrorListCompiled.add(new ErrorAnalisis(
                 encontrado,
                 "Sintactico",
                 "No se pudo recuperar el analisis cerca de: \"" + encontrado + "\".",
@@ -208,7 +233,7 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
 
             }
 
-            syntaxErrorList.add(new ErrorAnalisis(tokenEncontrado, "Sintactico", mensaje, simbolo.left, simbolo.right));
+            syntaxErrorListCompiled.add(new ErrorAnalisis(tokenEncontrado, "Sintactico", mensaje, simbolo.left, simbolo.right));
         }
 
         private String traductor(String nombre) {
@@ -330,7 +355,7 @@ class CUP$ParserCompiled$actions {
               CompiledContenedor RESULT =null;
 		int tablaleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
 		int tablaright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
-		CompiledForm tabla = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		CompiledTable tabla = (CompiledTable)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
 		
                             RESULT = tabla;
                         
@@ -344,7 +369,7 @@ class CUP$ParserCompiled$actions {
               CompiledContenedor RESULT =null;
 		int secleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
 		int secright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
-		CompiledForm sec = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		CompiledSection sec = (CompiledSection)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
 		
                             RESULT = sec;
                         
@@ -353,21 +378,38 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 6: // etiqueta_tabla ::= MENOR TABLE MAYOR MENOR CONTENT MAYOR filas_tabla INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR 
+          case 6: // etiqueta_tabla ::= MENOR TABLE MAYOR bloque_estilos MENOR CONTENT MAYOR filas_tabla INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR 
             {
-              CompiledForm RESULT =null;
+              CompiledTable RESULT =null;
+		int estilosleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-10)).left;
+		int estilosright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-10)).right;
+		CompiledEstilos estilos = (CompiledEstilos)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-10)).value;
 		int filasleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)).left;
 		int filasright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)).right;
 		List<List<CompiledForm>> filas = (List<List<CompiledForm>>)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)).value;
 		
                         RESULT = new CompiledTable(-1, -1, 0, 0, filas, estilos);
                     
+              CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("etiqueta_tabla",4, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-13)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
+            }
+          return CUP$ParserCompiled$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 7: // etiqueta_tabla ::= MENOR TABLE MAYOR MENOR CONTENT MAYOR filas_tabla INICIO_ETIQUETA CONTENT MAYOR INICIO_ETIQUETA TABLE MAYOR 
+            {
+              CompiledTable RESULT =null;
+		int filasleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)).left;
+		int filasright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)).right;
+		List<List<CompiledForm>> filas = (List<List<CompiledForm>>)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)).value;
+		
+                        RESULT = new CompiledTable(-1, -1, 0, 0, filas, null);
+                    
               CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("etiqueta_tabla",4, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-12)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
             }
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 7: // filas_tabla ::= filas_tabla fila 
+          case 8: // filas_tabla ::= filas_tabla fila 
             {
               List<List<CompiledForm>> RESULT =null;
 		int listleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).left;
@@ -385,7 +427,7 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 8: // filas_tabla ::= fila 
+          case 9: // filas_tabla ::= fila 
             {
               List<List<CompiledForm>> RESULT =null;
 		int fleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
@@ -401,7 +443,7 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 9: // fila ::= MENOR LINE MAYOR celdas_tabla INICIO_ETIQUETA LINE MAYOR 
+          case 10: // fila ::= MENOR LINE MAYOR celdas_tabla INICIO_ETIQUETA LINE MAYOR 
             {
               List<CompiledForm> RESULT =null;
 		int filleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).left;
@@ -415,7 +457,7 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 10: // celdas_tabla ::= celdas_tabla celda 
+          case 11: // celdas_tabla ::= celdas_tabla celda 
             {
               List<CompiledForm> RESULT =null;
 		int listleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).left;
@@ -433,7 +475,7 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 11: // celdas_tabla ::= celda 
+          case 12: // celdas_tabla ::= celda 
             {
               List<CompiledForm> RESULT =null;
 		int cleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
@@ -449,12 +491,12 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 12: // celda ::= MENOR ELEMENT MAYOR etiqueta INICIO_ETIQUETA ELEMENT MAYOR 
+          case 13: // celda ::= MENOR ELEMENT MAYOR etiqueta INICIO_ETIQUETA ELEMENT MAYOR 
             {
               CompiledForm RESULT =null;
 		int eleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).left;
 		int eright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).right;
-		CompiledContenedor e = (CompiledContenedor)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).value;
+		CompiledForm e = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).value;
 		
                         RESULT = e;
                     
@@ -463,12 +505,12 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 13: // etiqueta ::= etiqueta_tabla 
+          case 14: // etiqueta ::= etiqueta_tabla 
             {
-              CompiledContenedor RESULT =null;
+              CompiledForm RESULT =null;
 		int tablaleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
 		int tablaright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
-		CompiledForm tabla = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		CompiledTable tabla = (CompiledTable)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
 		
                             RESULT = tabla;
                         
@@ -477,12 +519,12 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 14: // etiqueta ::= etiqueta_section 
+          case 15: // etiqueta ::= etiqueta_section 
             {
-              CompiledContenedor RESULT =null;
+              CompiledForm RESULT =null;
 		int secleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
 		int secright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
-		CompiledForm sec = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		CompiledSection sec = (CompiledSection)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
 		
                             RESULT = sec;
                         
@@ -491,12 +533,12 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 15: // etiqueta ::= etiqueta_text 
+          case 16: // etiqueta ::= etiqueta_text 
             {
-              CompiledContenedor RESULT =null;
+              CompiledForm RESULT =null;
 		int textoleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
 		int textoright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
-		CompiledForm texto = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		CompiledText texto = (CompiledText)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
 		
                             RESULT = texto;
                         
@@ -505,16 +547,77 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 16: // etiqueta ::= etiqueta_preguntas 
+          case 17: // etiqueta ::= etiqueta_preguntas 
             {
-              CompiledContenedor RESULT =null;
+              CompiledForm RESULT =null;
 		int preguntasleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
 		int preguntasright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
-		CompiledForm preguntas = (CompiledForm)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		CompiledQuestions preguntas = (CompiledQuestions)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
 		
                             RESULT = preguntas;
                         
               CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("etiqueta",3, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
+            }
+          return CUP$ParserCompiled$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 18: // bloque_estilos ::= MENOR STYLE MAYOR lista_propiedades INICIO_ETIQUETA STYLE MAYOR 
+            {
+              CompiledEstilos RESULT =null;
+		int estilosleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).left;
+		int estilosright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).right;
+		CompiledEstilos estilos = (CompiledEstilos)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-3)).value;
+		
+                        RESULT = estilos;
+                    
+              CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("bloque_estilos",12, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-6)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
+            }
+          return CUP$ParserCompiled$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 19: // lista_propiedades ::= lista_propiedades propiedad 
+            {
+              CompiledEstilos RESULT =null;
+		int listleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).left;
+		int listright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).right;
+		CompiledEstilos list = (CompiledEstilos)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).value;
+		int propleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
+		int propright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
+		String prop = (String)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		
+                            RESULT = list;
+                        
+              CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("lista_propiedades",13, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
+            }
+          return CUP$ParserCompiled$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 20: // lista_propiedades ::= propiedad 
+            {
+              CompiledEstilos RESULT =null;
+		int propleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).left;
+		int propright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()).right;
+		String prop = (String)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.peek()).value;
+		
+                            CompiledEstilos est = new CompiledEstilos();
+
+                            RESULT = est;
+                        
+              CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("lista_propiedades",13, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
+            }
+          return CUP$ParserCompiled$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 21: // propiedad ::= MENOR COLOR_KEY MAYOR COLOR_HEX MAYOR 
+            {
+              String RESULT =null;
+		int hexleft = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).left;
+		int hexright = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).right;
+		String hex = (String)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).value;
+		
+                        RESULT = hex;
+                    
+              CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("propiedad",14, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-4)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
             }
           return CUP$ParserCompiled$result;
 

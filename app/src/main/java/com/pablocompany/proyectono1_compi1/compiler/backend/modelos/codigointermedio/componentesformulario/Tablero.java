@@ -166,8 +166,13 @@ public class Tablero extends Formulario {
     public String compilar() {
 
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<table=");
+        stringBuilder.append(this.width != null ? this.width.toString() : "-1").append(",");
+        stringBuilder.append(this.height != null ? this.height : "-1").append(",");
+        stringBuilder.append(this.pointX != null ? this.pointX : "-1").append(",");
+        stringBuilder.append(this.pointY != null ? this.pointY : "-1");
+        stringBuilder.append(">");
 
-        stringBuilder.append("<table>\n");
         if (this.estilos != null && this.estilos.tieneEstilos()) {
 
             stringBuilder.append("\n").append(this.estilos.crearEstilosLayout());

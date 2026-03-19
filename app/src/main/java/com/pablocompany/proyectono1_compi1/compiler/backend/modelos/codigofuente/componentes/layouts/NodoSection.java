@@ -65,6 +65,11 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores, boolean esLayout) {
 
+        validarObligatorio(countWidth, "width", listaErrores);
+        validarObligatorio(countHeight, "height", listaErrores);
+        validarObligatorio(countPointX, "pointX", listaErrores);
+        validarObligatorio(countPointY, "pointY", listaErrores);
+        validarObligatorio(countElementos, "elements", listaErrores);
 
         validarDuplicado(countElementos, "elements", listaErrores);
         validarDuplicado(countOrientation, "orientation", listaErrores);
@@ -120,6 +125,15 @@ public class NodoSection extends NodoComponente implements ValidarDatosForms {
         if (contador > 1) {
             listaErrores.add(new ErrorAnalisis("SECTION", "Semantico",
                     "El atributo \"" + nombreAtributo + "\" ha sido definido más de una vez en la SECTION.",
+                    getLinea(), getColumna()));
+        }
+    }
+
+    // Metodo que valida que el atributo haya sido definido al menos una vez
+    private void validarObligatorio(int contador, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador == 0) {
+            listaErrores.add(new ErrorAnalisis("SECTION", "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" es obligatorio y no ha sido definido en la \"SECTION\".",
                     getLinea(), getColumna()));
         }
     }
