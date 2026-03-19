@@ -79,21 +79,18 @@ fun AnswerScreen(
 
     /* ===== ANALISIS ===== */
 
-    val analizarFormulario = remember { AnalizarFormularioUseCase() }
-
     var showErrorDrawer by remember { mutableStateOf(false) }
     var hayErrores by remember { mutableStateOf(false) }
 
     val errores = answerViewModel.listaErrores
 
+    val interpretado = answerViewModel.codigoFormularioStateInterprete
 
-    LaunchedEffect(hayErrores) {
-        if (hayErrores) {
-            delay(3000)
-            hayErrores = false
+    LaunchedEffect(errores) {
+        if (errores.isNotEmpty()) {
+            hayErrores = true
         }
     }
-
 
     LaunchedEffect(codigo) {
 
@@ -102,13 +99,7 @@ fun AnswerScreen(
             return@LaunchedEffect
         }
 
-        val resultado = analizarFormulario.ejecutar(codigo)
-
-        answerViewModel.setResultadoAnalisis(resultado)
-
-        if (resultado.errores.isNotEmpty()) {
-            hayErrores = true
-        }
+        answerViewModel.procesarCodigo(codigo)
     }
 
     Log.d("codigo procesado", codigo)
@@ -187,7 +178,7 @@ fun AnswerScreen(
 
                     /* FORMULARIO TEMPORAL */
 
-                    repeat(5) { index ->
+                    interpretado?.codigo?.forEach { componente ->
 
                         Card(
                             modifier = Modifier
@@ -204,7 +195,7 @@ fun AnswerScreen(
                             ) {
 
                                 Text(
-                                    "Pregunta ${index + 1}",
+                                    "Pregunta",
                                     color = Color.White
                                 )
 
@@ -423,7 +414,7 @@ fun AnswerScreen(
                 OutlinedButton(
                     onClick = {
 
-                        answerViewModel.setCodigoProcesado("")
+                        answerViewModel.limpiarResultado()
                         showCloseDialog = false
 
                     },

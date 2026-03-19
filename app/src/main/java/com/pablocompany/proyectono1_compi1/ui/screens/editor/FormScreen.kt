@@ -369,7 +369,7 @@ fun FormScreen(
 
                                     if (interpretado != null) {
 
-                                        answerViewModel.setCodigoProcesadoInterprete(interpretado)
+                                        answerViewModel.setCodigoProcesado(sharedFormViewModel.codigoProcesado)
 
                                         navController.navigate("answer")
 
