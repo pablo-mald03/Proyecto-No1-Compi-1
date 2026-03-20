@@ -162,29 +162,5 @@ public class PreguntaMultiple extends Formulario {
     @Override
     public void heredarConfiguraciones(Formulario componente){
 
-        if(componente instanceof Seccion){
-            Seccion seccion = (Seccion) componente;
-
-            if(this.width== null){
-                this.width = seccion.getWidth();
-            }
-            if(this.height== null){
-                this.height = seccion.getHeight();
-            }
-
-        }
-
-
-        if(componente instanceof Tablero){
-            Tablero tablero = (Tablero) componente;
-
-            if(this.width== null){
-                this.width = tablero.getWidth();
-            }
-            if(this.height== null){
-                this.height = tablero.getHeight();
-            }
-        }
-
     }
 }

@@ -59,14 +59,22 @@ public class TextoPlano extends Formulario {
     @Override
     public void heredarEstilos(EstilosComponent estilos,Formulario componente) {
 
-        if(this.estilos == null){
-            return;
+        if (this.estilos == null) {
+            this.estilos = new EstilosComponent();
         }
 
-        this.estilos.setColor(estilos.getColor());
-        this.estilos.setBackgroundColor(estilos.getBackgroundColor());
-        this.estilos.setFontFamily(estilos.getFontFamily());
-        this.estilos.setTextSize(estilos.getTextSize());
+        if(this.estilos.getColor()==null) {
+            this.estilos.setColor(estilos.getColor());
+        }
+        if(this.estilos.getBackgroundColor()==null) {
+            this.estilos.setBackgroundColor(estilos.getBackgroundColor());
+        }
+        if(this.estilos.getFontFamily()==null) {
+            this.estilos.setFontFamily(estilos.getFontFamily());
+        }
+        if(this.estilos.getTextSize()==null) {
+            this.estilos.setTextSize(estilos.getTextSize());
+        }
 
     }
 
@@ -103,18 +111,6 @@ public class TextoPlano extends Formulario {
     //Metodo utilizado para heredar las configuraciones
     @Override
     public void heredarConfiguraciones(Formulario componente){
-
-        if(componente instanceof Seccion){
-            Seccion seccion = (Seccion) componente;
-
-            if(this.width== null){
-                this.width = seccion.getWidth();
-            }
-            if(this.height== null){
-                this.height = seccion.getHeight();
-            }
-
-        }
 
     }
 

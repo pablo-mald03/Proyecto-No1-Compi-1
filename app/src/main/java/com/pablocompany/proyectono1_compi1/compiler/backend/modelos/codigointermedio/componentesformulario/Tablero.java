@@ -86,82 +86,6 @@ public class Tablero extends Formulario {
         this.borde = borde;
     }
 
-
-    //Metodo que permite heredar los estilos
-    @Override
-    public void heredarEstilos(EstilosComponent estilos,Formulario componente) {
-
-        if (this.estilos == null) {
-            this.estilos = new EstilosComponent();
-        }
-
-        if(this.estilos.getColor()==null) {
-            this.estilos.setColor(estilos.getColor());
-        }
-        if(this.estilos.getBackgroundColor()==null) {
-            this.estilos.setBackgroundColor(estilos.getBackgroundColor());
-        }
-        if(this.estilos.getFontFamily()==null) {
-            this.estilos.setFontFamily(estilos.getFontFamily());
-        }
-        if(this.estilos.getTextSize()==null) {
-            this.estilos.setTextSize(estilos.getTextSize());
-        }
-
-        if(this.borde == null && componente instanceof Seccion){
-            Seccion seccion = (Seccion) componente;
-            this.setBorde(seccion.getBorde());
-        }
-
-        if(this.borde == null && componente instanceof Tablero){
-            Tablero tabla = (Tablero) componente;
-            this.setBorde(tabla.getBorde());
-        }
-
-    }
-
-    //Metodo utilizado para heredar las configuraciones
-    @Override
-    public void heredarConfiguraciones(Formulario componente){
-
-        if(componente instanceof Seccion){
-            Seccion seccion = (Seccion) componente;
-
-            if(this.pointX== null){
-                this.pointX = seccion.getPointX();
-            }
-            if(this.pointY== null){
-                this.pointY = seccion.getPointY();
-            }
-            if(this.width== null){
-                this.width = seccion.getWidth();
-            }
-            if(this.height== null){
-                this.height = seccion.getHeight();
-            }
-
-        }
-
-        if(componente instanceof Tablero){
-            Tablero tablero = (Tablero) componente;
-
-            if(this.pointX== null){
-                this.pointX = tablero.getPointX();
-            }
-            if(this.pointY== null){
-                this.pointY = tablero.getPointY();
-            }
-            if(this.width== null){
-                this.width = tablero.getWidth();
-            }
-            if(this.height== null){
-                this.height = tablero.getHeight();
-            }
-        }
-
-    }
-
-
     //Metodo que permite retornar la estructura de la tabla
     public String compilar() {
 
@@ -173,7 +97,7 @@ public class Tablero extends Formulario {
         stringBuilder.append(this.pointY != null ? this.pointY : "-1");
         stringBuilder.append(">");
 
-        if (this.estilos != null && this.estilos.tieneEstilos()) {
+        if ((this.estilos != null && this.estilos.tieneEstilos()) || this.borde != null) {
 
             stringBuilder.append("\n").append(this.estilos.crearEstilosLayout());
 
@@ -184,6 +108,7 @@ public class Tablero extends Formulario {
         }
 
         this.heredarEstilosAElementos();
+        this.heredarConfiguracionesAElementos();
 
         stringBuilder.append("\n    <content>");
 
@@ -228,8 +153,82 @@ public class Tablero extends Formulario {
         for (List<Formulario> fila : this.elementos) {
             for (Formulario componente : fila) {
                 componente.heredarEstilos(this.estilos, this);
+            }
+        }
+    }
+
+    // Nueva versión del procesador de herencia para Tablero
+    private void heredarConfiguracionesAElementos() {
+        if (this.elementos == null) return;
+
+        for (List<Formulario> fila : this.elementos) {
+            for (Formulario componente : fila) {
                 componente.heredarConfiguraciones(this);
             }
         }
+    }
+
+    //Metodo que permite heredar los estilos
+    @Override
+    public void heredarEstilos(EstilosComponent estilosForm,Formulario componente) {
+
+        if (this.estilos == null) {
+            this.estilos = new EstilosComponent();
+        }
+
+        if (estilosForm != null && this.estilos.getColor() == null) {
+            this.estilos.setColor(estilosForm.getColor());
+        }
+
+        if (estilosForm != null && this.estilos.getBackgroundColor() == null) {
+            this.estilos.setBackgroundColor(estilosForm.getBackgroundColor());
+        }
+
+        if (estilosForm != null && this.estilos.getFontFamily() == null) {
+            this.estilos.setFontFamily(estilosForm.getFontFamily());
+        }
+
+        if (estilosForm != null && this.estilos.getTextSize() == null) {
+            this.estilos.setTextSize(estilosForm.getTextSize());
+        }
+
+        if (estilosForm != null && this.borde == null) {
+            if (componente instanceof Seccion) {
+                Seccion seccion = (Seccion) componente;
+                this.setBorde(seccion.getBorde());
+            } else if (componente instanceof Tablero) {
+                Tablero tablero = (Tablero) componente;
+                this.setBorde(tablero.getBorde());
+            }
+        }
+
+    }
+
+    //Metodo utilizado para heredar las configuraciones
+    @Override
+    public void heredarConfiguraciones(Formulario componente){
+
+        if(componente instanceof Seccion){
+            Seccion seccion = (Seccion) componente;
+
+            if(this.pointX== null){
+                this.pointX = seccion.getPointX();
+            }
+            if(this.pointY== null){
+                this.pointY = seccion.getPointY();
+            }
+        }
+
+        if(componente instanceof Tablero){
+            Tablero tablero = (Tablero) componente;
+
+            if(this.pointX== null){
+                this.pointX = tablero.getPointX();
+            }
+            if(this.pointY== null){
+                this.pointY = tablero.getPointY();
+            }
+        }
+
     }
 }

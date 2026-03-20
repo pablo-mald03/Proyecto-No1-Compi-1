@@ -116,7 +116,7 @@ public class Seccion extends Formulario {
 
         estilosEtiquetaBasicos.append(">");
 
-        if (this.estilos != null && this.estilos.tieneEstilos()) {
+        if ((this.estilos != null && this.estilos.tieneEstilos()) || this.borde != null) {
             estilosEtiquetaBasicos.append("\n\n").append(this.estilos.crearEstilosLayout());
 
             if (this.borde != null) {
@@ -164,35 +164,41 @@ public class Seccion extends Formulario {
 
     //Metodo que permite heredar los estilos
     @Override
-    public void heredarEstilos(EstilosComponent estilos,Formulario componente) {
+    public void heredarEstilos(EstilosComponent estilosPadre,Formulario componente) {
 
         if (this.estilos == null) {
             this.estilos = new EstilosComponent();
         }
 
-        if(this.estilos.getColor()==null) {
-            this.estilos.setColor(estilos.getColor());
-        }
-        if(this.estilos.getBackgroundColor()==null) {
-            this.estilos.setBackgroundColor(estilos.getBackgroundColor());
-        }
-        if(this.estilos.getFontFamily()==null) {
-            this.estilos.setFontFamily(estilos.getFontFamily());
-        }
-        if(this.estilos.getTextSize()==null) {
-            this.estilos.setTextSize(estilos.getTextSize());
+        if (estilosPadre != null) {
+
+            if (this.estilos.getColor() == null) {
+                this.estilos.setColor(estilosPadre.getColor());
+            }
+            if (this.estilos.getBackgroundColor() == null) {
+                this.estilos.setBackgroundColor(estilosPadre.getBackgroundColor());
+            }
+            if (this.estilos.getFontFamily() == null) {
+                this.estilos.setFontFamily(estilosPadre.getFontFamily());
+            }
+            if (this.estilos.getTextSize() == null) {
+                this.estilos.setTextSize(estilosPadre.getTextSize());
+            }
         }
 
-        if(this.borde == null && componente instanceof Seccion){
-            Seccion seccion = (Seccion) componente;
-            this.setBorde(seccion.getBorde());
-        }
+        if (estilosPadre != null) {
 
-        if(this.borde == null && componente instanceof Tablero){
-            Tablero tabla = (Tablero) componente;
-            this.setBorde(tabla.getBorde());
-        }
+            if (this.borde == null && componente instanceof Seccion) {
+                Seccion seccion = (Seccion) componente;
+                this.setBorde(seccion.getBorde());
+            }
 
+            if (this.borde == null && componente instanceof Tablero) {
+                Tablero tabla = (Tablero) componente;
+                this.setBorde(tabla.getBorde());
+            }
+
+        }
     }
 
 
@@ -232,28 +238,12 @@ public class Seccion extends Formulario {
     //Metodo que permite heredar las configuraciones
     private void pasarHerenciaConfiguraciones(Formulario formulario){
 
-        if (formulario instanceof Seccion && ((Seccion) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
+        if (formulario instanceof Seccion) {
+            formulario.heredarConfiguraciones(this);
         }
-        if (formulario instanceof Tablero && ((Tablero) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
+        if (formulario instanceof Tablero) {
+            formulario.heredarConfiguraciones(this);
         }
-        if (formulario instanceof TextoPlano && ((TextoPlano) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
-        }
-        if (formulario instanceof PreguntaAbierta && ((PreguntaAbierta) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
-        }
-        if (formulario instanceof PreguntaMultiple && ((PreguntaMultiple) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
-        }
-        if (formulario instanceof PreguntaDrop && ((PreguntaDrop) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
-        }
-        if (formulario instanceof PreguntaSelect && ((PreguntaSelect) formulario).getEstilos() != null) {
-            formulario.heredarEstilos(this.estilos,this);
-        }
-
     }
 
     //Metodo utilizado para heredar las configuraciones
@@ -269,16 +259,9 @@ public class Seccion extends Formulario {
             if(this.pointY== null){
                 this.pointY = seccion.getPointY();
             }
-            if(this.width== null){
-                this.width = seccion.getWidth();
-            }
-            if(this.height== null){
-                this.height = seccion.getHeight();
-            }
             if(this.orientacion== null){
                 this.orientacion = seccion.getOrientacion();
             }
-
         }
 
         if(componente instanceof Tablero){
@@ -289,12 +272,6 @@ public class Seccion extends Formulario {
             }
             if(this.pointY== null){
                 this.pointY = tablero.getPointY();
-            }
-            if(this.width== null){
-                this.width = tablero.getWidth();
-            }
-            if(this.height== null){
-                this.height = tablero.getHeight();
             }
         }
 

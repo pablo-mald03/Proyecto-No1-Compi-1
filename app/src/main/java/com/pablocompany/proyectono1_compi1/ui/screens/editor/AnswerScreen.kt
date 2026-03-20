@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Airplay
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -193,7 +194,9 @@ fun AnswerScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Button(
-                            onClick = { showDialog = true },
+                            onClick = {
+                                showDialog = true
+                            },
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF04643C)),
                             shape = RoundedCornerShape(14.dp)
@@ -391,40 +394,68 @@ fun AnswerScreen(
         )
     }
 
-    /* ===== RESULTADO DEL FORMULARIO (PERMITE CALIFICAR LAS RESPUESTAS) ===== */
+    /* ===== RESULTADO DEL FORMULARIO QUE PERMITE CALIFICAR LAS RESPUESTAS===== */
 
     if (showDialog) {
+        val resultado = remember(interpretado) {
+            viewModel.caluclarPuntaje(interpretado?.codigo ?: emptyList())
+        }
 
         AlertDialog(
-
             onDismissRequest = { showDialog = false },
-
             containerColor = Color(0xFF1E1E1E),
-
             title = {
                 Text(
-                    "Resultado",
+                    text = if (resultado.second > 0) "Resultado de Evaluación" else "Formulario Enviado",
                     color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
             },
-
             text = {
-                Text(
-                    "Calificación: 85 / 100",
-                    color = Color(0xFFCCCCCC)
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    if (resultado.second > 0) {
+                        val porcentaje = (resultado.first.toFloat() / resultado.second * 100).toInt()
+
+                        Text(
+                            text = "$porcentaje / 100",
+                            style = MaterialTheme.typography.displayMedium,
+                            color = if (porcentaje >= 61) Color(0xFF4CAF50) else Color(0xFFF44336),
+                            fontWeight = FontWeight.Black
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = "Aciertos: ${resultado.first} de ${resultado.second}",
+                            color = Color.LightGray
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(48.dp)
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            "Tu respuesta ha sido procesada con éxito.",
+                            color = Color(0xFFCCCCCC),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             },
-
             confirmButton = {
-
                 Button(
-                    onClick = { showDialog = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF0D47A1)
-                    )
+                    onClick = {
+                        showDialog = false
+
+                        //viewModel.clear()
+                        // answerViewModel.limpiarResultado()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D47A1))
                 ) {
-                    Text("Cerrar")
+                    Text("Aceptar", color = Color.White)
                 }
             }
         )

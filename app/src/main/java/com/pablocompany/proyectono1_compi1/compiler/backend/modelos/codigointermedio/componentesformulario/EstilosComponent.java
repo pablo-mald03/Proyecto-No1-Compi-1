@@ -51,11 +51,6 @@ public class EstilosComponent {
         this.textSize = textSize;
     }
 
-
-
-
-
-
     /*Metodo que permite contar si el codigo tiene estilos (basicos)*/
     public boolean tieneEstilos(){
 
