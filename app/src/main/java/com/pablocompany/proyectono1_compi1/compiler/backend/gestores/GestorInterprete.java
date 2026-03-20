@@ -31,10 +31,18 @@ public class GestorInterprete {
             return;
         }
 
+        /*Termina de validar el codigo de estilos*/
         for (CompiledForm form : codigo.getCodigo()) {
             if (form != null) {
                 form.validarEstilos(this.listaErrores);
 
+            }
+        }
+
+        /*Permite que cada clase empaquete su propio estilo*/
+        for (CompiledForm form : codigo.getCodigo()) {
+            if (form != null) {
+                form.delegarEstilos();
             }
         }
 

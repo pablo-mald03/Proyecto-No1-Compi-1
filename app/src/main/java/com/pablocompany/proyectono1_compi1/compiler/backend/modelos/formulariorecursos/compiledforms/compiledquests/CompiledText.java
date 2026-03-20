@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledForm;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.cadenastexto.CompiledCadenaTexto;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions;
@@ -63,6 +64,12 @@ public class CompiledText extends CompiledQuestions {
         validarDuplicado(contadorFontFamily,"<text>", "font family", listaErrores);
         validarDuplicado(contadorTextSize,"<text>", "text size", listaErrores);
         validarDuplicado(contadorColor,"<text>", "color", listaErrores);
+    }
+
+    /*Metodo que permite que cad clase empaquete sus estilos*/
+    @Override
+    public  void delegarEstilos(){
+        this.empaquetaEstilos();
     }
 
 }/*Created by Pablo*/

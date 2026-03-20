@@ -1,6 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos;
 
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.EstilosProcesados;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
 import java.util.List;
@@ -22,6 +23,10 @@ public abstract class CompiledForm {
     protected int fila;
     protected int columna;
 
+    /*Estilos que permiten que cada clase empaquete su propio estilo*/
+    protected EstilosProcesados estilosProcesados;
+
+
     /*Constructor*/
     public CompiledForm (Number width, Number height, Number pointX, Number pointY, List<CompiledEstilos> estilos,int fila, int columna){
         this.width = width;
@@ -31,6 +36,7 @@ public abstract class CompiledForm {
         this.estilos = estilos;
         this.fila = fila;
         this.columna = columna;
+        this.estilosProcesados = null;
     }
 
     /*Metodos getters*/
@@ -74,5 +80,11 @@ public abstract class CompiledForm {
                     getFila(), getColumna()));
         }
     }
+
+    //Metodo de maxima jerarquia que permite que cada una de las clases que heredan de esta puedan empaquetar sus estilos o adquieran predeterminados
+    protected abstract void empaquetaEstilos();
+
+    /*Metodo utilizado para que todos los componentes empqueten sus estilos*/
+    public abstract void delegarEstilos();
 
 }

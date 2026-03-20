@@ -284,9 +284,9 @@ ComentarioBloque = "/*" ( [^*] | "*"+ [^/*] )* "*"+ "/"
 
 /*------EXPRESIONES CON UN CONTEXTO ESPECIAL PARA LOS ESTILOS DEL CODIGO COMPILADO-------*/
 
-"\"color\""             {return symbol(sym.BACKGROUND_COLOR, yytext());}
+"\"color\""             {return symbol(sym.COLOR_TEXTO, yytext());}
 
-"\"background color\""        {return symbol(sym.COLOR_TEXTO, yytext());}
+"\"background color\""        {return symbol(sym.BACKGROUND_COLOR, yytext());}
 
 "\"font family\""              {return symbol(sym.FONT_FAMILY, yytext());}
 

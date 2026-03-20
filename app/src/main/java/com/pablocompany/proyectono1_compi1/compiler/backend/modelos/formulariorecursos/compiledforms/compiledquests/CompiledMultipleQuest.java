@@ -74,5 +74,11 @@ public class CompiledMultipleQuest extends CompiledQuestions {
         validarDuplicado(contadorTextSize,"<multiple>", "text size", listaErrores);
         validarDuplicado(contadorColor,"<multiple>", "color", listaErrores);
     }
+
+    /*Metodo que permite que cad clase empaquete sus estilos*/
+    @Override
+    public  void delegarEstilos(){
+        this.empaquetaEstilos();
+    }
 }
 /*Created by Pablo*/

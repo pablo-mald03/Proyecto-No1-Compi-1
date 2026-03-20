@@ -74,5 +74,11 @@ public class CompiledDropQuest extends CompiledQuestions {
         validarDuplicado(contadorTextSize,"<drop>", "text size", listaErrores);
         validarDuplicado(contadorColor,"<drop>", "color", listaErrores);
     }
+
+    /*Metodo que permite que cad clase empaquete sus estilos*/
+    @Override
+    public  void delegarEstilos(){
+        this.empaquetaEstilos();
+    }
 }
 /*Created by Pablo*/

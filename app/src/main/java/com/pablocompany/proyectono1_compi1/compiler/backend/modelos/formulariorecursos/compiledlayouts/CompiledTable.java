@@ -96,6 +96,23 @@ public class CompiledTable extends CompiledContenedor {
             }
         }
     }
+
+    /*Metodo que permite que cad clase empaquete sus estilos*/
+    @Override
+    public  void delegarEstilos(){
+
+        super.empaquetaEstilos();
+
+        for(List<CompiledForm> fila : this.filas){
+            if (fila != null) {
+                for (CompiledForm form : fila) {
+                    if (form != null) {
+                        form.delegarEstilos();
+                    }
+                }
+            }
+        }
+    }
 }
 
 /*Created by Pablo*/

@@ -66,4 +66,10 @@ public class CompiledOpenQuest extends CompiledQuestions {
         validarDuplicado(contadorColor,"<open>", "color", listaErrores);
     }
 
+    /*Metodo que permite que cad clase empaquete sus estilos*/
+    @Override
+    public  void delegarEstilos(){
+        this.empaquetaEstilos();
+    }
+
 }/*Created by Pablo*/

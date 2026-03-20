@@ -87,16 +87,16 @@ public class EstilosComponent {
         estilos.append("    <style>");
         estilos.append("\n\n");
 
-        if(this.backgroundColor != null){
+        if(this.color != null){
             estilos.append("        <color=");
-            estilos.append(this.backgroundColor);
+            estilos.append(this.color );
             estilos.append("/>");
             estilos.append("\n");
         }
 
-        if(this.color != null){
+        if(this.backgroundColor != null){
             estilos.append("        <background color=");
-            estilos.append(this.color);
+            estilos.append(this.backgroundColor);
             estilos.append("/>");
             estilos.append("\n");
         }

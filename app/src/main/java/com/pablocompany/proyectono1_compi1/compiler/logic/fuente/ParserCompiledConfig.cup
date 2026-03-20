@@ -615,11 +615,11 @@ lista_estilos       ::= lista_estilos:list lista_propiedades:est
 
 lista_propiedades       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQUETA
                         {:
-                            RESULT = new CompiledBackground(color1);
+                            RESULT = new CompiledTextColor(color1);
                         :}
                         | MENOR BACKGROUND COLOR_KEY IGUAL valor_color:color2 CIERRE_ETIQUETA
                         {:
-                            RESULT = new CompiledTextColor(color2);
+                            RESULT = new CompiledBackground(color2);
                         :}
                         | MENOR FONT FAMILY IGUAL TIPOGRAFIA:tipo CIERRE_ETIQUETA
                         {:

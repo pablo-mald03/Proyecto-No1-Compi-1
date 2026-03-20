@@ -1949,7 +1949,7 @@ public class LexerForms implements java_cup.runtime.Scanner {
           // fall through
           case 156: break;
           case 68:
-            { return symbol(sym.BACKGROUND_COLOR, yytext());
+            { return symbol(sym.COLOR_TEXTO, yytext());
             }
           // fall through
           case 157: break;
@@ -2049,7 +2049,7 @@ public class LexerForms implements java_cup.runtime.Scanner {
           // fall through
           case 176: break;
           case 88:
-            { return symbol(sym.COLOR_TEXTO, yytext());
+            { return symbol(sym.BACKGROUND_COLOR, yytext());
             }
           // fall through
           case 177: break;

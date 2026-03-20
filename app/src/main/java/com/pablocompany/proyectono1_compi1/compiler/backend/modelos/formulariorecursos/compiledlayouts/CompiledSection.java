@@ -90,6 +90,16 @@ public class CompiledSection extends CompiledContenedor {
             }
         }
     }
+    //Metodo de maxima jerarquia que permite que cada una de las clases que heredan de esta puedan empaquetar sus estilos o adquieran predeterminados
+    @Override
+    public  void delegarEstilos(){
+        this.empaquetaEstilos();
 
+        for(CompiledForm form: this.elementos){
+            if(form != null) {
+                form.delegarEstilos();
+            }
+        }
+    }
 
 }
