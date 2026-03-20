@@ -31,7 +31,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.PrintWriter
 import java.io.StringReader
+import java.io.StringWriter
 
 class EditorViewModel(
     private val repository: FormFileRepository
@@ -317,11 +319,15 @@ class EditorViewModel(
 
         } catch (ex: Exception) {
 
+            Log.e("COMPILADOR_ERROR", "Error crítico durante la ejecución del AST", ex)
+
+            val stackTrace = Log.getStackTraceString(ex)
+
             val errores = listOf(
                 ErrorAnalisis(
-                    "Desconocido",
-                    "Sintáctico",
-                    ex.message ?: "Error desconocido en parser",
+                    "CRASH TÉCNICO",
+                    "Ejecución",
+                    ex.message ?: "Error sin mensaje",
                     -1,
                     -1
                 )

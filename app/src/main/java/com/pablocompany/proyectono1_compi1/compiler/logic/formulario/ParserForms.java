@@ -4003,7 +4003,7 @@ class CUP$ParserForms$actions {
 		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()).right;
 		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserForms$stack.peek()).value;
 		
-                            RESULT = new NodoEstilos(TipoEstilo.FONT_FAMILY, tipo.toString() , tipoleft, tiporight);
+                            RESULT = new NodoEstilos(TipoEstilo.FONT_FAMILY, new NodoTipoLetra(tipo.toString(), tipoleft, tiporight) , tipoleft, tiporight);
                         
               CUP$ParserForms$result = parser.getSymbolFactory().newSymbol("estilo_individual",11, ((java_cup.runtime.Symbol)CUP$ParserForms$stack.elementAt(CUP$ParserForms$top-2)), ((java_cup.runtime.Symbol)CUP$ParserForms$stack.peek()), RESULT);
             }

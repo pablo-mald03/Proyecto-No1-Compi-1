@@ -28,15 +28,15 @@ public abstract class CompiledContenedor extends CompiledForm {
 
         if (this.estilos == null) {
 
-            this.estilosProcesados = new EstilosProcesados(new int[]{0, 0, 0}, new int[]{255, 255, 255}, TipoLetra.MONO, null, null);
+            this.estilosProcesados = new EstilosProcesados( new int[]{255, 255, 255},new int[]{0, 0, 0}, TipoLetra.MONO, -1, null);
             return;
         }
 
         /*presets si en dado caso uno esta nulo*/
-        int[] backgroudColor = new int[]{0, 0, 0};
-        int[] textColor = new int[]{255, 255, 255};
+        int[] backgroudColor = new int[]{255, 255, 255};
+        int[] textColor = new int[]{0, 0, 0}  ;
         TipoLetra fontFamilly = TipoLetra.MONO;
-        Number textSize = null;
+        Number textSize = -1;
         CompiledBorder border = null;
 
         for (CompiledEstilos estilo : this.estilos) {

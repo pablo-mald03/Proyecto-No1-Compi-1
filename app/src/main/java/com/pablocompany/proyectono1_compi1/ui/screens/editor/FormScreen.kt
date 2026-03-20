@@ -79,6 +79,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -477,6 +478,19 @@ fun FormScreen(
                         (it.pointY?.toFloat() ?: 0f) + (it.height?.toFloat() ?: 0f)
                     } ?: 1000f
 
+                    val configuration = LocalConfiguration.current
+
+                    val screenWidth = configuration.screenWidthDp.toFloat()
+                    val screenHeight = configuration.screenHeightDp.toFloat()
+
+                    val BASE_WIDTH = 800f
+                    val BASE_HEIGHT = 1600f
+
+                    val scaleX = screenWidth / BASE_WIDTH
+                    val scaleY = screenHeight / BASE_HEIGHT
+
+                    val scale = minOf(scaleX, scaleY)
+
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -487,14 +501,15 @@ fun FormScreen(
 
                         Box(
                             modifier = Modifier
-                                .width(maxX.dp)
-                                .height(maxY.dp)
+                                .width((maxX * scale).dp)
+                                .height((maxY * scale).dp)
                         ) {
 
                             componentes.forEach { componente ->
                                 RenderComponent(
                                     component = componente,
-                                    viewModel = viewModel
+                                    viewModel = viewModel,
+                                    scale = scale
                                 )
                             }
                         }

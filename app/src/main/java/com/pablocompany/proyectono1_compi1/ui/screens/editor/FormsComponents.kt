@@ -3,15 +3,19 @@ package com.pablocompany.proyectono1_compi1.ui.screens.editor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
@@ -20,19 +24,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.TipoOrientacion
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.TipoEmoji
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledForm
@@ -54,16 +61,18 @@ import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
 @Composable
 fun RenderComponent(
     component: CompiledForm,
-    viewModel: FormViewModel
-){
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
+) {
     when (component) {
-        is CompiledSection -> RenderSection(component,viewModel)
-        is CompiledTable -> RenderTable(component,viewModel)
-        is CompiledText -> RenderText(component)
-        is CompiledOpenQuest -> RenderOpenQuestion(component, viewModel)
-        is CompiledSelectQuest -> RenderSelectQuestion(component, viewModel)
-        is CompiledDropQuest -> RenderDropQuestion(component, viewModel)
-        is CompiledMultipleQuest -> RenderMultipleQuestion(component, viewModel)
+        is CompiledSection -> RenderSection(component, viewModel, scale, usePosition)
+        is CompiledTable -> RenderTable(component, viewModel, scale, usePosition)
+        is CompiledText -> RenderText(component, scale, usePosition)
+        is CompiledOpenQuest -> RenderOpenQuestion(component, viewModel, scale, usePosition)
+        is CompiledSelectQuest -> RenderSelectQuestion(component, viewModel, scale, usePosition)
+        is CompiledDropQuest -> RenderDropQuestion(component, viewModel, scale, usePosition)
+        is CompiledMultipleQuest -> RenderMultipleQuestion(component, viewModel, scale, usePosition)
     }
 }
 
@@ -72,48 +81,38 @@ fun RenderComponent(
 @Composable
 fun RenderSection(
     section: CompiledSection,
-    viewModel: FormViewModel
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
 ) {
-
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .applyPosition(section)
-    ) {
-
-        val baseModifier = Modifier
-            .applySize(section)
+            .then(if (usePosition) Modifier.applyPosition(section, scale) else Modifier)
+            .applySize(section, scale)
             .applyStyles(section.estilosProcesados)
-            .defaultContentPadding()
+    ) {
+        val baseModifier = Modifier
+            .fillMaxSize()
+            .defaultContentPadding(scale)
 
         if (section.orientation == TipoOrientacion.VERTICAL) {
-
             Column(modifier = baseModifier) {
                 section.elementos.forEach { child ->
+                    val weightModifier = if (child.height?.toInt() == -1) Modifier.weight(1f) else Modifier
 
-                    val weightModifier =
-                        if (child.height?.toFloat() == -1f) {
-                            Modifier.weight(1f)
-                        } else Modifier
-
-                    Box(modifier = weightModifier) {
-                        RenderComponent(child,viewModel)
+                    Box(modifier = weightModifier.fillMaxWidth()) {
+                        RenderComponent(child, viewModel, scale, usePosition = false)
                     }
                 }
             }
-
         } else {
-
             Row(modifier = baseModifier) {
                 section.elementos.forEach { child ->
+                    // Si el ancho es -1, le damos peso equitativo
+                    val weightModifier = if (child.width?.toInt() == -1) Modifier.weight(1f) else Modifier
 
-                    val weightModifier =
-                        if (child.width?.toFloat() == -1f) {
-                            Modifier.weight(1f)
-                        } else Modifier
-
-                    Box(modifier = weightModifier) {
-                        RenderComponent(child,viewModel)
+                    Box(modifier = weightModifier.fillMaxHeight()) {
+                        RenderComponent(child, viewModel, scale, usePosition = false)
                     }
                 }
             }
@@ -125,40 +124,39 @@ fun RenderSection(
 @Composable
 fun RenderTable(
     table: CompiledTable,
-    viewModel: FormViewModel
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
 ) {
-
     Box(
         modifier = Modifier
-            .applyPosition(table)
+            .then(if (usePosition) Modifier.applyPosition(table, scale) else Modifier)
     ) {
-
         Column(
             modifier = Modifier
-                .applySize(table)
+                .applySize(table, scale)
                 .applyStyles(table.estilosProcesados)
-                .defaultContentPadding()
+                .defaultContentPadding(scale)
         ) {
             table.getElementos().forEach { fila ->
-
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
                 ) {
-
                     fila.forEach { cell ->
-
                         Box(
                             modifier = Modifier
                                 .weight(1f)
-                                .padding(4.dp)
-                                .defaultContentPadding()
-                                .applySize(cell)
+                                .padding((4 * scale).dp)
+                                .applySize(cell, scale)
                                 .applyStyles(cell.estilosProcesados)
                         ) {
-                            RenderComponent(cell,viewModel)
+                            RenderComponent(cell, viewModel, scale, usePosition = false)
                         }
                     }
 
+                    // Relleno para filas incompletas
                     val faltantes = table.getTotalColumnas() - fila.size
                     repeat(faltantes) {
                         Spacer(modifier = Modifier.weight(1f))
@@ -172,17 +170,11 @@ fun RenderTable(
 /*Funcion auxiliar para poder aplicar estilos a los componentes*/
 fun Modifier.applyStyles(estilos: EstilosProcesados?): Modifier {
     if (estilos == null) return this
-
     var modifier = this
 
     estilos.backgroudColor?.let {
         modifier = modifier.background(it.toComposeColor())
     }
-
-    estilos.textSize?.let {
-        // esto luego lo aplicamos en Text, no aquí
-    }
-
 
     estilos.border?.let { border ->
         modifier = modifier.border(
@@ -190,7 +182,6 @@ fun Modifier.applyStyles(estilos: EstilosProcesados?): Modifier {
             color = border.color.evaluarColor().toComposeColor()
         )
     }
-
     return modifier
 }
 
@@ -205,40 +196,27 @@ fun IntArray.toComposeColor(): Color {
 }
 
 /*Funcion que permite aplicar un tamanio a un componente*/
-fun Modifier.applySize(component: CompiledForm): Modifier {
-    var modifier = this
+fun Modifier.applySize(component: CompiledForm, scale: Float): Modifier {
+    val w = component.width?.toFloat() ?: -1f
+    val h = component.height?.toFloat() ?: -1f
 
-    val width = component.width?.toFloat()
-    val height = component.height?.toFloat()
-
-    if (width != null) {
-        modifier = when (width) {
-            -1f -> modifier.fillMaxWidth()
-            else -> modifier.width(width.dp)
+    return this.then(
+        when {
+            w > 0 && h > 0 -> Modifier.size((w * scale).dp, (h * scale).dp)
+            w > 0 -> Modifier.width((w * scale).dp)
+            h > 0 -> Modifier.height((h * scale).dp)
+            w == -1f -> Modifier.fillMaxWidth()
+            else -> Modifier
         }
-    }
-
-    if (height != null) {
-        modifier = when (height) {
-            -1f -> modifier.fillMaxHeight()
-            else -> modifier.height(height.dp)
-        }
-    }
-
-    return modifier
+    )
 }
 
-fun Modifier.applyPosition(component: CompiledForm): Modifier {
-    var modifier = this
+/*Funcion que permite aplicar la posicion en la que se va a escalar un componente*/
+fun Modifier.applyPosition(component: CompiledForm, scale: Float): Modifier {
+    val x = (component.pointX ?: 0).toFloat() * scale
+    val y = (component.pointY ?: 0).toFloat() * scale
 
-    val x = component.pointX?.toFloat() ?: 0f
-    val y = component.pointY?.toFloat() ?: 0f
-
-    if (x != 0f || y != 0f) {
-        modifier = modifier.offset(x.dp, y.dp)
-    }
-
-    return modifier
+    return this.offset(x.dp, y.dp)
 }
 
 /*Funcion que permite convertir a string los emojis y cadenas de texto*/
@@ -280,54 +258,66 @@ fun TipoEmoji.toUnicode(): String {
 
 /*Funcion que representa aun texto*/
 @Composable
-fun RenderText(text: CompiledText) {
-
+fun RenderText(text: CompiledText, scale: Float, usePosition: Boolean = true) {
     val contenido = text.texto.toDisplayString()
+    val estilos = text.estilosProcesados
 
     Text(
         text = contenido,
         modifier = Modifier
-            .applySize(text)
-            .applyStyles(text.estilosProcesados)
-            .padding(horizontal = 4.dp),
-        color = text.estilosProcesados?.textColor?.toComposeColor() ?: Color.White,
-        fontSize = (text.estilosProcesados?.textSize?.toFloat() ?: 14f).sp
+            .then(if (usePosition) Modifier.applyPosition(text, scale) else Modifier)
+            .applySize(text, scale)
+            .applyStyles(estilos)
+            .padding(horizontal = (4 * scale).dp),
+        color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+        fontSize = calculateFontSize(estilos?.textSize, scale)
     )
 }
+
 /*---*****--APARTADO DE PREGUNTAS----****---*/
 
 /*FUNCION QUE REPRESENTA A LA PREGUNTA ABIERTA*/
 @Composable
 fun RenderOpenQuestion(
     question: CompiledOpenQuest,
-    viewModel: FormViewModel
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
 ) {
-
     val id = "${question.fila}_${question.columna}"
-
     val text = viewModel.getAnswer(id) as? String ?: ""
+    val estilos = question.estilosProcesados
 
     Column(
         modifier = Modifier
-            .applySize(question)
-            .applyStyles(question.estilosProcesados)
-            .applyPosition(question)
-            .cardLike()
+            .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
+            .applySize(question, scale)
+            .applyStyles(estilos)
+            .cardLike(scale)
     ) {
-
         Text(
             text = question.texto.toDisplayString(),
-            color = question.estilosProcesados?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = (question.estilosProcesados?.textSize?.toFloat() ?: 14f).sp
+            color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+            fontSize = calculateFontSize(estilos?.textSize, scale),
+            fontWeight = FontWeight.Medium
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height((8 * scale).dp))
+
         OutlinedTextField(
             value = text,
-            onValueChange = {
-                viewModel.setAnswer(id, it)
-            },
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = { viewModel.setAnswer(id, it) },
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = TextStyle(
+                color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                fontSize = calculateFontSize(14, scale)
+            ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                unfocusedTextColor = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                focusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(alpha = 0.7f),
+                unfocusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(alpha = 0.4f)
+            )
         )
     }
 }
@@ -338,113 +328,111 @@ fun RenderOpenQuestion(
 @Composable
 fun RenderSelectQuestion(
     question: CompiledSelectQuest,
-    viewModel: FormViewModel
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
 ) {
-
     val id = "${question.fila}_${question.columna}"
-
     val selectedIndex = viewModel.getAnswer(id) as? Int ?: -1
+    val estilos = question.estilosProcesados
 
     Column(
         modifier = Modifier
-            .applyPosition(question)
-            .applySize(question)
-            .applyStyles(question.estilosProcesados)
-            .cardLike()
+            .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
+            .applySize(question, scale)
+            .applyStyles(estilos)
+            .cardLike(scale)
     ) {
-
         Text(
             text = question.texto.toDisplayString(),
-            color = question.estilosProcesados?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = (question.estilosProcesados?.textSize?.toFloat() ?: 14f).sp
+            color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+            fontSize = calculateFontSize(estilos?.textSize, scale),
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height((8 * scale).dp))
+
 
         question.opciones.forEachIndexed { index, opcion ->
-
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = (4 * scale).dp)
+                    .clickable { viewModel.setAnswer(id, index) }
             ) {
-
                 RadioButton(
                     selected = selectedIndex == index,
-                    onClick = {
-                        viewModel.setAnswer(id, index)
-                    }
+                    onClick = { viewModel.setAnswer(id, index) },
+                    modifier = Modifier.scale(scale),
+                    // Ajustamos colores para que se vean sobre el blanco preset
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = Color(0xFF6200EE),
+                        unselectedColor = Color.Gray
+                    )
                 )
 
                 Text(
                     text = opcion.toDisplayString(),
-                    color = Color.White
+                    fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
+                    color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                    modifier = Modifier.padding(start = (8 * scale).dp)
                 )
             }
         }
     }
 }
-
 /*Funcion que representa a la pregunta drop*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RenderDropQuestion(
     question: CompiledDropQuest,
-    viewModel: FormViewModel
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
 ) {
-
     val id = "${question.fila}_${question.columna}"
-
     val selectedIndex = viewModel.getAnswer(id) as? Int ?: -1
     val expanded = remember { mutableStateOf(false) }
-
     val opciones = question.opciones.map { it.toDisplayString() }
-
-    val selectedText =
-        if (selectedIndex in opciones.indices) opciones[selectedIndex]
-        else ""
+    val selectedText = if (selectedIndex in opciones.indices) opciones[selectedIndex] else ""
+    val estilos = question.estilosProcesados
 
     Column(
         modifier = Modifier
-            .applyPosition(question)
-            .applySize(question)
-            .applyStyles(question.estilosProcesados)
-            .cardLike()
+            .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
+            .applySize(question, scale)
+            .applyStyles(estilos)
+            .cardLike(scale)
     ) {
-
         Text(
             text = question.texto.toDisplayString(),
-            color = question.estilosProcesados?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = (question.estilosProcesados?.textSize?.toFloat() ?: 14f).sp
+            color = estilos?.textColor?.toComposeColor() ?: Color.White,
+            fontSize = calculateFontSize(estilos?.textSize, scale)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height((8 * scale).dp))
 
         ExposedDropdownMenuBox(
             expanded = expanded.value,
             onExpandedChange = { expanded.value = !expanded.value }
         ) {
-
             OutlinedTextField(
                 value = selectedText,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Elige") },
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value)
-                },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
+                textStyle = TextStyle(fontSize = calculateFontSize(14, scale)),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
             )
 
             ExposedDropdownMenu(
                 expanded = expanded.value,
                 onDismissRequest = { expanded.value = false }
             ) {
-
                 opciones.forEachIndexed { index, opcion ->
-
                     DropdownMenuItem(
-                        text = { Text(opcion) },
+                        text = { Text(opcion, fontSize = calculateFontSize(14, scale)) },
                         onClick = {
                             viewModel.setAnswer(id, index)
                             expanded.value = false
@@ -457,59 +445,51 @@ fun RenderDropQuestion(
 }
 
 /*FUNCION QUE REPRESENTA A LA MULTIPLEQUESTION*/
-
 @Composable
 fun RenderMultipleQuestion(
     question: CompiledMultipleQuest,
-    viewModel: FormViewModel
+    viewModel: FormViewModel,
+    scale: Float,
+    usePosition: Boolean = true
 ) {
-
     val id = "${question.fila}_${question.columna}"
-
-    val selected = (viewModel.getAnswer(id) as? List<Int>)?.toMutableList()
-        ?: mutableListOf()
+    val selected = (viewModel.getAnswer(id) as? List<Int>)?.toMutableList() ?: mutableListOf()
+    val estilos = question.estilosProcesados
 
     Column(
         modifier = Modifier
-            .applyPosition(question)
-            .applySize(question)
-            .applyStyles(question.estilosProcesados)
-            .cardLike()
+            .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
+            .applySize(question, scale)
+            .applyStyles(estilos)
+            .cardLike(scale)
     ) {
         Text(
             text = question.texto.toDisplayString(),
-            color = question.estilosProcesados?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = (question.estilosProcesados?.textSize?.toFloat() ?: 14f).sp
+            color = estilos?.textColor?.toComposeColor() ?: Color.White,
+            fontSize = calculateFontSize(estilos?.textSize, scale)
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height((8 * scale).dp))
+
         question.opciones.forEachIndexed { index, opcion ->
-
             val isChecked = selected.contains(index)
-
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = (2 * scale).dp)
             ) {
-
                 Checkbox(
                     checked = isChecked,
                     onCheckedChange = { checked ->
-
                         val newList = selected.toMutableList()
-
-                        if (checked) {
-                            newList.add(index)
-                        } else {
-                            newList.remove(index)
-                        }
-
+                        if (checked) newList.add(index) else newList.remove(index)
                         viewModel.setAnswer(id, newList)
-                    }
+                    },
+                    modifier = Modifier.scale(scale)
                 )
-
                 Text(
                     text = opcion.toDisplayString(),
-                    color = Color.White
+                    color = estilos?.textColor?.toComposeColor() ?: Color.White,
+                    fontSize = calculateFontSize(estilos?.textSize ?: 12, scale)
                 )
             }
         }
@@ -519,17 +499,28 @@ fun RenderMultipleQuestion(
 
 /*Funcion que permita poner un padding por defecto*/
 
-fun Modifier.defaultContentPadding(): Modifier {
-    return this.padding(8.dp)
+fun Modifier.defaultContentPadding(scale: Float): Modifier {
+    return this.padding((8 * scale).dp)
 }
 
 /*Funcion que permite poner un padding por defecto y un border*/
-fun Modifier.cardLike(): Modifier {
+fun Modifier.cardLike(scale: Float): Modifier {
+    // Aseguramos que el padding mínimo sea razonable (al menos 4dp)
+    val dynamicPadding = maxOf(4f, 8 * scale).dp
     return this
-        .padding(8.dp)
-        .clip(RoundedCornerShape(10.dp))
-        .padding(8.dp)
+        .padding(dynamicPadding)
+        .clip(RoundedCornerShape(maxOf(4f, 10 * scale).dp))
+        .background(Color.White.copy(alpha = 0.05f))
+        .padding(dynamicPadding)
 }
 
+@Composable
+fun calculateFontSize(textSize: Number?, scale: Float): TextUnit {
+    val rawSize = textSize?.toFloat() ?: -1f
+
+    val baseSize = if (rawSize <= 0f) 16f else rawSize
+
+    return (baseSize * scale).sp
+}
 
 

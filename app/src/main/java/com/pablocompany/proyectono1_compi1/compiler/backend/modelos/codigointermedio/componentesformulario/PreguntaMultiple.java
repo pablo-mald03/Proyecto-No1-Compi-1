@@ -118,7 +118,7 @@ public class PreguntaMultiple extends Formulario {
         if(this.respuestasCorrectas != null){
             estilosEtiquetaBasicos.append("{");
             for (int i = 0; i < this.respuestasCorrectas.size(); i++) {
-                estilosEtiquetaBasicos.append("\"").append(this.respuestasCorrectas.get(i)).append("\"");
+                estilosEtiquetaBasicos.append(this.respuestasCorrectas.get(i));
                 if(i < this.respuestasCorrectas.size() - 1){
                     estilosEtiquetaBasicos.append(",");
                 }
