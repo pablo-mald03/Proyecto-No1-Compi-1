@@ -32,6 +32,11 @@ public class CompiledMultipleQuest extends CompiledQuestions {
         return this.respuesta;
     }
 
+
+    public CompiledCadenaTexto getTexto() {
+        return this.texto;
+    }
+
     public List<CompiledCadenaTexto> getOpciones() {
         return this.opciones;
     }

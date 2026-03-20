@@ -52,8 +52,8 @@ public class GestorInterprete {
     /*Metodos getteres para obtener los atributos*/
 
     /*Obtiene la lista del codigo interpretado*/
-    public List<CompiledForm> getCodigoInterpretado() {
-        return codigo.getCodigo();
+    public CodigoInterpretado getCodigoInterpretado() {
+        return codigo;
     }
 
     /*Obtiene la lista de errores finales*/

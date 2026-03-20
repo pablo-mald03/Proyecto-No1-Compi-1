@@ -28,9 +28,14 @@ public class CompiledSelectQuest extends CompiledQuestions {
         this.texto = texto;
     }
 
+
     /*Metodos getter para obtener los atributos de la clase*/
     public Number getRespuesta() {
         return this.respuesta;
+    }
+
+    public CompiledCadenaTexto getTexto() {
+        return this.texto;
     }
 
     public List<CompiledCadenaTexto>  getOpciones() {

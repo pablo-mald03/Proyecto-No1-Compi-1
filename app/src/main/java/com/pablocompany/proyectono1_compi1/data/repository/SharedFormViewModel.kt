@@ -168,9 +168,13 @@ class SharedFormViewModel : ViewModel() {
                     val gestorInterprete = GestorInterprete(interpretado, erroresTotales);
 
                     gestorInterprete.ejecutarCodigoInterpretado();
+
                     /*Pendiente definir el retorno del interprete*/
 
-                    Pair(interpretado, gestorInterprete.listadoErrores)
+                    val interpretadoCodigo = gestorInterprete.codigoInterpretado
+
+
+                    Pair(interpretadoCodigo, gestorInterprete.listadoErrores)
                 }
 
                 val (interpretado, erroresTotales) = resultado

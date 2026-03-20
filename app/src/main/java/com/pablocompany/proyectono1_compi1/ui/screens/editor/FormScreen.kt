@@ -13,6 +13,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,8 +83,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
+import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.ServerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import com.pablocompany.proyectono1_compi1.domain.usecase.UploadFormUseCase
@@ -117,6 +120,9 @@ fun FormScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    /*VIEWMODEL DE LA INFORMACION DE LAS PREGUNTAS*/
+    val viewModel: FormViewModel = viewModel()
+
     /* ---------------- Permite Mostrar el mensaje (Notificacion) de errores ---------------- */
 
     var showErrorDrawer by remember { mutableStateOf(false) }
@@ -127,6 +133,10 @@ fun FormScreen(
             delay(3000)
             hayErrores = false
         }
+    }
+
+    LaunchedEffect(interpretado) {
+        viewModel.clear()
     }
 
 
@@ -156,6 +166,8 @@ fun FormScreen(
 
     val scrollState = rememberScrollState()
     val consoleScroll = rememberScrollState()
+
+    val componentes = interpretado?.codigo ?: emptyList()
 
     /* ---------------- Guardado de formularios ---------------- */
 
@@ -455,59 +467,37 @@ fun FormScreen(
 
                     /* ---------------- Área visual del formulario ---------------- */
 
-                    Column(
+                    val scrollState = rememberScrollState()
+
+                    val maxX = componentes.maxOfOrNull {
+                        (it.pointX?.toFloat() ?: 0f) + (it.width?.toFloat() ?: 0f)
+                    } ?: 1000f
+
+                    val maxY = componentes.maxOfOrNull {
+                        (it.pointY?.toFloat() ?: 0f) + (it.height?.toFloat() ?: 0f)
+                    } ?: 1000f
+
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(padding)
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
+                            .horizontalScroll(rememberScrollState())
                     ) {
 
-                        Text(
-                            "Vista del formulario",
-                            color = Color.White,
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Box(
+                            modifier = Modifier
+                                .width(maxX.dp)
+                                .height(maxY.dp)
+                        ) {
 
-                        Spacer(Modifier.height(24.dp))
-
-                        /* ----- PENDIENTE RECIBIR CODIGO DE BACKEND (QUEMADO) ----- */
-
-                        interpretado?.codigo?.forEach { componente ->
-
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color(0xFF2C2C2C)
+                            componentes.forEach { componente ->
+                                RenderComponent(
+                                    component = componente,
+                                    viewModel = viewModel
                                 )
-                            ) {
-
-                                Column(Modifier.padding(16.dp)) {
-
-                                    Text(
-                                        //text = componente.id ?: "Campo",
-                                        text = "Campo",
-                                        color = Color.White
-                                    )
-
-                                    Spacer(Modifier.height(8.dp))
-
-                                    OutlinedTextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                }
                             }
                         }
-
-                        /* ----- PENDIENTE RECIBIR CODIGO DE BACKEND (QUEMADO) ----- */
-
-                        Spacer(Modifier.height(120.dp))
                     }
                 }
             }

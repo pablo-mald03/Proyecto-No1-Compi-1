@@ -27,13 +27,13 @@ public abstract class CompiledQuestions extends CompiledForm {
 
         if (this.estilos == null) {
 
-            this.estilosProcesados = new EstilosProcesados(new int[]{0, 0, 0}, new int[]{255, 255, 255}, TipoLetra.MONO, null);
+            this.estilosProcesados = new EstilosProcesados(new int[]{255, 255, 255}, new int[]{0, 0, 0}, TipoLetra.MONO, null);
             return;
         }
 
         /*presets si en dado caso uno esta nulo*/
-        int[] backgroudColor = new int[]{0, 0, 0};
-        int[] textColor = new int[]{255, 255, 255};
+        int[] backgroudColor = new int[]{255, 255, 255};
+        int[] textColor = new int[]{0, 0, 0};
         TipoLetra fontFamilly = TipoLetra.MONO;
         Number textSize = null;
 
@@ -41,7 +41,7 @@ public abstract class CompiledQuestions extends CompiledForm {
             if (estilo instanceof CompiledBackground) {
 
                 CompiledColor background = ((CompiledBackground) estilo).getBackgroundColor();
-                if(background != null){
+                if (background != null) {
                     backgroudColor = background.evaluarColor();
                 }
 
@@ -49,7 +49,7 @@ public abstract class CompiledQuestions extends CompiledForm {
 
                 CompiledColor colorText = ((CompiledTextColor) estilo).getColorTexto();
 
-                if(colorText != null){
+                if (colorText != null) {
                     textColor = colorText.evaluarColor();
                 }
 
