@@ -42,6 +42,11 @@ public class CompiledEmoji extends CompiledTexto {
 
     }
 
+    /*Metodo que permte obtener el emoji*/
+    public TipoEmoji getTipoEmoji() {
+        return this.tipoEmoji;
+    }
+
     //Metodo que retorna las veces que se va a repetir el emoji
     public int getVeces() {
         return this.veces;

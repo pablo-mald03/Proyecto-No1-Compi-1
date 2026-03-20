@@ -69,6 +69,11 @@ public abstract class CompiledForm {
         return columna;
     }
 
+    public EstilosProcesados getEstilosProcesados() {
+        return estilosProcesados;
+    }
+
+
     /*Metodo delegado para poder validar los estilos de cada clase*/
     public abstract void validarEstilos(List<ErrorAnalisis> listaErrores);
 

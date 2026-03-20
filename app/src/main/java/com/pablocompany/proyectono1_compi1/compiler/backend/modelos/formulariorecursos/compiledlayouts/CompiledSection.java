@@ -31,7 +31,7 @@ public class CompiledSection extends CompiledContenedor {
 
 
     /*Metodos getters y setters que permiten obtener la lista de componentes*/
-    private List<CompiledForm> getElementos() {
+    public List<CompiledForm> getElementos() {
         return elementos;
     }
 

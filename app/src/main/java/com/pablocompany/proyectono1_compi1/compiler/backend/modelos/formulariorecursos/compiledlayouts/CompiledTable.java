@@ -23,8 +23,12 @@ public class CompiledTable extends CompiledContenedor {
         this.filas = filas;
     }
 
+    public void setFilas(List<List<CompiledForm>> filas) {
+        this.filas = filas;
+    }
+
     /*Metodos getters y setters que permiten obtener la lista de componentes*/
-    private List<List<CompiledForm>> getElementos() {
+    public List<List<CompiledForm>> getElementos() {
         return this.filas;
     }
 
