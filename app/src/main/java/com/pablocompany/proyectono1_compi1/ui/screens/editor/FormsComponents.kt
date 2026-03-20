@@ -559,7 +559,7 @@ fun RenderMultipleQuestion(
             fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
-        Spacer(modifier = Modifier.height((8 * scale).dp))
+        Spacer(modifier = Modifier.height((7 * scale).dp))
 
         question.opciones.forEachIndexed { index, opcion ->
             val isChecked = selected.contains(index)
@@ -571,7 +571,15 @@ fun RenderMultipleQuestion(
                     checked = isChecked,
                     onCheckedChange = { checked ->
                         val newList = selected.toMutableList()
-                        if (checked) newList.add(index) else newList.remove(index)
+
+                        val indiceRealParaBackend = index
+
+                        if (checked) {
+                            if (!newList.contains(indiceRealParaBackend)) newList.add(indiceRealParaBackend)
+                        } else {
+                            newList.remove(indiceRealParaBackend)
+                        }
+
                         viewModel.setAnswer(id, newList)
                     },
                     modifier = Modifier.scale(scale)

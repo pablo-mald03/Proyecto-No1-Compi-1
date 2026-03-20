@@ -397,7 +397,7 @@ fun AnswerScreen(
     /* ===== RESULTADO DEL FORMULARIO QUE PERMITE CALIFICAR LAS RESPUESTAS===== */
 
     if (showDialog) {
-        val resultado = remember(interpretado) {
+        val resultado = remember(showDialog) {
             viewModel.caluclarPuntaje(interpretado?.codigo ?: emptyList())
         }
 
@@ -429,7 +429,8 @@ fun AnswerScreen(
                             text = "Aciertos: ${resultado.first} de ${resultado.second}",
                             color = Color.LightGray
                         )
-                    } else {
+                    }
+                    else {
                         Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = null,
@@ -438,7 +439,7 @@ fun AnswerScreen(
                         )
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            "Tu respuesta ha sido procesada con éxito.",
+                            "Tu respuesta ha sido procesada con exito.",
                             color = Color(0xFFCCCCCC),
                             textAlign = TextAlign.Center
                         )

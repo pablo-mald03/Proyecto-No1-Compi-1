@@ -1,11 +1,14 @@
 package com.pablocompany.proyectono1_compi1.data.repository
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.CompiledDropQuest
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.CompiledMultipleQuest
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.CompiledOpenQuest
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.CompiledSelectQuest
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.CompiledSection
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.CompiledTable
 
 /*ViewModel que representa a las respuestas del formulario  (FUNCIONAMIENTO BASICO CON HASHMAP)*/
 class FormViewModel : ViewModel() {
@@ -35,62 +38,80 @@ class FormViewModel : ViewModel() {
 
 
     /*Metodo utilizado para poder calificar las respuestas obtenidas en el resultado*/
-    fun caluclarPuntaje(componentes: List<Any>): Pair<Int,Int> {
-
+    fun caluclarPuntaje(componentes: List<Any>): Pair<Int, Int> {
         var aciertos = 0
-        var totalCalificables = 0
+        var totalPreguntas = 0
 
-        componentes.forEach { comp ->
-
-            val id = when (comp) {
-                is CompiledOpenQuest -> "${comp.fila}_${comp.columna}"
-                is CompiledSelectQuest -> "${comp.fila}_${comp.columna}"
-                is CompiledDropQuest -> "${comp.fila}_${comp.columna}"
-                is CompiledMultipleQuest -> "${comp.fila}_${comp.columna}"
-                else -> null
-            }
-
-
-            if (id != null) {
-                val respuestaUsuario = _answers[id]
+        // Función interna recursiva para no repetir código
+        fun procesarRecursivo(lista: List<Any>) {
+            lista.forEach { comp ->
+                println("Analizando componente: ${comp::class.simpleName}")
 
                 when (comp) {
-                    is CompiledMultipleQuest -> {
-                        totalCalificables++
-                        val userList =
-                            (respuestaUsuario as? List<*>)?.mapNotNull { it as? Int }?.sorted()
-                        val correctList =
-                            (comp.respuesta as? List<*>)?.mapNotNull { it as? Int }?.sorted()
-                        if (userList != null && userList == correctList){
-                            aciertos++
-                        }
+                    is CompiledTable -> {
+                        val todosLosElementos = comp.elementos?.flatten() ?: emptyList()
+                        procesarRecursivo(todosLosElementos)
                     }
-                    is CompiledSelectQuest -> {
+                    is CompiledSection -> {
+                        procesarRecursivo(comp.elementos ?: emptyList())
+                    }
+                    is CompiledMultipleQuest -> {
+                        totalPreguntas++
+                        val id = "${comp.fila}_${comp.columna}"
 
-                        totalCalificables++
+                        val resUsuario = (_answers[id] as? List<*>)
+                            ?.mapNotNull { it?.toString()?.toDoubleOrNull()?.toInt() }
+                            ?.sorted() ?: emptyList()
 
-                        if (respuestaUsuario == comp.respuesta){
+                        val resCorrecta = (comp.respuesta as? List<*>)
+                            ?.mapNotNull { it?.toString()?.toDoubleOrNull()?.toInt() }
+                            ?.sorted() ?: emptyList()
+
+                        if (resUsuario.isNotEmpty() && resUsuario == resCorrecta) {
                             aciertos++
                         }
                     }
                     is CompiledDropQuest -> {
+                        totalPreguntas++
+                        val id = "${comp.fila}_${comp.columna}"
 
-                        totalCalificables++
-                        if (respuestaUsuario == comp.respuesta){
+                        val resUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
+
+                        val resCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
+
+                        if (resUsuario != null && resUsuario == resCorrecta) {
+                            aciertos++
+                        }
+                    }
+                    is CompiledSelectQuest -> {
+                        totalPreguntas++
+                        val id = "${comp.fila}_${comp.columna}"
+
+                        val resUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
+                        val resCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
+
+                        if (resUsuario != null && resUsuario == resCorrecta) {
                             aciertos++
                         }
                     }
                     is CompiledOpenQuest -> {
 
-                        totalCalificables++
-                        aciertos++
+                        totalPreguntas++
+                        val id = "${comp.fila}_${comp.columna}"
+
+                        val respuestaTexto = _answers[id] as? String ?: ""
+
+                        if (respuestaTexto.trim().isNotEmpty()) {
+                            aciertos++
+                        }
                     }
                 }
-
             }
-
         }
-        return Pair(aciertos, totalCalificables)
+
+        procesarRecursivo(componentes)
+
+        return Pair(aciertos, totalPreguntas)
     }
 
     /*Metodo que permite validar si la respuesta esta correcta*/
