@@ -64,6 +64,15 @@ public abstract class CompiledForm {
     }
 
     /*Metodo delegado para poder validar los estilos de cada clase*/
-    public abstract void ValidarEstilos(List<ErrorAnalisis> listaErrores);
+    public abstract void validarEstilos(List<ErrorAnalisis> listaErrores);
+
+    // Metodo que permite validar la duplicadad de instrucciones en el cuerpo de un componente
+    protected void validarDuplicado(int contador,String componente, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador > 1) {
+            listaErrores.add(new ErrorAnalisis(componente, "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" ha sido definido mas de una vez en la \"etiqueta\".",
+                    getFila(), getColumna()));
+        }
+    }
 
 }

@@ -3,6 +3,11 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formularior
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.TipoOrientacion;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledForm;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledBackground;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledBorder;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledFontFamily;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledTextColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledTextSize;
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
 import java.util.List;
@@ -33,5 +38,58 @@ public class CompiledSection extends CompiledContenedor {
     private void setElementos(List<CompiledForm> elementos) {
         this.elementos = elementos;
     }
+
+
+
+    /*Metodo delegado para poder validar los estilos para cada section*/
+    @Override
+    public void validarEstilos(List<ErrorAnalisis> listaErrores){
+
+        if (this.estilos == null) {
+            return;
+        }
+
+        int contadorBorder = 0;
+        int contadorBackgroundColor = 0;
+        int contadorColor = 0;
+        int contadorTextSize = 0;
+        int contadorFontFamily = 0;
+
+        for(CompiledEstilos estilo : this.estilos){
+
+            if(estilo instanceof CompiledBorder){
+                contadorBorder++;
+            }
+            if(estilo instanceof CompiledBackground) {
+                contadorBackgroundColor++;
+            }
+
+            if(estilo instanceof CompiledTextColor) {
+                contadorColor++;
+            }
+
+            if(estilo instanceof CompiledTextSize){
+                contadorTextSize++;
+            }
+
+            if(estilo instanceof CompiledFontFamily){
+                contadorFontFamily++;
+            }
+
+        }
+
+        validarDuplicado(contadorBorder,"<section>", "border", listaErrores);
+        validarDuplicado(contadorBackgroundColor,"<section>", "background color", listaErrores);
+        validarDuplicado(contadorFontFamily,"<section>", "font family", listaErrores);
+        validarDuplicado(contadorTextSize,"<section>", "text size", listaErrores);
+        validarDuplicado(contadorColor, "<section>","color", listaErrores);
+
+        for(CompiledForm form: this.elementos){
+            if(form != null) {
+                form.validarEstilos(listaErrores);
+            }
+        }
+    }
+
 
 }

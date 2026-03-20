@@ -60,9 +60,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
-import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
-import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
-import kotlinx.coroutines.delay
 
 //Vista que sirve para contestar los formularios (Independientemente)
 @OptIn(ExperimentalMaterial3Api::class)

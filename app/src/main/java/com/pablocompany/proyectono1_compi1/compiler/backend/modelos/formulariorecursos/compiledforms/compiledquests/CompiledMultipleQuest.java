@@ -3,6 +3,11 @@ package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formularior
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.cadenastexto.CompiledCadenaTexto;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.CompiledEstilos;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledBackground;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledFontFamily;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledTextColor;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.estilosmodels.CompiledTextSize;
+import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis;
 
 import java.util.List;
 
@@ -29,6 +34,45 @@ public class CompiledMultipleQuest extends CompiledQuestions {
 
     public List<CompiledCadenaTexto> getOpciones() {
         return this.opciones;
+    }
+
+    /*Metodo delegado para poder validar los estilos de cada clase de multiple*/
+    @Override
+    public void validarEstilos(List<ErrorAnalisis> listaErrores){
+
+        if (this.estilos == null) {
+            return;
+        }
+
+        int contadorBackgroundColor = 0;
+        int contadorColor = 0;
+        int contadorTextSize = 0;
+        int contadorFontFamily = 0;
+
+        for(CompiledEstilos estilo : this.estilos){
+
+            if(estilo instanceof CompiledBackground) {
+                contadorBackgroundColor++;
+            }
+
+            if(estilo instanceof CompiledTextColor) {
+                contadorColor++;
+            }
+
+            if(estilo instanceof CompiledTextSize){
+                contadorTextSize++;
+            }
+
+            if(estilo instanceof CompiledFontFamily){
+                contadorFontFamily++;
+            }
+
+        }
+
+        validarDuplicado(contadorBackgroundColor,"<multiple>", "background color", listaErrores);
+        validarDuplicado(contadorFontFamily,"<multiple>", "font family", listaErrores);
+        validarDuplicado(contadorTextSize,"<multiple>", "text size", listaErrores);
+        validarDuplicado(contadorColor,"<multiple>", "color", listaErrores);
     }
 }
 /*Created by Pablo*/

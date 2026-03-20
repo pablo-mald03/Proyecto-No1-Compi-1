@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pablocompany.proyectono1_compi1.compiler.backend.gestores.GestorInterprete
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CodigoInterpretado
 import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.LexerCompiled
 import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.ParserCompiled
@@ -159,18 +160,24 @@ class SharedFormViewModel : ViewModel() {
 
                     val interpretado = parseResult.value as? CodigoInterpretado
 
-                    /*Apartado de validar errores*/
+                    val erroresTotales = mutableListOf<ErrorAnalisis>()
+                    erroresTotales.addAll(lexer.lexicalErrors)
+                    erroresTotales.addAll(parser.syntaxErrorList)
 
-                    val errores = parser.syntaxErrorList + lexer.lexicalErrors
+                    /*Apartado de validar errores (DELEGADO A BACKEND)*/
+                    val gestorInterprete = GestorInterprete(interpretado, erroresTotales);
 
-                    Pair(interpretado, errores)
+                    gestorInterprete.ejecutarCodigoInterpretado();
+                    /*Pendiente definir el retorno del interprete*/
+
+                    Pair(interpretado, gestorInterprete.listadoErrores)
                 }
 
-                val (interpretado, errores) = resultado
+                val (interpretado, erroresTotales) = resultado
 
-                if (errores.isNotEmpty() || interpretado == null) {
+                if (erroresTotales.isNotEmpty() || interpretado == null) {
                     codigoInterpretado = null
-                    listaErrores = errores
+                    listaErrores = erroresTotales
                 } else {
                     codigoInterpretado = interpretado
                     listaErrores = emptyList()

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.pablocompany.proyectono1_compi1.compiler.backend.gestores.GestorInterprete
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CodigoInterpretado
 import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.LexerCompiled
 import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.ParserCompiled
@@ -79,9 +80,18 @@ class AnswerViewModel : ViewModel() {
 
                     /*Apartado de validar errores*/
 
-                    val errores = parser.syntaxErrorList + lexer.lexicalErrors
+                    val erroresTotales = mutableListOf<ErrorAnalisis>()
+                    erroresTotales.addAll(lexer.lexicalErrors)
+                    erroresTotales.addAll(parser.syntaxErrorList)
 
-                    Pair(interpretado, errores)
+                    /*Apartado de validar errores (DELEGADO A BACKEND)*/
+                    val gestorInterprete = GestorInterprete(interpretado, erroresTotales);
+
+                    gestorInterprete.ejecutarCodigoInterpretado();
+
+                    /*Pendiente definir el retorno del interprete*/
+
+                    Pair(interpretado, gestorInterprete.listadoErrores)
                 }
 
                 val (interpretado, errores) = resultado

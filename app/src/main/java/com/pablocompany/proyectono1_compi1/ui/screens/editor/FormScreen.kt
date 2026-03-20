@@ -82,12 +82,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.ServerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
-import com.pablocompany.proyectono1_compi1.domain.usecase.AnalizarFormularioUseCase
 import com.pablocompany.proyectono1_compi1.domain.usecase.UploadFormUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

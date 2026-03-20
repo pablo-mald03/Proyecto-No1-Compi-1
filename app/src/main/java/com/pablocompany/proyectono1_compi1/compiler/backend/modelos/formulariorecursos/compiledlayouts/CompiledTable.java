@@ -42,5 +42,60 @@ public class CompiledTable extends CompiledContenedor {
 
     }
 
+    /*Metodo delegado para poder validar los estilos para table*/
+    @Override
+    public void validarEstilos(List<ErrorAnalisis> listaErrores){
 
+        if (this.estilos == null) {
+            return;
+        }
+
+        int contadorBorder = 0;
+        int contadorBackgroundColor = 0;
+        int contadorColor = 0;
+        int contadorTextSize = 0;
+        int contadorFontFamily = 0;
+
+        for(CompiledEstilos estilo : this.estilos){
+
+            if(estilo instanceof CompiledBorder){
+                contadorBorder++;
+            }
+            if(estilo instanceof CompiledBackground) {
+                contadorBackgroundColor++;
+            }
+
+            if(estilo instanceof CompiledTextColor) {
+                contadorColor++;
+            }
+
+            if(estilo instanceof CompiledTextSize){
+                contadorTextSize++;
+            }
+
+            if(estilo instanceof CompiledFontFamily){
+                contadorFontFamily++;
+            }
+
+        }
+
+        validarDuplicado(contadorBorder,"<table>", "border", listaErrores);
+        validarDuplicado(contadorBackgroundColor,"<table>", "background color", listaErrores);
+        validarDuplicado(contadorFontFamily,"<table>", "font family", listaErrores);
+        validarDuplicado(contadorTextSize,"<table>", "text size", listaErrores);
+        validarDuplicado(contadorColor, "<table>","color", listaErrores);
+
+
+        for(List<CompiledForm> fila : this.filas){
+            if (fila != null) {
+                for (CompiledForm form : fila) {
+                    if (form != null) {
+                        form.validarEstilos(listaErrores);
+                    }
+                }
+            }
+        }
+    }
 }
+
+/*Created by Pablo*/

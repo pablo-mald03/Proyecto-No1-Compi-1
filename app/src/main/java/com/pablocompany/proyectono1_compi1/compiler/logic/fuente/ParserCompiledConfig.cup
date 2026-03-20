@@ -274,6 +274,10 @@ cuerpo_etiquetas        ::=  cuerpo_etiquetas:list etiqueta_principal:e
                             list.add(e);
                             RESULT = list;
                         :}
+                        | error
+                        {:
+                            RESULT = new ArrayList<CompiledForm>();
+                        :}
                         | cuerpo_etiquetas:list error
                         {:
                             RESULT = list;
