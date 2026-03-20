@@ -34,13 +34,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.componentes.layouts.TipoOrientacion
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoBorde
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.TipoLetra
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.fragmentos.TipoEmoji
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CompiledForm
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.cadenastexto.CompiledCadena
@@ -89,7 +100,7 @@ fun RenderSection(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(section, scale) else Modifier)
             .applySize(section, scale)
-            .applyStyles(section.estilosProcesados)
+            .applyStyles(section.estilosProcesados, scale)
     ) {
         val baseModifier = Modifier
             .fillMaxSize()
@@ -98,7 +109,8 @@ fun RenderSection(
         if (section.orientation == TipoOrientacion.VERTICAL) {
             Column(modifier = baseModifier) {
                 section.elementos.forEach { child ->
-                    val weightModifier = if (child.height?.toInt() == -1) Modifier.weight(1f) else Modifier
+                    val weightModifier =
+                        if (child.height?.toInt() == -1) Modifier.weight(1f) else Modifier
 
                     Box(modifier = weightModifier.fillMaxWidth()) {
                         RenderComponent(child, viewModel, scale, usePosition = false)
@@ -108,8 +120,8 @@ fun RenderSection(
         } else {
             Row(modifier = baseModifier) {
                 section.elementos.forEach { child ->
-                    // Si el ancho es -1, le damos peso equitativo
-                    val weightModifier = if (child.width?.toInt() == -1) Modifier.weight(1f) else Modifier
+                    val weightModifier =
+                        if (child.width?.toInt() == -1) Modifier.weight(1f) else Modifier
 
                     Box(modifier = weightModifier.fillMaxHeight()) {
                         RenderComponent(child, viewModel, scale, usePosition = false)
@@ -135,7 +147,7 @@ fun RenderTable(
         Column(
             modifier = Modifier
                 .applySize(table, scale)
-                .applyStyles(table.estilosProcesados)
+                .applyStyles(table.estilosProcesados, scale)
                 .defaultContentPadding(scale)
         ) {
             table.getElementos().forEach { fila ->
@@ -150,7 +162,7 @@ fun RenderTable(
                                 .weight(1f)
                                 .padding((4 * scale).dp)
                                 .applySize(cell, scale)
-                                .applyStyles(cell.estilosProcesados)
+                                .applyStyles(cell.estilosProcesados, scale)
                         ) {
                             RenderComponent(cell, viewModel, scale, usePosition = false)
                         }
@@ -168,7 +180,7 @@ fun RenderTable(
 }
 
 /*Funcion auxiliar para poder aplicar estilos a los componentes*/
-fun Modifier.applyStyles(estilos: EstilosProcesados?): Modifier {
+fun Modifier.applyStyles(estilos: EstilosProcesados?,scale: Float): Modifier {
     if (estilos == null) return this
     var modifier = this
 
@@ -177,10 +189,64 @@ fun Modifier.applyStyles(estilos: EstilosProcesados?): Modifier {
     }
 
     estilos.border?.let { border ->
-        modifier = modifier.border(
-            width = border.width.toFloat().dp,
-            color = border.color.evaluarColor().toComposeColor()
-        )
+        val colorBorde = border.color.evaluarColor().toComposeColor()
+        val widthBorde = border.width.toFloat().dp
+
+        estilos.border?.let { border ->
+            val colorBorde = border.color.evaluarColor().toComposeColor()
+            val widthPx = border.width.toFloat() * scale
+            val roundedRadius = 8f * scale
+
+            modifier = modifier.drawBehind {
+                when (border.tipo) {
+                    TipoBorde.DOTTED -> {
+                        drawRoundRect(
+                            color = colorBorde,
+                            style = Stroke(
+                                width = widthPx,
+                                pathEffect = PathEffect.dashPathEffect(
+                                    intervals = floatArrayOf(10f * scale, 10f * scale),
+                                    phase = 0f
+                                )
+                            ),
+                            cornerRadius = CornerRadius(roundedRadius, roundedRadius)
+                        )
+                    }
+                    TipoBorde.DOUBLE -> {
+                        drawRoundRect(
+                            color = colorBorde,
+                            style = Stroke(width = widthPx / 3f),
+                            cornerRadius = CornerRadius(roundedRadius, roundedRadius)
+                        )
+
+                        val gap = widthPx * 0.8f
+
+                        val innerSize = Size(
+                            width = size.width - (gap * 2),
+                            height = size.height - (gap * 2)
+                        )
+
+                        drawRoundRect(
+                            color = colorBorde,
+                            topLeft = Offset(x = gap, y = gap),
+                            size = innerSize,
+                            style = Stroke(width = widthPx / 3f),
+                            cornerRadius = CornerRadius(
+                                maxOf(0f, roundedRadius - gap),
+                                maxOf(0f, roundedRadius - gap)
+                            )
+                        )
+                    }
+                    else -> {
+                        drawRoundRect(
+                            color = colorBorde,
+                            style = Stroke(width = widthPx),
+                            cornerRadius = CornerRadius(roundedRadius, roundedRadius)
+                        )
+                    }
+                }
+            }
+        }
     }
     return modifier
 }
@@ -267,10 +333,11 @@ fun RenderText(text: CompiledText, scale: Float, usePosition: Boolean = true) {
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(text, scale) else Modifier)
             .applySize(text, scale)
-            .applyStyles(estilos)
+            .applyStyles(estilos, scale)
             .padding(horizontal = (4 * scale).dp),
         color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-        fontSize = calculateFontSize(estilos?.textSize, scale)
+        fontSize = calculateFontSize(estilos?.textSize, scale),
+        fontFamily = estilos?.fontFamilly.toComposeFont()
     )
 }
 
@@ -292,14 +359,15 @@ fun RenderOpenQuestion(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
-            .applyStyles(estilos)
-            .cardLike(scale)
+            .applyStyles(estilos, scale)
+            .cardLike(scale,estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
             color = estilos?.textColor?.toComposeColor() ?: Color.Black,
             fontSize = calculateFontSize(estilos?.textSize, scale),
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
         Spacer(modifier = Modifier.height((8 * scale).dp))
@@ -310,13 +378,18 @@ fun RenderOpenQuestion(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(
                 color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-                fontSize = calculateFontSize(14, scale)
+                fontSize = calculateFontSize(14, scale),
+                fontFamily = estilos?.fontFamilly.toComposeFont()
             ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = estilos?.textColor?.toComposeColor() ?: Color.Black,
                 unfocusedTextColor = estilos?.textColor?.toComposeColor() ?: Color.Black,
-                focusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(alpha = 0.7f),
-                unfocusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(alpha = 0.4f)
+                focusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(
+                    alpha = 0.7f
+                ),
+                unfocusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(
+                    alpha = 0.4f
+                )
             )
         )
     }
@@ -340,14 +413,15 @@ fun RenderSelectQuestion(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
-            .applyStyles(estilos)
-            .cardLike(scale)
+            .applyStyles(estilos, scale)
+            .cardLike(scale,estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
             color = estilos?.textColor?.toComposeColor() ?: Color.Black,
             fontSize = calculateFontSize(estilos?.textSize, scale),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
         Spacer(modifier = Modifier.height((8 * scale).dp))
@@ -365,7 +439,7 @@ fun RenderSelectQuestion(
                     selected = selectedIndex == index,
                     onClick = { viewModel.setAnswer(id, index) },
                     modifier = Modifier.scale(scale),
-                    // Ajustamos colores para que se vean sobre el blanco preset
+
                     colors = RadioButtonDefaults.colors(
                         selectedColor = Color(0xFF6200EE),
                         unselectedColor = Color.Gray
@@ -376,12 +450,15 @@ fun RenderSelectQuestion(
                     text = opcion.toDisplayString(),
                     fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
                     color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-                    modifier = Modifier.padding(start = (8 * scale).dp)
+                    modifier = Modifier.padding(start = (8 * scale).dp),
+                    fontFamily = estilos?.fontFamilly.toComposeFont()
                 )
             }
         }
     }
 }
+
+
 /*Funcion que representa a la pregunta drop*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -402,13 +479,14 @@ fun RenderDropQuestion(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
-            .applyStyles(estilos)
-            .cardLike(scale)
+            .applyStyles(estilos, scale)
+            .cardLike(scale,estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
             color = estilos?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = calculateFontSize(estilos?.textSize, scale)
+            fontSize = calculateFontSize(estilos?.textSize, scale),
+            fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
         Spacer(modifier = Modifier.height((8 * scale).dp))
@@ -421,9 +499,14 @@ fun RenderDropQuestion(
                 value = selectedText,
                 onValueChange = {},
                 readOnly = true,
-                textStyle = TextStyle(fontSize = calculateFontSize(14, scale)),
+                textStyle = TextStyle(
+                    fontSize = calculateFontSize(14, scale),
+                    fontFamily = estilos?.fontFamilly.toComposeFont()
+                ),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
             )
 
             ExposedDropdownMenu(
@@ -432,7 +515,13 @@ fun RenderDropQuestion(
             ) {
                 opciones.forEachIndexed { index, opcion ->
                     DropdownMenuItem(
-                        text = { Text(opcion, fontSize = calculateFontSize(14, scale)) },
+                        text = {
+                            Text(
+                                opcion,
+                                fontSize = calculateFontSize(14, scale),
+                                fontFamily = estilos?.fontFamilly.toComposeFont(),
+                            )
+                        },
                         onClick = {
                             viewModel.setAnswer(id, index)
                             expanded.value = false
@@ -460,13 +549,14 @@ fun RenderMultipleQuestion(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
-            .applyStyles(estilos)
-            .cardLike(scale)
+            .applyStyles(estilos, scale)
+            .cardLike(scale,estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
             color = estilos?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = calculateFontSize(estilos?.textSize, scale)
+            fontSize = calculateFontSize(estilos?.textSize, scale),
+            fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
         Spacer(modifier = Modifier.height((8 * scale).dp))
@@ -489,7 +579,8 @@ fun RenderMultipleQuestion(
                 Text(
                     text = opcion.toDisplayString(),
                     color = estilos?.textColor?.toComposeColor() ?: Color.White,
-                    fontSize = calculateFontSize(estilos?.textSize ?: 12, scale)
+                    fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
+                    fontFamily = estilos?.fontFamilly.toComposeFont()
                 )
             }
         }
@@ -504,16 +595,20 @@ fun Modifier.defaultContentPadding(scale: Float): Modifier {
 }
 
 /*Funcion que permite poner un padding por defecto y un border*/
-fun Modifier.cardLike(scale: Float): Modifier {
-    // Aseguramos que el padding mínimo sea razonable (al menos 4dp)
+fun Modifier.cardLike(scale: Float, estilos: EstilosProcesados? = null): Modifier {
     val dynamicPadding = maxOf(4f, 8 * scale).dp
-    return this
+    var mod = this
         .padding(dynamicPadding)
         .clip(RoundedCornerShape(maxOf(4f, 10 * scale).dp))
-        .background(Color.White.copy(alpha = 0.05f))
-        .padding(dynamicPadding)
+
+    if (estilos?.backgroudColor == null) {
+        mod = mod.background(Color.White.copy(alpha = 0.1f))
+    }
+
+    return mod.padding(dynamicPadding)
 }
 
+/*Metodo que calcula el size de la fuente en base a la escala*/
 @Composable
 fun calculateFontSize(textSize: Number?, scale: Float): TextUnit {
     val rawSize = textSize?.toFloat() ?: -1f
@@ -524,3 +619,19 @@ fun calculateFontSize(textSize: Number?, scale: Float): TextUnit {
 }
 
 
+// Metodo que calcula el tipo de la letra a FontFamily
+
+fun TipoLetra?.toComposeFont(): FontFamily {
+    return when (this) {
+        TipoLetra.MONO -> FontFamily.Monospace
+        TipoLetra.SANS_SERIF -> FontFamily.SansSerif
+        TipoLetra.CURSIVE -> FontFamily.Cursive
+        else -> FontFamily.Default // Para NOT_FOUND y null
+    }
+}
+
+// Mapeo de TipoBorde
+
+fun TipoBorde?.toStrokeCap(): StrokeCap {
+    return StrokeCap.Round
+}
