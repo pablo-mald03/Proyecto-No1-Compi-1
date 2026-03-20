@@ -89,9 +89,9 @@ class AnswerViewModel : ViewModel() {
 
                     gestorInterprete.ejecutarCodigoInterpretado();
 
-                    /*Pendiente definir el retorno del interprete*/
+                    val interpretadoCodigo = gestorInterprete.codigoInterpretado
 
-                    Pair(interpretado, gestorInterprete.listadoErrores)
+                    Pair(interpretadoCodigo, gestorInterprete.listadoErrores)
                 }
 
                 val (interpretado, errores) = resultado

@@ -19,11 +19,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Airplay
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -55,11 +57,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
+import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
 
 //Vista que sirve para contestar los formularios (Independientemente)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +88,9 @@ fun AnswerScreen(
 
     val interpretado = answerViewModel.codigoFormularioStateInterprete
 
+    /*Viewmodel de respuestas*/
+    val viewModel: FormViewModel = viewModel()
+
     LaunchedEffect(errores) {
         if (errores.isNotEmpty()) {
             hayErrores = true
@@ -99,9 +107,6 @@ fun AnswerScreen(
         answerViewModel.procesarCodigo(codigo)
     }
 
-    Log.d("codigo procesado", codigo)
-
-
     /* ===== UI PRINCIPAL PARA PODER VER EL FORM Y PODERLO CONTESTAR ===== */
 
     Box(
@@ -110,24 +115,15 @@ fun AnswerScreen(
 
         Scaffold(
             containerColor = Color.Transparent,
-
             topBar = {
-
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                         titleContentColor = Color.White
                     ),
-
-                    title = {
-                        Text(
-                            "Contestar Formulario",
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    title = { Text("Contestar Formulario", fontWeight = FontWeight.Bold) }
                 )
             }
-
         ) { padding ->
 
             Column(
@@ -135,132 +131,90 @@ fun AnswerScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer(Modifier.height(15.dp))
+                Spacer(Modifier.height(10.dp))
 
-                HorizontalDivider(
-                    color = Color(0xFF060434),
-                    thickness = 5.dp
-                )
 
-                Spacer(Modifier.height(24.dp))
+                if (codigo.isBlank() || interpretado == null || interpretado.codigo.isEmpty()) {
 
-                if (codigo.isBlank()) {
+                    Spacer(Modifier.height(100.dp))
 
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF1E1E1E)
-                            ),
-                            border = BorderStroke(1.dp, Color(0xFF3A3A3A)),
-                            shape = RoundedCornerShape(14.dp)
-                        ) {
-
-                            Text(
-                                "No hay formulario seleccionado para contestar",
-                                modifier = Modifier.padding(24.dp),
-                                color = Color.White,
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Airplay,
+                        contentDescription = null,
+                        modifier = Modifier.size(80.dp),
+                        tint = Color.White.copy(alpha = 0.2f)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        "No hay formulario abierto",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.White.copy(alpha = 0.4f),
+                        fontWeight = FontWeight.Light,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        "Regresa al editor y compila tu código .pkm.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.3f),
+                        textAlign = TextAlign.Center
+                    )
 
                 } else {
+                    /* --- CALCULOS PARA ADAPTAR A LA PANTALLA --- */
+                    val configuration = LocalConfiguration.current
+                    val screenWidth = configuration.screenWidthDp.toFloat()
+                    val scale = screenWidth / 800f
 
-                    /* FORMULARIO TEMPORAL */
+                    HorizontalDivider(
+                        color = Color(0xFF060434),
+                        thickness = 5.dp,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
 
-                    interpretado?.codigo?.forEach { componente ->
-
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF2C2C2C)
+                    interpretado.codigo.forEach { componente ->
+                        Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                            RenderComponent(
+                                component = componente,
+                                viewModel = viewModel,
+                                scale = scale,
+                                usePosition = false
                             )
-                        ) {
-
-                            Column(
-                                Modifier.padding(16.dp)
-                            ) {
-
-                                Text(
-                                    "Pregunta",
-                                    color = Color.White
-                                )
-
-                                Spacer(Modifier.height(10.dp))
-
-                                OutlinedTextField(
-                                    value = "",
-                                    onValueChange = {},
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
                         }
                     }
 
-                    Spacer(Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            12.dp,
-                            Alignment.CenterHorizontally
-                        )
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-
                         Button(
                             onClick = { showDialog = true },
-
                             modifier = Modifier.weight(1f),
-
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF04643C)
-                            ),
-
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF04643C)),
                             shape = RoundedCornerShape(14.dp)
-
                         ) {
-
-                            Text(
-                                "Enviar",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Text("Enviar", color = Color.White, fontWeight = FontWeight.Bold)
                         }
-
 
                         Button(
                             onClick = { showCloseDialog = true },
-
                             modifier = Modifier.weight(1f),
-
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF09066E)
-                            ),
-
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF09066E)),
                             shape = RoundedCornerShape(14.dp)
-
                         ) {
-
-                            Text(
-                                "Cerrar",
-                                color = Color.White,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Text("Cerrar", color = Color.White, fontWeight = FontWeight.Bold)
                         }
                     }
-
-                    Spacer(Modifier.height(60.dp))
+                    Spacer(modifier = Modifier.height(80.dp))
                 }
+
+
+
             }
         }
 

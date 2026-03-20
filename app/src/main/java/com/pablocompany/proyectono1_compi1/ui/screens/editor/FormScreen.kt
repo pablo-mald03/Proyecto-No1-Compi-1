@@ -24,12 +24,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Airplay
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -83,6 +85,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -423,13 +426,13 @@ fun FormScreen(
                         }
                     }
                 }
-            ) {
+            ) { consolePadding ->
 
                 /* ---------------- Pantalla principal ---------------- */
 
                 Scaffold(
+                    modifier = Modifier.padding(consolePadding),
                     containerColor = Color.Transparent,
-
                     topBar = {
 
                         AnimatedVisibility(visible = !isExpanded) {
@@ -464,7 +467,7 @@ fun FormScreen(
                         }
                     }
 
-                ) { padding ->
+                ) { scaffoldPadding ->
 
                     /* ---------------- Área visual del formulario ---------------- */
 
@@ -494,23 +497,63 @@ fun FormScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(padding)
-                            .verticalScroll(rememberScrollState())
-                            .horizontalScroll(rememberScrollState())
+                            .padding(scaffoldPadding)
+                            .then(
+                                if (componentes.isNotEmpty()) Modifier
+                                    .verticalScroll(
+                                        rememberScrollState()
+                                    )
+                                    .horizontalScroll(rememberScrollState()) else Modifier
+                            ),
+                        contentAlignment = Alignment.Center
                     ) {
 
-                        Box(
-                            modifier = Modifier
-                                .width((maxX * scale).dp)
-                                .height((maxY * scale).dp)
-                        ) {
+                        if (componentes.isEmpty()) {
 
-                            componentes.forEach { componente ->
-                                RenderComponent(
-                                    component = componente,
-                                    viewModel = viewModel,
-                                    scale = scale
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(32.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Airplay,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(80.dp),
+                                    tint = Color.White.copy(alpha = 0.2f)
                                 )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Text(
+                                    text = "Esperando código fuente...",
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = Color.White.copy(alpha = 0.4f),
+                                    fontWeight = FontWeight.Light
+                                )
+
+                                Text(
+                                    text = "Compila un archivo .pkm para visualizar el formulario",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.White.copy(alpha = 0.3f),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+
+                        } else {
+
+                            Box(
+                                modifier = Modifier
+                                    .width((maxX * scale).dp)
+                                    .height((maxY * scale).dp)
+                            ) {
+
+                                componentes.forEach { componente ->
+                                    RenderComponent(
+                                        component = componente,
+                                        viewModel = viewModel,
+                                        scale = scale
+                                    )
+                                }
                             }
                         }
                     }
