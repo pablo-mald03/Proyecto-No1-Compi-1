@@ -15,10 +15,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.pablocompany.proyectono1_compi1.compiler.backend.gestores.GestorCodigoCompilado
+import com.pablocompany.proyectono1_compi1.compiler.backend.gestores.GestorInterprete
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.NodoCodigo
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.CodigoInterpretado
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.LexerForms
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.ParserForms
 import com.pablocompany.proyectono1_compi1.compiler.logic.formulario.sym
+import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.LexerCompiled
+import com.pablocompany.proyectono1_compi1.compiler.logic.fuente.ParserCompiled
 import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.compiler.models.lexerpintado.TokenUI
 import com.pablocompany.proyectono1_compi1.data.clases.CompilacionState
@@ -38,6 +42,13 @@ import java.io.StringWriter
 class EditorViewModel(
     private val repository: FormFileRepository
 ) : ViewModel() {
+
+    /*Variable que permite almacenar el codigo compilado*/
+    var codigoInterpretado by mutableStateOf<CodigoInterpretado?>(null)
+        private set
+
+    var isParsingInterprete by mutableStateOf(false)
+        private set
 
     //Variable que optimiza el pintado de letras
     private var highlightJob: Job? = null
@@ -321,7 +332,6 @@ class EditorViewModel(
 
             Log.e("COMPILADOR_ERROR", "Error crítico durante la ejecución del AST", ex)
 
-            val stackTrace = Log.getStackTraceString(ex)
 
             val errores = listOf(
                 ErrorAnalisis(
@@ -359,6 +369,7 @@ class EditorViewModel(
 
                 if (errores.isNotEmpty()) {
                     codigoGenerado = null
+                    codigoInterpretado = null
                     onResult(false)
                 } else {
                     codigoGenerado = codigo
@@ -369,6 +380,42 @@ class EditorViewModel(
         }
     }
 
+    /*Metodo que permite compilar el codigo retornado para poder ejecutar el codigo compilado*/
+    suspend fun interpretarCodigoCompilado(codigo: String) {
+        val resultado = withContext(Dispatchers.Default) {
+            try {
+                val reader = StringReader(codigo)
+                val lexer = LexerCompiled(reader)
+                val parser = ParserCompiled(lexer)
+                val parseResult = parser.parse()
+                val interpretado = parseResult.value as? CodigoInterpretado
+
+                val erroresTotales = mutableListOf<ErrorAnalisis>().apply {
+                    addAll(lexer.lexicalErrors)
+                    addAll(parser.syntaxErrorList)
+                }
+
+                val gestorInterprete = GestorInterprete(interpretado, erroresTotales)
+                gestorInterprete.ejecutarCodigoInterpretado()
+
+                Pair(gestorInterprete.codigoInterpretado, gestorInterprete.listadoErrores)
+
+            } catch (e: Exception) {
+                Pair(null, listOf(ErrorAnalisis("Interpretacion", "Runtime", e.message ?: "Error", -1, -1)))
+            }
+        }
+
+        withContext(Dispatchers.Main) {
+            val (interpretadoFinal, erroresFinales) = resultado
+            if (erroresFinales.isNotEmpty() || interpretadoFinal == null) {
+                codigoInterpretado = null
+                listaErrores = erroresFinales
+            } else {
+                codigoInterpretado = interpretadoFinal
+                listaErrores = emptyList()
+            }
+        }
+    }
 
     /*====Apartado de analisis formal de codigo al ejecutar====*/
 

@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -40,6 +41,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Airplay
 import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ColorLens
@@ -90,10 +92,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -118,6 +122,7 @@ import com.pablocompany.proyectono1_compi1.compiler.models.errores.ErrorAnalisis
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.EditorViewModelFactory
 import com.pablocompany.proyectono1_compi1.data.repository.FormFileRepository
+import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.SharedFormViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -180,9 +185,7 @@ fun EditorScreen(
     val context = LocalContext.current
 
     val repository = remember { FormFileRepository(context) }
-    val viewModel: EditorViewModel = viewModel(
-        factory = EditorViewModelFactory(repository)
-    )
+    val viewModel: EditorViewModel = viewModel(factory = EditorViewModelFactory(repository))
 
     val fileNameObserved by viewModel::fileName
     val isModified by viewModel::isModified
@@ -218,6 +221,9 @@ fun EditorScreen(
 
     //Variable para mostrar el picker de colores
     var showTemplateDialog by remember { mutableStateOf(false) }
+
+    /*VIEWMODEL DE LA INFORMACION DE LAS PREGUNTAS*/
+    val viewModelPreguntas: FormViewModel = viewModel()
 
 
     //====Permite guardar el archivo con el codigo compilado al darle a guardar
@@ -332,10 +338,13 @@ fun EditorScreen(
 
                             val codigoFinal = header + it
 
+                            scope.launch {
 
+                                viewModel.interpretarCodigoCompilado(codigoFinal)
 
-                            sharedFormViewModel.loadTemporary(codigoFinal)
-                            navController.navigate("form")
+                                sharedFormViewModel.loadTemporary(codigoFinal)
+                                navController.navigate("form")
+                            }
                         }
                     }
                 ) {
@@ -426,12 +435,17 @@ fun EditorScreen(
 
                         val codigoFinal = header + (codigoPendiente ?: "")
 
-                        if (sharedFormViewModel.currentFileUri != null) {
-                            sobrescribirFormulario(codigoFinal)
-                            navController.navigate("form")
-                        } else {
-                            codigoPendiente = codigoFinal
-                            saveFormLauncher.launch("Formulario.pkm")
+                        scope.launch {
+
+                            viewModel.interpretarCodigoCompilado(codigoFinal)
+
+                            if (sharedFormViewModel.currentFileUri != null) {
+                                sobrescribirFormulario(codigoFinal)
+                                navController.navigate("form")
+                            } else {
+                                codigoPendiente = codigoFinal
+                                saveFormLauncher.launch("Formulario.pkm")
+                            }
                         }
                     }
                 ) {
@@ -569,7 +583,7 @@ fun EditorScreen(
                         return@DrawerContent
                     }
 
-                    if(estaCompilando){
+                    if (estaCompilando) {
                         return@DrawerContent
                     }
                     estaCompilando = true
@@ -636,7 +650,7 @@ fun EditorScreen(
                                 return@ConsoleSection
                             }
 
-                            if(estaCompilando){
+                            if (estaCompilando) {
                                 return@ConsoleSection
                             }
                             estaCompilando = true
@@ -685,23 +699,60 @@ fun EditorScreen(
                             estaCompilando = true
 
                             viewModel.compilarFormulario { exito ->
-                                estaCompilando = false
 
                                 if (!exito) {
+                                    estaCompilando = false
                                     keyboardController?.hide()
                                     focusManager.clearFocus()
                                     hayErrores = true
                                     showErrorDrawer = true
                                 } else {
-                                    hayErrores = false
-                                    showErrorDrawer = false
 
-                                    // PENDIENTE LOGICA DE REFRESCADO
-                                    Toast.makeText(context, "Vista actualizada", Toast.LENGTH_SHORT).show()
+
+                                    val nombreFinal =
+                                        if (nombreAutor.isBlank()) "android-app" else nombreAutor
+
+                                    val descripcionFinal =
+                                        if (descripcion.isBlank()) "..." else descripcion
+
+                                    val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                        .format(Date())
+
+                                    val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault())
+                                        .format(Date())
+
+                                    val header = """
+###
+    Author: $nombreFinal
+    Fecha: $fechaActual
+    Hora: $horaActual
+    Descripcion: "$descripcionFinal"
+    
+""".trimIndent() + "\n"
+
+                                    val cuerpoCodigo = viewModel.codigoGenerado ?: ""
+
+                                    val codigoFinal = header + cuerpoCodigo
+
+                                    scope.launch {
+
+                                        viewModel.interpretarCodigoCompilado(codigoFinal)
+
+                                        estaCompilando = false
+                                        hayErrores = false
+                                        showErrorDrawer = false
+
+                                        Toast.makeText(
+                                            context,
+                                            "Vista actualizada",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                            .show()
+                                    }
                                 }
                             }
                         },
-                        onAgregarClick = {//Pendiente definir bloques de codigo
+                        onAgregarClick = {
                             showTemplateDialog = true
                         },
                         onColorClick = {
@@ -746,16 +797,22 @@ fun EditorScreen(
                     }
                 ) { padding ->
 
+                    val estadoInterpretado = viewModel.codigoInterpretado
+                    val componentesInterpretados = estadoInterpretado?.codigo ?: emptyList()
+
+                    /*---INTEGRACION DE LA VISTA REAL DEL FORMULARIO----*/
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(padding)
                             .verticalScroll(rememberScrollState())
-                            .padding(16.dp)
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
                         Text(
-                            "Previsualización del Formulario",
+                            "Previsualizacion del Formulario",
                             color = Color.White,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold
@@ -763,32 +820,72 @@ fun EditorScreen(
 
                         Spacer(Modifier.height(24.dp))
 
-                        repeat(10) { index ->
-                            Card(
+                        if (componentesInterpretados.isEmpty()) {
+
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color(0xFF2C2C2C)
-                                )
+                                    .padding(top = 100.dp)
+                                    .alpha(0.4f)
                             ) {
-                                Column(Modifier.padding(16.dp)) {
-                                    Text(
-                                        text = "Campo dinámico #$index",
-                                        color = Color.White
-                                    )
-                                    Spacer(Modifier.height(8.dp))
-                                    OutlinedTextField(
-                                        value = "",
-                                        onValueChange = {},
-                                        modifier = Modifier.fillMaxWidth()
+                                Icon(
+                                    imageVector = Icons.Default.Airplay,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(80.dp),
+                                    tint = Color.White
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = "Sin componentes interpretados",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.White
+                                )
+                            }
+                        } else {
+
+                            val maxX = componentesInterpretados.maxOfOrNull {
+                                (it.pointX?.toFloat() ?: 0f) + (it.width?.toFloat() ?: 0f)
+                            } ?: 1000f
+
+                            val maxY = componentesInterpretados.maxOfOrNull {
+                                (it.pointY?.toFloat() ?: 0f) + (it.height?.toFloat() ?: 0f)
+                            } ?: 1000f
+
+                            val configuration = LocalConfiguration.current
+
+                            val screenWidth = configuration.screenWidthDp.toFloat()
+                            val screenHeight = configuration.screenHeightDp.toFloat()
+
+                            val BASE_WIDTH = 800f
+                            val BASE_HEIGHT = 1600f
+
+                            val scaleX = screenWidth / BASE_WIDTH
+                            val scaleY = screenHeight / BASE_HEIGHT
+
+                            val scale = minOf(scaleX, scaleY)
+
+                            componentesInterpretados.forEach { componente ->
+
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    RenderComponent(
+                                        component = componente,
+                                        viewModel = viewModelPreguntas,
+                                        scale = scale,
+                                        usePosition = false
                                     )
                                 }
                             }
                         }
 
-                        Spacer(Modifier.height(120.dp))
+                        Spacer(Modifier.height(80.dp))
                     }
+
                 }
             }
 
@@ -1604,7 +1701,7 @@ fun TemplatePickerDialog(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth()
-                ){
+                ) {
 
                     // ===== FUNCIONES SPECIAL =====
                     TemplateDropdownButton(
@@ -1612,28 +1709,33 @@ fun TemplatePickerDialog(
                         options = listOf(
 
                             "TEXTO" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 TEXT [
     width: 1, ${'$'}opcional 
     height: 1, ${'$'}opcional
     content: "contenido"
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "OPEN QUESTION" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 OPEN_QUESTION [
     width: 1, ${'$'}opcional
     height: 1, ${'$'}opcional
     label: "texto"
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "DROP QUESTION" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 DROP_QUESTION [
     width: 1, ${'$'}opcional
     height: 1, ${'$'}opcional
@@ -1643,11 +1745,13 @@ DROP_QUESTION [
 
     correct: 0
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "SELECT QUESTION" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 SELECT_QUESTION [
     width: 1, ${'$'}opcional
     height: 1, ${'$'}opcional
@@ -1656,11 +1760,13 @@ SELECT_QUESTION [
 
     correct: 0
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "MULTIPLE QUESTION" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 MULTIPLE_QUESTION [
     width: 1, ${'$'}opcional
     height: 1, ${'$'}opcional
@@ -1669,7 +1775,8 @@ MULTIPLE_QUESTION [
 
     correct: {0, 1}
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             }
 
@@ -1682,7 +1789,8 @@ MULTIPLE_QUESTION [
                         options = listOf(
 
                             "SECTION" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 SECTION [
     width: 1,    ${'$'}Opcional
     height: 1,  ${'$'}Opcional
@@ -1697,12 +1805,14 @@ SECTION [
     }
     
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "TABLE" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 TABLE [
     width: 1, ${'$'}Opcional
     height: 1, ${'$'}Opcional
@@ -1721,7 +1831,8 @@ TABLE [
     }
     
 ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             }
                         )
@@ -1733,44 +1844,56 @@ TABLE [
                         options = listOf(
 
                             "STYLES" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
     styles [
         "color": #000000,
         "background color": #000000,
         "font family": MONO,
         "text size": 1
     ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "COLOR" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
         "color": #000000
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "BACKGROUND COLOR" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
         "background color": #000000
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "FONT FAMILY" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
         "font family": MONO
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "TEXT SIZE" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
         "text size": 1
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "BORDER" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
         "border": (1, DOTTED, #000000)
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             }
                         )
@@ -1782,38 +1905,46 @@ TABLE [
                         options = listOf(
 
                             "IF" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 IF (condicion) {
     ${'$'}Contenido
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "IF - ELSE" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 IF (condicion) {
     ${'$'}Contenido
 } ELSE {
     
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "ELSE" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 ELSE {
     ${'$'}Contenido 
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "ELSE IF" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 ELSE IF (condicion){
     ${'$'}Contenido 
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             }
                         )
@@ -1825,38 +1956,46 @@ ELSE IF (condicion){
                         options = listOf(
 
                             "FOR" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 FOR (i = 0; i < 10; i = i + 1) {
     ${'$'}Contenido
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "WHILE" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 WHILE (condicion) {
     ${'$'}Contenido
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "DO-WHILE" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 DO {
     ${'$'}Contenido
 } WHILE (condicion)
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "FOR-RANGO" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
 FOR (i in 1..5) {
     ${'$'}Contenido
 }
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             }
                         )
@@ -1868,49 +2007,59 @@ FOR (i in 1..5) {
                         options = listOf(
 
                             "FILAS" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
     [
         {
             ${'$'}Elemento
         }
     ]
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "COLUMNA" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
     
     {
             ${'$'}Elemento
     }
     
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
 
                             "ORIENTATION" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
     
     orientation: VERTICAL,
     
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "FUNCION POKEMON" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
     
     who_is_that_pokemon(NUMBER, 1, 5),
     
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             },
                             "LABEL" to {
-                                onTemplateSelected("""
+                                onTemplateSelected(
+                                    """
                                     
     label: "texto",
     
-                                """.trimIndent() + "\n")
+                                """.trimIndent() + "\n"
+                                )
                                 onDismiss()
                             }
                         )
@@ -1921,7 +2070,6 @@ FOR (i in 1..5) {
         }
     )
 }
-
 
 
 /*Metodo composable que permite mostrar las opciones como dropdown*/
