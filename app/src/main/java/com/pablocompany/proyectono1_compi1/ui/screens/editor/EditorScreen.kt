@@ -634,6 +634,11 @@ fun EditorScreen(
                         onCodeChange = { viewModel.updateCodeField(it) },
                         onFinalizarClick = {
 
+                            if (viewModel.codeField.text.isBlank()) {
+                                Toast.makeText(context, "El codigo fuente esta vacío", Toast.LENGTH_SHORT).show()
+                                return@ConsoleSection
+                            }
+
                             //Condicion que permite verificar antes de que se guarde el formulario (caso en el que se abro un formulario)
                             if (
                                 sharedFormViewModel.codigoCompilado != null &&
@@ -680,6 +685,11 @@ fun EditorScreen(
                         },
                         onReemplazarClick = {
 
+                            if (viewModel.codeField.text.isBlank()) {
+                                Toast.makeText(context, "El codigo fuente esta vacío", Toast.LENGTH_SHORT).show()
+                                return@ConsoleSection
+                            }
+
                             if (
                                 sharedFormViewModel.codigoCompilado != null &&
                                 !sharedFormViewModel.generadoDesdeEditor &&
@@ -715,8 +725,9 @@ fun EditorScreen(
                                     val descripcionFinal =
                                         if (descripcion.isBlank()) "..." else descripcion
 
-                                    val fechaActual = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                        .format(Date())
+                                    val fechaActual =
+                                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                            .format(Date())
 
                                     val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault())
                                         .format(Date())

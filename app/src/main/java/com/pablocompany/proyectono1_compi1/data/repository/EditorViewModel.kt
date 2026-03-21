@@ -427,6 +427,7 @@ class EditorViewModel(
         listaErrores = emptyList()
         codigoGenerado = null
         isModified = true
+        codigoInterpretado = null
     }
 
 }
