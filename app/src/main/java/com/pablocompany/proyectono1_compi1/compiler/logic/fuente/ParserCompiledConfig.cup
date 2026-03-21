@@ -623,7 +623,7 @@ lista_propiedades       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQ
                         :}
                         | MENOR FONT FAMILY IGUAL TIPOGRAFIA:tipo CIERRE_ETIQUETA
                         {:
-                            RESULT = new CompiledFontFamily(tipo);
+                            RESULT = new CompiledFontFamily(tipo.toString());
                         :}
                         | MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
                         {:
@@ -661,15 +661,15 @@ lista_estilos_quests    ::= lista_estilos_quests:list lista_propiedades_quests:e
 
 lista_propiedades_quests       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQUETA
                                 {:
-                                    RESULT = new CompiledBackground(color1);
+                                    RESULT = new CompiledTextColor(color1);
                                 :}
                                 | MENOR BACKGROUND COLOR_KEY IGUAL valor_color:color2 CIERRE_ETIQUETA
                                 {:
-                                    RESULT = new CompiledTextColor(color2);
+                                    RESULT = new CompiledBackground(color2);
                                 :}
                                 | MENOR FONT FAMILY IGUAL TIPOGRAFIA:tipo CIERRE_ETIQUETA
                                 {:
-                                    RESULT = new CompiledFontFamily(tipo);
+                                    RESULT = new CompiledFontFamily(tipo.toString());
                                 :}
                                 | MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
                                 {:

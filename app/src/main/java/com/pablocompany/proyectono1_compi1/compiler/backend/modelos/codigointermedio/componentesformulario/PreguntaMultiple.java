@@ -20,13 +20,14 @@ public class PreguntaMultiple extends Formulario {
 
     private String label;
 
-    public PreguntaMultiple(Number height, Number width, List<String> opciones, List<Integer> respuestas, EstilosComponent estilos, int linea, int columna) {
+    public PreguntaMultiple(Number height, Number width,String label, List<String> opciones, List<Integer> respuestas, EstilosComponent estilos, int linea, int columna) {
         super(linea, columna);
         this.height = height;
         this.width = width;
         this.opciones = opciones;
         this.estilos = estilos;
         this.respuestasCorrectas = respuestas;
+        this.label = label;
     }
     /*Metodos getters y setters*/
 
@@ -103,7 +104,7 @@ public class PreguntaMultiple extends Formulario {
         estilosEtiquetaBasicos.append("<multiple=");
         estilosEtiquetaBasicos.append(this.width != null ? this.width.toString() : "-1").append(",");
         estilosEtiquetaBasicos.append(this.height != null ? this.height : "-1").append(",");
-        estilosEtiquetaBasicos.append("\"Selecciona\",");
+        estilosEtiquetaBasicos.append("\"").append(this.label).append("\",");
 
         if(this.opciones != null){
             estilosEtiquetaBasicos.append("{");

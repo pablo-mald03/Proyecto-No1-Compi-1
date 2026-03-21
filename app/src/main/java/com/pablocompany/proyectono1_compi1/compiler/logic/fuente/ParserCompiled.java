@@ -1587,7 +1587,7 @@ class CUP$ParserCompiled$actions {
 		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).right;
 		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).value;
 		
-                            RESULT = new CompiledFontFamily(tipo);
+                            RESULT = new CompiledFontFamily(tipo.toString());
                         
               CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("lista_propiedades",20, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
             }
@@ -1683,7 +1683,7 @@ class CUP$ParserCompiled$actions {
 		int color1right = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).right;
 		CompiledColor color1 = (CompiledColor)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).value;
 		
-                                    RESULT = new CompiledBackground(color1);
+                                    RESULT = new CompiledTextColor(color1);
                                 
               CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("lista_propiedades_quests",22, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-4)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
             }
@@ -1697,7 +1697,7 @@ class CUP$ParserCompiled$actions {
 		int color2right = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).right;
 		CompiledColor color2 = (CompiledColor)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).value;
 		
-                                    RESULT = new CompiledTextColor(color2);
+                                    RESULT = new CompiledBackground(color2);
                                 
               CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("lista_propiedades_quests",22, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
             }
@@ -1711,7 +1711,7 @@ class CUP$ParserCompiled$actions {
 		int tiporight = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).right;
 		String tipo = (String)((java_cup.runtime.Symbol) CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).value;
 		
-                                    RESULT = new CompiledFontFamily(tipo);
+                                    RESULT = new CompiledFontFamily(tipo.toString());
                                 
               CUP$ParserCompiled$result = parser.getSymbolFactory().newSymbol("lista_propiedades_quests",22, ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-5)), ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.peek()), RESULT);
             }

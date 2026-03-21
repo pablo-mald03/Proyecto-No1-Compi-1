@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.ui.screens.editor
 
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,7 +40,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -66,6 +66,8 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariore
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.CompiledTable
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.EstilosProcesados
 import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
+import androidx.compose.ui.text.font.Font
+import com.pablocompany.proyectono1_compi1.R
 
 /*Clase composable utilizada para poder recrear los elementos en la UI*/
 
@@ -96,6 +98,9 @@ fun RenderSection(
     scale: Float,
     usePosition: Boolean = true
 ) {
+
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${section.javaClass.name ?: "NULL (Default)"}")
+
     Box(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(section, scale) else Modifier)
@@ -140,6 +145,9 @@ fun RenderTable(
     scale: Float,
     usePosition: Boolean = true
 ) {
+
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${table.javaClass.name ?: "NULL (Default)"}")
+
     Box(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(table, scale) else Modifier)
@@ -328,6 +336,9 @@ fun RenderText(text: CompiledText, scale: Float, usePosition: Boolean = true) {
     val contenido = text.texto.toDisplayString()
     val estilos = text.estilosProcesados
 
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${text.javaClass.name ?: "NULL (Default)"}")
+
+
     Text(
         text = contenido,
         modifier = Modifier
@@ -354,6 +365,9 @@ fun RenderOpenQuestion(
     val id = "${question.fila}_${question.columna}"
     val text = viewModel.getAnswer(id) as? String ?: ""
     val estilos = question.estilosProcesados
+
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
+
 
     Column(
         modifier = Modifier
@@ -408,6 +422,9 @@ fun RenderSelectQuestion(
     val id = "${question.fila}_${question.columna}"
     val selectedIndex = viewModel.getAnswer(id) as? Int ?: -1
     val estilos = question.estilosProcesados
+
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
+
 
     Column(
         modifier = Modifier
@@ -474,6 +491,9 @@ fun RenderDropQuestion(
     val opciones = question.opciones.map { it.toDisplayString() }
     val selectedText = if (selectedIndex in opciones.indices) opciones[selectedIndex] else ""
     val estilos = question.estilosProcesados
+
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
+
 
     Column(
         modifier = Modifier
@@ -544,6 +564,8 @@ fun RenderMultipleQuestion(
     val id = "${question.fila}_${question.columna}"
     val selected = (viewModel.getAnswer(id) as? List<Int>)?.toMutableList() ?: mutableListOf()
     val estilos = question.estilosProcesados
+
+    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
 
     Column(
         modifier = Modifier
@@ -627,14 +649,20 @@ fun calculateFontSize(textSize: Number?, scale: Float): TextUnit {
 }
 
 
-// Metodo que calcula el tipo de la letra a FontFamily
 
+/*Variables de tipos de letra propios de la app*/
+val JetBrainsMono = FontFamily(Font(R.font.jetbrains_mono, FontWeight.Normal))
+val RobotoSans = FontFamily(Font(R.font.roboto_regular, FontWeight.Normal))
+val MontserratDefault = FontFamily(Font(R.font.montserrat_regular, FontWeight.Normal))
+
+
+// Metodo que calcula el tipo de la letra a FontFamily
 fun TipoLetra?.toComposeFont(): FontFamily {
     return when (this) {
-        TipoLetra.MONO -> FontFamily.Monospace
-        TipoLetra.SANS_SERIF -> FontFamily.SansSerif
+        TipoLetra.MONO -> JetBrainsMono
+        TipoLetra.SANS_SERIF -> RobotoSans
         TipoLetra.CURSIVE -> FontFamily.Cursive
-        else -> FontFamily.Default // Para NOT_FOUND y null
+        else -> MontserratDefault
     }
 }
 

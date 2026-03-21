@@ -219,6 +219,10 @@ public class NodoSelectQuestion extends NodoQuestion {
             this.funcionPokemon.validarSemantica(tabla, listaErrores);
         }
 
+        if(this.label != null){
+            this.label.validarSemantica(tabla,listaErrores);
+        }
+
         if (this.id == null) {
             int totalComodines = this.contarComodines();
             if (totalComodines > 0) {
@@ -326,6 +330,9 @@ public class NodoSelectQuestion extends NodoQuestion {
             this.height.getExpresion().buscarComodines(parametrosPregunta);
         }
 
+        if (this.label != null && this.label.getExpresion() != null) {
+            this.label.getExpresion().buscarComodines(parametrosPregunta);
+        }
 
         if (this.funcionPokemon != null) {
             this.funcionPokemon.buscarComodines(parametrosPregunta);
@@ -378,6 +385,10 @@ public class NodoSelectQuestion extends NodoQuestion {
         Object respuestaCorrectaQuest = (this.respuestaCorrecta != null) ? this.respuestaCorrecta.ejecutar(tabla, listaErrores) : null;
 
         if (respuestaCorrectaQuest instanceof OnCompilacionError) return respuestaCorrectaQuest;
+
+        Object labelResultado = (this.label != null) ? this.label.ejecutar(tabla, listaErrores) : null;
+
+        if (labelResultado instanceof OnCompilacionError) return labelResultado;
 
         EstilosComponent estilosObjeto = new EstilosComponent();
 
@@ -448,7 +459,7 @@ public class NodoSelectQuestion extends NodoQuestion {
         }
 
 
-        return new PreguntaSelect(alto, ancho, listaOpciones,indiceCorrecto, estilosObjeto, getLinea(), getColumna());
+        return new PreguntaSelect(alto, ancho, ( labelResultado != null)? labelResultado.toString():null, listaOpciones,indiceCorrecto, estilosObjeto, getLinea(), getColumna());
     }
 
 

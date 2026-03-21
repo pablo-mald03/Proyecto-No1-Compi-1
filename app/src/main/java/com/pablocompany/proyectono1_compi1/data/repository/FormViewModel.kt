@@ -45,8 +45,6 @@ class FormViewModel : ViewModel() {
         // Función interna recursiva para no repetir código
         fun procesarRecursivo(lista: List<Any>) {
             lista.forEach { comp ->
-                println("Analizando componente: ${comp::class.simpleName}")
-
                 when (comp) {
                     is CompiledTable -> {
                         val todosLosElementos = comp.elementos?.flatten() ?: emptyList()
@@ -59,15 +57,15 @@ class FormViewModel : ViewModel() {
                         totalPreguntas++
                         val id = "${comp.fila}_${comp.columna}"
 
-                        val resUsuario = (_answers[id] as? List<*>)
+                        val respuestaUsuario = (_answers[id] as? List<*>)
                             ?.mapNotNull { it?.toString()?.toDoubleOrNull()?.toInt() }
                             ?.sorted() ?: emptyList()
 
-                        val resCorrecta = (comp.respuesta as? List<*>)
+                        val respuestaCorrecta = (comp.respuesta as? List<*>)
                             ?.mapNotNull { it?.toString()?.toDoubleOrNull()?.toInt() }
                             ?.sorted() ?: emptyList()
 
-                        if (resUsuario.isNotEmpty() && resUsuario == resCorrecta) {
+                        if (respuestaUsuario.isNotEmpty() && respuestaUsuario == respuestaCorrecta) {
                             aciertos++
                         }
                     }
@@ -75,11 +73,11 @@ class FormViewModel : ViewModel() {
                         totalPreguntas++
                         val id = "${comp.fila}_${comp.columna}"
 
-                        val resUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
+                        val respuestaUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
 
-                        val resCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
+                        val respuestaCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
 
-                        if (resUsuario != null && resUsuario == resCorrecta) {
+                        if (respuestaUsuario != null && respuestaUsuario == respuestaCorrecta) {
                             aciertos++
                         }
                     }
@@ -87,10 +85,10 @@ class FormViewModel : ViewModel() {
                         totalPreguntas++
                         val id = "${comp.fila}_${comp.columna}"
 
-                        val resUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
-                        val resCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
+                        val respuestaUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
+                        val respuestaCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
 
-                        if (resUsuario != null && resUsuario == resCorrecta) {
+                        if (respuestaUsuario != null && respuestaUsuario == respuestaCorrecta) {
                             aciertos++
                         }
                     }

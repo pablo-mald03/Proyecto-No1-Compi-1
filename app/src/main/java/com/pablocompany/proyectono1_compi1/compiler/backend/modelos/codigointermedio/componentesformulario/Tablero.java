@@ -117,7 +117,7 @@ public class Tablero extends Formulario {
             for (Formulario componente : fila) {
                 stringBuilder.append("\n\n            <element>\n\n");
                 stringBuilder.append("                ").append(componente.compilar().replace("\n", "\n                "));
-                stringBuilder.append("\n\n            </element>");
+                stringBuilder.append("\n            </element>");
             }
             stringBuilder.append("\n\n        </line>\n\n");
         }

@@ -136,7 +136,7 @@ public class Seccion extends Formulario {
             estilosEtiquetaBasicos.append("        ").append(formulario.compilar()).append("\n");
         }
 
-        estilosEtiquetaBasicos.append("     </content>\n");
+        estilosEtiquetaBasicos.append("     </content>\n\n");
 
         estilosEtiquetaBasicos.append("</section>\n\n");
         return estilosEtiquetaBasicos.toString();

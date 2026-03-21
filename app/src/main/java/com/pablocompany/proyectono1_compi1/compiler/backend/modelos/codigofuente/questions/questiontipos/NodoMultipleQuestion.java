@@ -150,6 +150,10 @@ public class NodoMultipleQuestion extends NodoQuestion {
             this.funcionPokemon.validarSemantica(tabla, listaErrores);
         }
 
+        if(this.label != null){
+            this.label.validarSemantica(tabla,listaErrores);
+        }
+
         if (this.id == null) {
             int totalComodines = this.contarComodines();
             if (totalComodines > 0) {
@@ -357,6 +361,9 @@ public class NodoMultipleQuestion extends NodoQuestion {
             this.height.getExpresion().buscarComodines(parametrosPregunta);
         }
 
+        if (this.label != null && this.label.getExpresion() != null) {
+            this.label.getExpresion().buscarComodines(parametrosPregunta);
+        }
 
         if (this.funcionPokemon != null) {
             this.funcionPokemon.buscarComodines(parametrosPregunta);
@@ -411,6 +418,10 @@ public class NodoMultipleQuestion extends NodoQuestion {
         Object opcionesResultado = (this.opciones != null) ? this.opciones.ejecutar(tabla, listaErrores) : new ArrayList<String>();
 
         if (opcionesResultado instanceof OnCompilacionError) return opcionesResultado;
+
+        Object labelResultado = (this.label != null) ? this.label.ejecutar(tabla, listaErrores) : null;
+
+        if (labelResultado instanceof OnCompilacionError) return labelResultado;
 
         List<String> listaOpciones = (List<String>) opcionesResultado;
 
@@ -470,7 +481,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
-        return new PreguntaMultiple(alto, ancho, listaOpciones, indicesCorrectos, estilosObjeto, getLinea(), getColumna());
+        return new PreguntaMultiple(alto, ancho, ( labelResultado != null)? labelResultado.toString():null, listaOpciones, indicesCorrectos, estilosObjeto, getLinea(), getColumna());
     }
 
     /*Metodo auxiliar que permite retornar el listado de indices correctos*/
