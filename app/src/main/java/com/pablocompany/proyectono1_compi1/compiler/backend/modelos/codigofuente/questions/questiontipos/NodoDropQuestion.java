@@ -384,6 +384,14 @@ public class NodoDropQuestion extends NodoQuestion {
         Object labelResultado = (this.label != null) ? this.label.ejecutar(tabla, listaErrores) : null;
         if(labelResultado instanceof  OnCompilacionError) return labelResultado;
 
+        if (labelResultado == null) {
+            return this.reporteError("DROP_QUESTION", "El atributo \"label\" de la \"DROP_QUESTION\" es obligatorio.", listaErrores);
+        }
+
+        if (!(labelResultado instanceof String)) {
+            return this.reporteError("DROP_QUESTION", "El \"label\" de la \"DROP_QUESTION\" debe ser una cadena de texto.", listaErrores);
+        }
+
         Object heightResultado = (this.height != null) ? this.height.ejecutar(tabla, listaErrores) : null;
 
         if (heightResultado instanceof OnCompilacionError) return heightResultado;
@@ -466,13 +474,23 @@ public class NodoDropQuestion extends NodoQuestion {
                 return reportarError(listaErrores, "Valor numerico entero requerido", getLinea(), getColumna());
             }
 
-            if (!listaOpciones.isEmpty()) {
-                if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
-                    return reportarError(listaErrores, "La respuesta correcta esta fuera de los indices de las \"opciones\" disponibles", getLinea(), getColumna());
-                }
+            if (listaOpciones.isEmpty()) {
+                return reportarError(listaErrores, "Se definio una respuesta correcta pero la lista de \"options\" esta vacia.", getLinea(), getColumna());
+            }
+
+
+            if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
+                return reportarError(listaErrores, "La respuesta correcta esta fuera de los indices de las \"options\" disponibles", getLinea(), getColumna());
             }
         }
 
+        if (ancho != null && ancho.doubleValue() < 0) {
+            return this.reporteError("DROP_QUESTION", "El \"width\" de la \"DROP_QUESTION\" no puede ser negativo.", listaErrores);
+        }
+
+        if (alto != null && alto.doubleValue() < 0) {
+            return this.reporteError("DROP_QUESTION", "El \"height\" de la \"DROP_QUESTION\" no puede ser negativo.", listaErrores);
+        }
 
         return new PreguntaDrop(alto, ancho,labelCalculado, listaOpciones, indiceCorrecto, estilosObjeto, getLinea(), getColumna());
     }

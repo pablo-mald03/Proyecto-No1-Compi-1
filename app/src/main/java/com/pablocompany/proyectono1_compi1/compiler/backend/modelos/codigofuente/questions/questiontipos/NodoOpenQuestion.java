@@ -231,6 +231,14 @@ public class NodoOpenQuestion extends NodoQuestion {
 
         if (labelTexto instanceof OnCompilacionError) return labelTexto;
 
+        if (labelTexto == null) {
+            return this.reporteError("OPEN_QUESTION", "El atributo \"label\" es obligatorio.", listaErrores);
+        }
+
+        if ( !(labelTexto instanceof String)) {
+            return this.reporteError("OPEN_QUESTION","El \"label\" de la \"OPEN_QUESTION\" debe ser una cadena de texto.",listaErrores);
+        }
+
         Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
 
         if (widthResultado instanceof OnCompilacionError) return widthResultado;
@@ -278,6 +286,14 @@ public class NodoOpenQuestion extends NodoQuestion {
         }
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
+
+        if (ancho != null && ancho.doubleValue() < 0) {
+            return this.reporteError("OPEN_QUESTION","El \"width\" de la \"OPEN_QUESTION\" no puede ser negativo.",listaErrores);
+        }
+
+        if (alto != null && alto.doubleValue() < 0) {
+            return this.reporteError("OPEN_QUESTION","El \"height\" de la \"OPEN_QUESTION\" no puede ser negativo.",listaErrores);
+        }
 
         return new PreguntaAbierta(alto, ancho, ( labelTexto != null)? labelTexto.toString():null, estilosObjeto, getLinea(), getColumna());
     }

@@ -318,6 +318,18 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
         Number x = (pointXConfig instanceof Number) ? (Number) pointXConfig : 0;
         Number y = (pointYConfig instanceof Number) ? (Number) pointYConfig : 0;
 
+        if (ancho != null && ancho.doubleValue() < 0) {
+            listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
+                    "El \"width\" de la \"TABLE\" no puede ser negativo.", getLinea(), getColumna()));
+            return new OnCompilacionError("Error de dimension", getLinea(), getColumna(), true);
+        }
+
+        if (alto != null && alto.doubleValue() < 0) {
+            listaErrores.add(new ErrorAnalisis("TABLE", "Semantico",
+                    "El \"height\" de la \"TABLE\" no puede ser negativo.", getLinea(), getColumna()));
+            return new OnCompilacionError("Error de dimensión", getLinea(), getColumna(), true);
+        }
+
         EstiloBorde bordeFinal = (bordeResultado instanceof EstiloBorde) ? (EstiloBorde) bordeResultado : null;
 
         return new Tablero(alto, ancho, x, y, tablaFinal, estilosObjeto, bordeFinal, getLinea(), getColumna());

@@ -89,7 +89,7 @@ public class NodoSelectQuestion extends NodoQuestion {
                     this.opciones = (NodoOptions) config.getNodoValor();
                     if (tieneFuncionPokemon(this.opciones)) {
                         getFuncionPokemon();
-                    }else{
+                    } else {
                         this.countOptions++;
                     }
                     break;
@@ -150,7 +150,7 @@ public class NodoSelectQuestion extends NodoQuestion {
             this.funcionPokemon = nodo;
             this.opciones = null;
             this.countPokemon++;
-        }else{
+        } else {
             this.countOptions++;
         }
     }
@@ -164,21 +164,21 @@ public class NodoSelectQuestion extends NodoQuestion {
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
         /*--Validacion de duplicidad---*/
-        validarObligatorio(this.countLabel,"SELECT_QUESTION", "label", listaErrores);
+        validarObligatorio(this.countLabel, "SELECT_QUESTION", "label", listaErrores);
 
-        if(this.countOptions == 0){
-            validarObligatorio(this.countPokemon,"SELECT_QUESTION", "who_is_that_pokemon()", listaErrores);
-        }else{
-            validarObligatorio(this.countOptions,"SELECT_QUESTION", "options", listaErrores);
+        if (this.countOptions == 0) {
+            validarObligatorio(this.countPokemon, "SELECT_QUESTION", "who_is_that_pokemon()", listaErrores);
+        } else {
+            validarObligatorio(this.countOptions, "SELECT_QUESTION", "options", listaErrores);
         }
 
-        validarDuplicado(this.countWidth,"SELECT_QUESTION", "width", listaErrores);
-        validarDuplicado(this.countCorrect,"SELECT_QUESTION", "correct", listaErrores);
-        validarDuplicado(this.countPokemon,"SELECT_QUESTION", "who_is_that_pokemon()", listaErrores);
-        validarDuplicado(this.countOptions,"SELECT_QUESTION", "options", listaErrores);
-        validarDuplicado(this.countHeight,"SELECT_QUESTION", "height", listaErrores);
-        validarDuplicado(this.countLabel,"SELECT_QUESTION", "label", listaErrores);
-        validarDuplicado(this.countStyles,"SELECT_QUESTION", "styles", listaErrores);
+        validarDuplicado(this.countWidth, "SELECT_QUESTION", "width", listaErrores);
+        validarDuplicado(this.countCorrect, "SELECT_QUESTION", "correct", listaErrores);
+        validarDuplicado(this.countPokemon, "SELECT_QUESTION", "who_is_that_pokemon()", listaErrores);
+        validarDuplicado(this.countOptions, "SELECT_QUESTION", "options", listaErrores);
+        validarDuplicado(this.countHeight, "SELECT_QUESTION", "height", listaErrores);
+        validarDuplicado(this.countLabel, "SELECT_QUESTION", "label", listaErrores);
+        validarDuplicado(this.countStyles, "SELECT_QUESTION", "styles", listaErrores);
 
 
         /*--Validacion de config---*/
@@ -219,8 +219,8 @@ public class NodoSelectQuestion extends NodoQuestion {
             this.funcionPokemon.validarSemantica(tabla, listaErrores);
         }
 
-        if(this.label != null){
-            this.label.validarSemantica(tabla,listaErrores);
+        if (this.label != null) {
+            this.label.validarSemantica(tabla, listaErrores);
         }
 
         if (this.id == null) {
@@ -322,7 +322,7 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         List<NodoComodin> parametrosPregunta = new ArrayList<>();
 
-        if (this.width != null && this.width.getExpresion() != null ) {
+        if (this.width != null && this.width.getExpresion() != null) {
             this.width.getExpresion().buscarComodines(parametrosPregunta);
         }
 
@@ -374,7 +374,7 @@ public class NodoSelectQuestion extends NodoQuestion {
             Object resultadoPokemon = this.funcionPokemon.ejecutar(tabla, listaErrores);
             if (resultadoPokemon instanceof OnCompilacionError) return resultadoPokemon;
 
-            if(resultadoPokemon instanceof List){
+            if (resultadoPokemon instanceof List) {
                 this.opciones = new NodoOptions((List<Nodo>) resultadoPokemon, getLinea(), getColumna());
             }
         }
@@ -389,6 +389,14 @@ public class NodoSelectQuestion extends NodoQuestion {
         Object labelResultado = (this.label != null) ? this.label.ejecutar(tabla, listaErrores) : null;
 
         if (labelResultado instanceof OnCompilacionError) return labelResultado;
+
+        if (labelResultado == null) {
+            return this.reporteError("SELECT_QUESTION", "El atributo \"label\" de la \"SELECT_QUESTION\" es obligatorio.", listaErrores);
+        }
+
+        if (!(labelResultado instanceof String)) {
+            return this.reporteError("SELECT_QUESTION", "El \"label\" de la \"SELECT_QUESTION\" debe ser una cadena de texto.", listaErrores);
+        }
 
         EstilosComponent estilosObjeto = new EstilosComponent();
 
@@ -436,36 +444,46 @@ public class NodoSelectQuestion extends NodoQuestion {
         if (respuestaCorrectaQuest != null) {
             if (respuestaCorrectaQuest instanceof Integer || respuestaCorrectaQuest instanceof Long) {
                 indiceCorrecto = ((Number) respuestaCorrectaQuest).intValue();
-            }
-            else if (respuestaCorrectaQuest instanceof Double) {
+            } else if (respuestaCorrectaQuest instanceof Double) {
                 double val = (Double) respuestaCorrectaQuest;
                 if (val == (int) val) {
                     indiceCorrecto = (int) val;
                 } else {
 
-                    return reportarError(listaErrores,"La respuesta correcta debe ser un indice con valor numerico \"entero\" sin decimales diferentes a 0",
+                    return reportarError(listaErrores, "La respuesta correcta debe ser un indice con valor numerico \"entero\" sin decimales diferentes a 0",
                             getLinea(), getColumna());
                 }
-            }
-            else {
-                return reportarError(listaErrores,"Valor numerico entero requerido", getLinea(), getColumna());
+            } else {
+                return reportarError(listaErrores, "Valor numerico entero requerido", getLinea(), getColumna());
             }
 
-            if (!listaOpciones.isEmpty()) {
-                if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
-                    return reportarError(listaErrores, "La respuesta correcta esta fuera de los indices de las \"opciones\" disponibles", getLinea(), getColumna());
-                }
+            if (listaOpciones.isEmpty()) {
+                return reportarError(listaErrores, "Se definio una respuesta correcta pero la lista de \"options\" esta vacia.", getLinea(), getColumna());
             }
+
+
+            if (indiceCorrecto < 0 || indiceCorrecto >= listaOpciones.size()) {
+                return reportarError(listaErrores, "La respuesta correcta esta fuera de los indices de las \"options\" disponibles", getLinea(), getColumna());
+            }
+
+        }
+
+        if (ancho != null && ancho.doubleValue() < 0) {
+            return this.reporteError("SELECT_QUESTION", "El \"width\" de la \"SELECT_QUESTION\" no puede ser negativo.", listaErrores);
+        }
+
+        if (alto != null && alto.doubleValue() < 0) {
+            return this.reporteError("SELECT_QUESTION", "El \"height\" de la \"SELECT_QUESTION\" no puede ser negativo.", listaErrores);
         }
 
 
-        return new PreguntaSelect(alto, ancho, ( labelResultado != null)? labelResultado.toString():null, listaOpciones,indiceCorrecto, estilosObjeto, getLinea(), getColumna());
+        return new PreguntaSelect(alto, ancho, (labelResultado != null) ? labelResultado.toString() : null, listaOpciones, indiceCorrecto, estilosObjeto, getLinea(), getColumna());
     }
 
 
     /*Metodo propio que permite clonar a una intancia de clase nodo select question*/
     @Override
-    public NodoQuestion clonar(){
+    public NodoQuestion clonar() {
         NodoSelectQuestion clon = new NodoSelectQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
 
         clon.width = (this.width != null) ? this.width.clonar() : null;
@@ -489,9 +507,8 @@ public class NodoSelectQuestion extends NodoQuestion {
         if (this.respuestaCorrecta != null) {
             if (this.respuestaCorrecta instanceof NodoExpresion) {
                 clon.respuestaCorrecta = ((NodoExpresion) this.respuestaCorrecta).clonar();
-            }
-            else if (this.respuestaCorrecta instanceof NodoCorrect) {
-                NodoExpresion expClonada = ((NodoCorrect)this.respuestaCorrecta).getExpresion().clonar();
+            } else if (this.respuestaCorrecta instanceof NodoCorrect) {
+                NodoExpresion expClonada = ((NodoCorrect) this.respuestaCorrecta).getExpresion().clonar();
                 clon.respuestaCorrecta = new NodoCorrect(expClonada, getLinea(), getColumna());
             }
         }
@@ -502,7 +519,7 @@ public class NodoSelectQuestion extends NodoQuestion {
     /*--Metodo utilizado para Reportar error--*/
     private OnCompilacionError reportarError(List<ErrorAnalisis> listaErrores, String mensaje, int linea, int columna) {
         listaErrores.add(new ErrorAnalisis("SELECT_QUESTION", "Semantico",
-                mensaje,linea, columna ));
+                mensaje, linea, columna));
         return new OnCompilacionError("Error tiempo de compilacion", getLinea(), getColumna(), true);
     }
 

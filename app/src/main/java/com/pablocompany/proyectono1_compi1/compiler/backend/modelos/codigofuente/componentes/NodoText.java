@@ -181,6 +181,14 @@ public class NodoText extends NodoComponente {
 
         if (contenidoTexto instanceof OnCompilacionError) return contenidoTexto;
 
+        if (contenidoTexto == null) {
+            return this.reporteError( "El atributo \"content\" es obligatorio.", listaErrores);
+        }
+
+        if ( !(contenidoTexto instanceof String)) {
+            return this.reporteError("El \"content\" de la \"TEXT\" debe ser una cadena de texto.",listaErrores);
+        }
+
         Object widthResultado = (this.width != null) ? this.width.ejecutar(tabla, listaErrores) : null;
 
         if (widthResultado instanceof OnCompilacionError) return widthResultado;
@@ -229,8 +237,24 @@ public class NodoText extends NodoComponente {
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
+        if (ancho != null && ancho.doubleValue() < 0) {
+            return this.reporteError("El \"width\" de \"TEXT\" no puede ser negativo.",listaErrores);
+        }
+
+        if (alto != null && alto.doubleValue() < 0) {
+            return this.reporteError("El \"height\" de \"TEXT\" no puede ser negativo.",listaErrores);
+        }
+
         return new TextoPlano(alto, ancho, contenidoTexto.toString(), estilosObjeto, getLinea(), getColumna());
 
+    }
+
+    /*Metodo utilizado para reportar errores*/
+    private OnCompilacionError reporteError(String motivo,List<ErrorAnalisis> listaErrores){
+
+        listaErrores.add(new ErrorAnalisis("TEXT", "Semantico",
+                motivo, getLinea(), getColumna()));
+        return new OnCompilacionError("Error semantico", getLinea(), getColumna(), true);
     }
 
     @Override

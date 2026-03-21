@@ -1,5 +1,6 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.questions;
 
+import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.Nodo;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores.NodoHslColor;
@@ -125,6 +126,14 @@ public abstract class NodoQuestion extends NodoComponente {
 
     /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
     public abstract void inyectarParametros(List<Nodo> parametros,List<ErrorAnalisis> listaErrores);
+
+    /*Metodo que permite reportar errores en tiempo de compilacion*/
+    protected OnCompilacionError reporteError( String quest, String motivo,List<ErrorAnalisis> listaErrores){
+
+        listaErrores.add(new ErrorAnalisis(quest, "Semantico",
+                motivo, getLinea(), getColumna()));
+        return new OnCompilacionError("Error semantico", getLinea(), getColumna(), true);
+    }
 
     /*Created by Pablo*/
 }

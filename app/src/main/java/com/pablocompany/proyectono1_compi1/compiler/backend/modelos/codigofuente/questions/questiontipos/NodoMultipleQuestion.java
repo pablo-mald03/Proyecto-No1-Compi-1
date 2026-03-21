@@ -423,6 +423,14 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         if (labelResultado instanceof OnCompilacionError) return labelResultado;
 
+        if (labelResultado == null) {
+            return this.reporteError("MULTIPLE_QUESTION", "El atributo \"label\" de la \"MULTIPLE_QUESTION\" es obligatorio.", listaErrores);
+        }
+
+        if (!(labelResultado instanceof String)) {
+            return this.reporteError("MULTIPLE_QUESTION", "El \"label\" de la \"MULTIPLE_QUESTION\" debe ser una cadena de texto.", listaErrores);
+        }
+
         List<String> listaOpciones = (List<String>) opcionesResultado;
 
         Object indicesCalculados = this.obtenerListaindices(tabla, listaErrores, listaOpciones);
@@ -481,6 +489,15 @@ public class NodoMultipleQuestion extends NodoQuestion {
         Number alto = (heightResultado instanceof Number) ? (Number) heightResultado : null;
         Number ancho = (widthResultado instanceof Number) ? (Number) widthResultado : null;
 
+        if (ancho != null && ancho.doubleValue() < 0) {
+            return this.reporteError("MULTIPLE_QUESTION", "El \"width\" de la \"MULTIPLE_QUESTION\" no puede ser negativo.", listaErrores);
+        }
+
+        if (alto != null && alto.doubleValue() < 0) {
+            return this.reporteError("MULTIPLE_QUESTION", "El \"height\" de la \"MULTIPLE_QUESTION\" no puede ser negativo.", listaErrores);
+        }
+
+
         return new PreguntaMultiple(alto, ancho, ( labelResultado != null)? labelResultado.toString():null, listaOpciones, indicesCorrectos, estilosObjeto, getLinea(), getColumna());
     }
 
@@ -504,10 +521,10 @@ public class NodoMultipleQuestion extends NodoQuestion {
                     if (val == (int) val) {
                         indiceActual = (int) val;
                     } else {
-                        return reportarError(listaErrores, "Indice múltiple debe ser entero sin decimales", getLinea(), getColumna());
+                        return reportarError(listaErrores, "El indice de \"MULTIPLE_QUESTION\" debe ser entero sin decimales", getLinea(), getColumna());
                     }
                 } else {
-                    return reportarError(listaErrores, "Índice múltiple debe ser un valor numérico", getLinea(), getColumna());
+                    return reportarError(listaErrores, "El indice de \"MULTIPLE_QUESTION\" debe ser un valor numerico", getLinea(), getColumna());
                 }
 
                 if (!listaOpciones.isEmpty()) {
