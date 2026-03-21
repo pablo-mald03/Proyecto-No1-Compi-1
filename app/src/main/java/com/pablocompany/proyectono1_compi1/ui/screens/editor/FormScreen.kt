@@ -59,6 +59,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -126,6 +128,10 @@ fun FormScreen(
 
     /*VIEWMODEL DE LA INFORMACION DE LAS PREGUNTAS*/
     val viewModel: FormViewModel = viewModel()
+
+    /*Booleano qu permite intercambiar entre vistas*/
+    var modoEditor by remember { mutableStateOf(true) }
+
 
     /* ---------------- Permite Mostrar el mensaje (Notificacion) de errores ---------------- */
 
@@ -426,12 +432,12 @@ fun FormScreen(
                         }
                     }
                 }
-            ) { consolePadding ->
+            ) {innerPadding ->
 
                 /* ---------------- Pantalla principal ---------------- */
 
                 Scaffold(
-                    modifier = Modifier.padding(consolePadding),
+                    modifier = Modifier.padding(innerPadding),
                     containerColor = Color.Transparent,
                     topBar = {
 
@@ -471,8 +477,6 @@ fun FormScreen(
 
                     /* ---------------- Área visual del formulario ---------------- */
 
-                    val scrollState = rememberScrollState()
-
                     val maxX = componentes.maxOfOrNull {
                         (it.pointX?.toFloat() ?: 0f) + (it.width?.toFloat() ?: 0f)
                     } ?: 1000f
@@ -494,69 +498,143 @@ fun FormScreen(
 
                     val scale = minOf(scaleX, scaleY)
 
-                    Box(
+                    Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(scaffoldPadding)
-                            .then(
-                                if (componentes.isNotEmpty()) Modifier
-                                    .verticalScroll(
-                                        rememberScrollState()
-                                    )
-                                    .horizontalScroll(rememberScrollState()) else Modifier
-                            ),
-                        contentAlignment = Alignment.Center
+                            .padding(scaffoldPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
 
-                        if (componentes.isEmpty()) {
-
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(32.dp)
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                                    .fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Airplay,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(80.dp),
-                                    tint = Color.White.copy(alpha = 0.2f)
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                Text(
-                                    text = "Esperando código fuente...",
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = Color.White.copy(alpha = 0.4f),
-                                    fontWeight = FontWeight.Light
-                                )
-
-                                Text(
-                                    text = "Compila un archivo .pkm para visualizar el formulario",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.White.copy(alpha = 0.3f),
-                                    textAlign = TextAlign.Center
+                                Column {
+                                    Text(
+                                        "Vista de Diseño",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        if (modoEditor) "Interpretacion .pkm" else "Ajuste automático",
+                                        color = Color.White.copy(alpha = 0.6f),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                                Switch(
+                                    checked = modoEditor,
+                                    onCheckedChange = { modoEditor = it },
+                                    colors = SwitchDefaults.colors(
+                                        checkedThumbColor = Color(0xFF0D47A1),
+                                        checkedTrackColor = Color(0xFF0D47A1).copy(alpha = 0.4f)
+                                    )
                                 )
                             }
+                        }
 
-                        } else {
+                        /* ---------------- Área visual del formulario ---------------- */
 
-                            Box(
-                                modifier = Modifier
-                                    .width((maxX * scale).dp)
-                                    .height((maxY * scale).dp)
-                            ) {
-
-                                componentes.forEach { componente ->
-                                    RenderComponent(
-                                        component = componente,
-                                        viewModel = viewModel,
-                                        scale = scale
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .weight(1f),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            if (componentes.isEmpty()) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(32.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Airplay,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(80.dp),
+                                        tint = Color.White.copy(alpha = 0.2f)
                                     )
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Text(
+                                        text = "Esperando codigo fuente...",
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        color = Color.White.copy(alpha = 0.4f),
+                                        fontWeight = FontWeight.Light
+                                    )
+
+                                    Text(
+                                        text = "Compila o abre un archivo .pkm para visualizar el formulario",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.White.copy(alpha = 0.3f),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            } else {
+                                if (modoEditor) {
+
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .verticalScroll(rememberScrollState())
+                                            .horizontalScroll(rememberScrollState()),
+                                        contentAlignment = Alignment.TopStart
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .width((maxX * scale).dp)
+                                                .height((maxY * scale).dp)
+                                                .background(Color.White.copy(alpha = 0.02f))
+                                        ) {
+                                            componentes.forEach { componente ->
+                                                RenderComponent(
+                                                    component = componente,
+                                                    viewModel = viewModel,
+                                                    scale = scale,
+                                                    usePosition = true
+                                                )
+                                            }
+                                        }
+                                    }
+                                } else {
+
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .verticalScroll(rememberScrollState())
+                                            .padding(16.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        componentes.forEach { componente ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 8.dp)
+                                            ) {
+                                                RenderComponent(
+                                                    component = componente,
+                                                    viewModel = viewModel,
+                                                    scale = scale,
+                                                    usePosition = false
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
+
                     }
+
                 }
             }
 
