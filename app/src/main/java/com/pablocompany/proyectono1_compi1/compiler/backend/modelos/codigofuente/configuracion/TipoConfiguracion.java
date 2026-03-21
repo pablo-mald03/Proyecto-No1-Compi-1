@@ -7,7 +7,6 @@ public enum TipoConfiguracion {
     HEIGHT("height"),
     LABEL("label"),
     POKEMON("pokemon"),
-
     STYLES("styles"),
     CONTENT("content"),
     POINT_X("pointX"),

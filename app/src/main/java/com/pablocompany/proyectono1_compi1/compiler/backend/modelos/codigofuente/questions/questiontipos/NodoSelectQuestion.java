@@ -6,6 +6,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoCorrect;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOptions;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
@@ -38,6 +39,18 @@ public class NodoSelectQuestion extends NodoQuestion {
     //Atributo que permite definir la respuesta correcta de la pregunta
     private Nodo respuestaCorrecta;
 
+    private NodoLabel label;
+
+    //Atributos de validacion
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countLabel = 0;
+    private int countStyles = 0;
+    private int countOptions = 0;
+    private int countCorrect = 0;
+    private int countPokemon = 0;
+
+
     /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
 
     public NodoSelectQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
@@ -62,24 +75,35 @@ public class NodoSelectQuestion extends NodoQuestion {
 
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
+                    break;
+                case LABEL:
+                    this.label = (NodoLabel) config.getNodoValor();
+                    this.countLabel++;
                     break;
                 case OPTIONS:
                     this.opciones = (NodoOptions) config.getNodoValor();
                     if (tieneFuncionPokemon(this.opciones)) {
                         getFuncionPokemon();
+                    }else{
+                        this.countOptions++;
                     }
                     break;
                 case POKEMON:
                     this.funcionPokemon = (NodoFuncionPokemon) config.getNodoValor();
+                    this.countPokemon++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
                 case CORRECT:
                     this.respuestaCorrecta = (Nodo) config.getNodoValor();
+                    this.countCorrect++;
                     break;
             }
 
@@ -125,6 +149,9 @@ public class NodoSelectQuestion extends NodoQuestion {
         if (nodo instanceof NodoFuncionPokemon) {
             this.funcionPokemon = nodo;
             this.opciones = null;
+            this.countPokemon++;
+        }else{
+            this.countOptions++;
         }
     }
 
@@ -135,6 +162,24 @@ public class NodoSelectQuestion extends NodoQuestion {
      * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        /*--Validacion de duplicidad---*/
+        validarObligatorio(this.countLabel,"SELECT_QUESTION", "label", listaErrores);
+
+        if(this.countOptions == 0){
+            validarObligatorio(this.countPokemon,"SELECT_QUESTION", "who_is_that_pokemon()", listaErrores);
+        }else{
+            validarObligatorio(this.countOptions,"SELECT_QUESTION", "options", listaErrores);
+        }
+
+        validarDuplicado(this.countWidth,"SELECT_QUESTION", "width", listaErrores);
+        validarDuplicado(this.countCorrect,"SELECT_QUESTION", "correct", listaErrores);
+        validarDuplicado(this.countPokemon,"SELECT_QUESTION", "who_is_that_pokemon()", listaErrores);
+        validarDuplicado(this.countOptions,"SELECT_QUESTION", "options", listaErrores);
+        validarDuplicado(this.countHeight,"SELECT_QUESTION", "height", listaErrores);
+        validarDuplicado(this.countLabel,"SELECT_QUESTION", "label", listaErrores);
+        validarDuplicado(this.countStyles,"SELECT_QUESTION", "styles", listaErrores);
+
 
         /*--Validacion de config---*/
         if (this.width != null) {
@@ -416,6 +461,15 @@ public class NodoSelectQuestion extends NodoQuestion {
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
         clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
+        clon.label = (this.label != null) ? this.label.clonar() : null;
+
+        clon.countWidth = this.countWidth;
+        clon.countHeight = this.countHeight;
+        clon.countLabel = this.countLabel;
+        clon.countStyles = this.countStyles;
+        clon.countOptions = this.countOptions;
+        clon.countCorrect = this.countCorrect;
+        clon.countPokemon = this.countPokemon;
 
         if (this.funcionPokemon instanceof NodoFuncionPokemon) {
             clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();

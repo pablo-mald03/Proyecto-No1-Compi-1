@@ -824,23 +824,16 @@ text_declaration        ::= TEXT CORCHETE_APERTURA cuerpo_text:cuerpo CORCHETE_C
 
 
 /*-----Reglas de produccion para definir el cuerpo del texto----------*/
-cuerpo_text         ::= CONTENT DOS_PUNTOS expresion:exp
-                        {:
-                            List<AtributoConfig> list = new ArrayList<>();
-                            list.add(new AtributoConfig(TipoConfiguracion.CONTENT, exp));
-                            RESULT = list;
-                        :}
-                        | CONTENT DOS_PUNTOS expresion:exp COMA lista_config_text:list
-                        {:
-                            list.add(new AtributoConfig(TipoConfiguracion.CONTENT, exp));
-                            RESULT = list;
-                        :}
-                        | lista_config_text:list COMA CONTENT DOS_PUNTOS expresion:exp
-                        {:
-                            list.add(new AtributoConfig(TipoConfiguracion.CONTENT, exp));
-                            RESULT = list;
-                        :}
-                        ;
+cuerpo_text         ::= lista_config_text:list
+                    {:
+                        RESULT = list;
+                    :}
+                    | error
+                    {:
+                        RESULT = new ArrayList<AtributoConfig>();
+                    :}
+                    ;
+
 
 /*Produccion para la lista de atributos de configuracion que tienen los textos*/
 lista_config_text       ::=  lista_config_text:list COMA atributo_text_extra:extra
@@ -866,6 +859,10 @@ atributo_text_extra         ::= WIDTH DOS_PUNTOS expresion:exp
                             | HEIGHT DOS_PUNTOS expresion:exp
                             {:
                                 RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
+                            :}
+                            | CONTENT DOS_PUNTOS expresion:exp
+                            {:
+                                RESULT = new AtributoConfig(TipoConfiguracion.CONTENT, exp);
                             :}
                             | STYLES CORCHETE_APERTURA lista_estilos_basicos_layout:list CORCHETE_CIERRE
                             {:
@@ -934,89 +931,52 @@ instruccion         ::= VAR_NUMERO ID:id IGUALACION expresion:expresion
 
 /*--***---Produccion que permite definir las producciones de configuracion de una select question----***---*/
 
-cuerpo_select         ::=
-                    contenido_options:opts
-                    {:
-                        List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list;
-                    :}
-                    | lista_config_drop:list1 COMA contenido_options:opts
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | contenido_options:opts COMA lista_config_drop:list1
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA contenido_options:opts COMA lista_config_drop:list2
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | error
-                    {:
-                        RESULT = new ArrayList<AtributoConfig>();
-                    :}
-                    ;
+cuerpo_select         ::= lista_config_drop:list
+                        {:
+                            RESULT = list;
+                        :}
+                        | error
+                        {:
+                            RESULT = new ArrayList<AtributoConfig>();
+                        :}
+                        ;
 
 
 /*-----Reglas que permiten definir las configuraciones de las multiple questions-----*/
 
 /*--***---Produccion que permite definir las producciones de configuracion de una drop question----***---*/
 
-cuerpo_multiple         ::=
-                    contenido_options:opts
-                    {:
-                        List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list;
-                    :}
-                    | lista_config_multiple:list1 COMA contenido_options:opts
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_multiple:list1 COMA contenido_options:opts COMA lista_config_multiple:list2
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | contenido_options:opts COMA lista_config_multiple:list1
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | error
-                    {:
-                        RESULT = new ArrayList<AtributoConfig>();
-                    :}
-                    ;
+cuerpo_multiple         ::= lista_config_multiple:list
+                        {:
+                            RESULT = list;
+                        :}
+                        | error
+                        {:
+                            RESULT = new ArrayList<AtributoConfig>();
+                        :}
+                        ;
+
 
 /*--***---Produccion que permite definir las opciones que se tendran en una multiple question----***---*/
 
 /*---Define la produccion para poder definir los atributos de configuracion denttro de la drop question----*/
 
 lista_config_multiple   ::= lista_config_multiple:list COMA atributo_multiple:atr
-                    {:
-                        list.add(atr);
-                        RESULT = list;
-                    :}
-                    | atributo_multiple:atr
-                    {:
-                        List<AtributoConfig> list = new ArrayList<>();
-                        list.add(atr);
-                        RESULT = list;
-                    :}
-                    | lista_config_multiple:list COMA error
-                    {:
-                        RESULT = list;
-                    :}
-                    ;
+                        {:
+                            list.add(atr);
+                            RESULT = list;
+                        :}
+                        | atributo_multiple:atr
+                        {:
+                            List<AtributoConfig> list = new ArrayList<>();
+                            list.add(atr);
+                            RESULT = list;
+                        :}
+                        | lista_config_multiple:list COMA error
+                        {:
+                            RESULT = list;
+                        :}
+                        ;
 
 /*----Define los atributos que puede tener la multiple question----*/
 
@@ -1027,6 +987,14 @@ atributo_multiple       ::= WIDTH DOS_PUNTOS expresion:exp
                         | HEIGHT DOS_PUNTOS expresion:exp
                         {:
                             RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
+                        :}
+                        | LABEL DOS_PUNTOS expresion:exp
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright));
+                        :}
+                        | contenido_options:opts
+                        {:
+                            RESULT = new AtributoConfig(TipoConfiguracion.OPTIONS, opts);
                         :}
                         | CORRECT DOS_PUNTOS LLAVE_APERTURA lista_correctas:list LLAVE_CIERRE
                         {:
@@ -1056,116 +1024,8 @@ lista_correctas     ::= lista_correctas:list COMA expresion:exp
 
 /*--***---Produccion que permite definir las producciones de configuracion de una drop y select question----***---*/
 
-cuerpo_drop         ::=
-                    lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts COMA lista_config_drop:list2
+cuerpo_drop         ::= lista_config_drop:list
                     {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2 COMA contenido_options:opts COMA lista_config_drop:list3
-                    {:
-                        list1.addAll(list2);
-                        list1.addAll(list3);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA contenido_options:opts COMA lista_config_drop:list2 COMA
-                    LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list3
-                    {:
-                        list1.addAll(list2);
-                        list1.addAll(list3);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1 COMA contenido_options:opts COMA lista_config_drop:list2
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | contenido_options:opts COMA lista_config_drop:list1 COMA
-                    LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list2 COMA contenido_options:opts
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA contenido_options:opts COMA
-                    lista_config_drop:list2 COMA LABEL DOS_PUNTOS expresion:exp
-                    {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts COMA lista_config_drop:list1
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | lista_config_drop:list1 COMA contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA lista_config_drop:list1 COMA contenido_options:opts
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | contenido_options:opts COMA lista_config_drop:list1 COMA LABEL DOS_PUNTOS expresion:exp
-                    {:
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list1.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list1;
-                    :}
-                    | LABEL DOS_PUNTOS expresion:exp COMA contenido_options:opts
-                    {:
-                        List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
-                        RESULT = list;
-                    :}
-                    | contenido_options:opts COMA LABEL DOS_PUNTOS expresion:exp
-                    {:
-                        List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright)));
-                        list.add(new AtributoConfig(TipoConfiguracion.OPTIONS, opts));
                         RESULT = list;
                     :}
                     | error
@@ -1222,6 +1082,14 @@ atributo_drop       ::= WIDTH DOS_PUNTOS expresion:exp
                     {:
                         RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(exp, expleft, expright));
                     :}
+                    | LABEL DOS_PUNTOS expresion:exp
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(exp, expleft, expright));
+                    :}
+                    | contenido_options:opts
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.OPTIONS, opts);
+                    :}
                     | CORRECT DOS_PUNTOS expresion:exp
                     {:
                         RESULT = new AtributoConfig(TipoConfiguracion.CORRECT, new NodoCorrect(exp, expleft, expright));
@@ -1273,27 +1141,8 @@ funcion_pokemon     ::= WHO_IS_THAT_POKEMON PARENT_APERTURA NUMBER_REQUEST COMA 
 
 /*--***---Produccion que permite definir las producciones de configuracion de una open question----***---*/
 
-cuerpo_open         ::=
-                    lista_config_open:list1 COMA LABEL:lb DOS_PUNTOS expresion:e COMA lista_config_open:list2
+cuerpo_open         ::= lista_config_open:list
                     {:
-                        list1.addAll(list2);
-                        list1.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
-                        RESULT = list1;
-                    :}
-                    | lista_config_open:list COMA LABEL DOS_PUNTOS expresion:e
-                    {:
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
-                        RESULT = list;
-                    :}
-                    | LABEL DOS_PUNTOS expresion:e COMA lista_config_open:list
-                    {:
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
-                        RESULT = list;
-                    :}
-                    | LABEL DOS_PUNTOS expresion:e
-                    {:
-                        List<AtributoConfig> list = new ArrayList<>();
-                        list.add(new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright)));
                         RESULT = list;
                     :}
                     | error
@@ -1332,6 +1181,10 @@ atributo_open       ::= WIDTH DOS_PUNTOS expresion:expresion
                     | HEIGHT DOS_PUNTOS expresion:expresion
                     {:
                         RESULT = new AtributoConfig(TipoConfiguracion.HEIGHT, new NodoHeight(expresion, expresionleft, expresionright));
+                    :}
+                    | LABEL DOS_PUNTOS expresion:e
+                    {:
+                        RESULT = new AtributoConfig(TipoConfiguracion.LABEL, new NodoLabel(e, eleft, eright));
                     :}
                     | STYLES CORCHETE_APERTURA lista_estilos_basicos:list CORCHETE_CIERRE
                     {:

@@ -28,6 +28,12 @@ public class NodoText extends NodoComponente {
     //Atributos
     private NodoExpresion contenido;
 
+    //Atributos de validacion
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countContent = 0;
+    private int countStyles = 0;
+
     public NodoText(List<AtributoConfig> configs, int linea, int columna) {
         super(null, null, null, linea, columna);
         this.contenido = null;
@@ -38,6 +44,15 @@ public class NodoText extends NodoComponente {
     //Metodo que permite validar semantica del lenguaje generado (PENDIENTE)
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        validarObligatorio(this.countContent, "content", listaErrores);
+
+        validarDuplicado(this.countWidth, "width", listaErrores);
+        validarDuplicado(this.countHeight, "height", listaErrores);
+        validarDuplicado(this.countContent, "content", listaErrores);
+        validarDuplicado(this.countStyles, "styles", listaErrores);
+
+
         if (this.contenido != null) {
             TipoVariable tipoContenido = this.contenido.validarSemantica(tabla, listaErrores);
 
@@ -83,17 +98,39 @@ public class NodoText extends NodoComponente {
             switch (config.getTipo()) {
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
                 case CONTENT:
                     this.contenido = (NodoExpresion) config.getNodoValor();
+                    this.countContent++;
                     break;
             }
+        }
+    }
+
+    // Metodo que valida que el atributo haya sido definido al menos una vez
+    private void validarObligatorio(int contador, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador == 0) {
+            listaErrores.add(new ErrorAnalisis("TEXT", "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" es obligatorio y no ha sido definido en la \"TEXT\".",
+                    getLinea(), getColumna()));
+        }
+    }
+
+    //Metodo que permite validar la duplicidad de instrucciones en el cuerpo de la tabla
+    private void validarDuplicado(int contador, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador > 1) {
+            listaErrores.add(new ErrorAnalisis("TEXT", "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" ha sido definido mas de una vez en \"TEXT\".",
+                    getLinea(), getColumna()));
         }
     }
 

@@ -39,6 +39,15 @@ public class NodoDropQuestion extends NodoQuestion {
     //Atributo que permite definir la respuesta correcta de la pregunta
     private Nodo respuestaCorrecta;
 
+    //Atributos de validacion
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countLabel = 0;
+    private int countStyles = 0;
+    private int countOptions = 0;
+    private int countCorrect = 0;
+    private int countPokemon = 0;
+
     /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
 
     public NodoDropQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
@@ -56,6 +65,25 @@ public class NodoDropQuestion extends NodoQuestion {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
+        /*--Validacion de duplicidad---*/
+        validarObligatorio(this.countLabel,"DROP_QUESTION", "label", listaErrores);
+
+        if(this.countOptions == 0){
+            validarObligatorio(this.countPokemon,"DROP_QUESTION", "who_is_that_pokemon()", listaErrores);
+        }else{
+            validarObligatorio(this.countOptions,"DROP_QUESTION", "options", listaErrores);
+        }
+
+        validarDuplicado(this.countWidth,"DROP_QUESTION", "width", listaErrores);
+        validarDuplicado(this.countCorrect,"DROP_QUESTION", "correct", listaErrores);
+        validarDuplicado(this.countPokemon,"DROP_QUESTION", "who_is_that_pokemon()", listaErrores);
+        validarDuplicado(this.countOptions,"DROP_QUESTION", "options", listaErrores);
+        validarDuplicado(this.countHeight,"DROP_QUESTION", "height", listaErrores);
+        validarDuplicado(this.countLabel,"DROP_QUESTION", "label", listaErrores);
+        validarDuplicado(this.countStyles,"DROP_QUESTION", "styles", listaErrores);
+
+
+
         /*--Validacion de config---*/
         if (this.width != null) {
             width.validarSemantica(tabla, listaErrores, false);
@@ -70,12 +98,12 @@ public class NodoDropQuestion extends NodoQuestion {
 
         /*--Validacion de opciones--*/
         if (this.opciones == null && this.funcionPokemon == null) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
                     "La pregunta DROP_QUESTION debe tener opciones definidas.", getLinea(), getColumna()));
         }
 
         if (this.opciones != null && this.funcionPokemon != null) {
-            listaErrores.add(new ErrorAnalisis(id, "Semántico",
+            listaErrores.add(new ErrorAnalisis(id, "Semantico",
                     "La pregunta DROP_QUESTION debe tener solo la lista de opciones o solo la funcion who_is_that_pokemon.", getLinea(), getColumna()));
         }
 
@@ -172,28 +200,36 @@ public class NodoDropQuestion extends NodoQuestion {
 
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
                     break;
                 case LABEL:
                     this.label = (NodoLabel) config.getNodoValor();
+                    this.countLabel++;
                     break;
                 case OPTIONS:
                     this.opciones = (NodoOptions) config.getNodoValor();
 
                     if (tieneFuncionPokemon(this.opciones)) {
                         getFuncionPokemon();
+                    }else{
+                        this.countOptions++;
                     }
                     break;
                 case POKEMON:
                     this.funcionPokemon = (NodoFuncionPokemon) config.getNodoValor();
+                    this.countPokemon++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
                 case CORRECT:
                     this.respuestaCorrecta = (Nodo) config.getNodoValor();
+                    this.countCorrect++;
                     break;
             }
         }
@@ -220,6 +256,10 @@ public class NodoDropQuestion extends NodoQuestion {
         if (nodo instanceof NodoFuncionPokemon) {
             this.funcionPokemon = nodo;
             this.opciones = null;
+            this.countPokemon++;
+        }
+        else{
+            this.countOptions++;
         }
     }
 
@@ -446,6 +486,14 @@ public class NodoDropQuestion extends NodoQuestion {
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
         clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
         clon.label = (this.label != null) ? this.label.clonar() : null;
+
+        clon.countWidth = this.countWidth;
+        clon.countHeight = this.countHeight;
+        clon.countLabel = this.countLabel;
+        clon.countStyles = this.countStyles;
+        clon.countOptions = this.countOptions;
+        clon.countCorrect = this.countCorrect;
+        clon.countPokemon = this.countPokemon;
 
         if (this.funcionPokemon instanceof NodoFuncionPokemon) {
             clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();

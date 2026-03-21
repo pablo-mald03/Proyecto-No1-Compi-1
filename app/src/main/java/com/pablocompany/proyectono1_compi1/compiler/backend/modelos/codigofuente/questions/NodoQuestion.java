@@ -84,7 +84,6 @@ public abstract class NodoQuestion extends NodoComponente {
     protected void recolectarComodinesColor(NodoColor color, List<NodoComodin> listaTotal) {
         if (color == null) return;
 
-        // Ya no usamos extraerValor, usamos buscarComodines() que definimos en NodoExpresion
         if (color instanceof NodoRgbColor) {
             NodoRgbColor rgbColor = (NodoRgbColor) color;
             if (rgbColor.getRed() != null) rgbColor.getRed().buscarComodines(listaTotal);
@@ -93,10 +92,27 @@ public abstract class NodoQuestion extends NodoComponente {
         }
         else if (color instanceof NodoHslColor) {
             NodoHslColor hslColor = (NodoHslColor) color;
-            // Asumiendo que HSL también tiene 3 expresiones (Hue, Sat, Lit)
             if (hslColor.getRed() != null) hslColor.getRed().buscarComodines(listaTotal);
             if (hslColor.getBlue() != null) hslColor.getBlue().buscarComodines(listaTotal);
             if (hslColor.getGreen() != null) hslColor.getGreen().buscarComodines(listaTotal);
+        }
+    }
+
+    // Metodo que valida que el atributo haya sido definido al menos una vez
+    protected void validarObligatorio(int contador,String question, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador == 0) {
+            listaErrores.add(new ErrorAnalisis(question, "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" es obligatorio y no ha sido definido en la \""+question+"\".",
+                    getLinea(), getColumna()));
+        }
+    }
+
+    //Metodo que permite validar la duplicidad de instrucciones en el cuerpo de la tabla
+    protected void validarDuplicado(int contador,String question, String nombreAtributo, List<ErrorAnalisis> listaErrores) {
+        if (contador > 1) {
+            listaErrores.add(new ErrorAnalisis(question, "Semantico",
+                    "El atributo \"" + nombreAtributo + "\" ha sido definido mas de una vez en \""+question+"\".",
+                    getLinea(), getColumna()));
         }
     }
 

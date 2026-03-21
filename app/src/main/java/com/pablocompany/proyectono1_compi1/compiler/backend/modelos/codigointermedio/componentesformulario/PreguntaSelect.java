@@ -18,6 +18,8 @@ public class PreguntaSelect extends Formulario {
 
     private Integer respuestaCorrecta;
 
+    private String label;
+
     public PreguntaSelect( Number height, Number width, List<String> opciones, Integer respuestaCorrecta, EstilosComponent estilos,int linea, int columna) {
         super(linea, columna);
         this.height = height;

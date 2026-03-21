@@ -18,6 +18,8 @@ public class PreguntaMultiple extends Formulario {
 
     private List<Integer> respuestasCorrectas;
 
+    private String label;
+
     public PreguntaMultiple(Number height, Number width, List<String> opciones, List<Integer> respuestas, EstilosComponent estilos, int linea, int columna) {
         super(linea, columna);
         this.height = height;

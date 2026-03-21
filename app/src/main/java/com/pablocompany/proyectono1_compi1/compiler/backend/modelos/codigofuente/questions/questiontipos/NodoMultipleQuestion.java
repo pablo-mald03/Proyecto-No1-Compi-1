@@ -6,6 +6,7 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.AtributoConfig;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoCorrect;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoHeight;
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoLabel;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoOptions;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.configuracion.NodoWidth;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.estilos.NodoEstilos;
@@ -38,6 +39,17 @@ public class NodoMultipleQuestion extends NodoQuestion {
     //Atributo que permite definir la respuesta correcta de la pregunta
     private List<Nodo> respuestasCorrectas;
 
+    private NodoLabel label;
+
+    //Atributos de validacion
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countLabel = 0;
+    private int countStyles = 0;
+    private int countOptions = 0;
+    private int countCorrect = 0;
+    private int countPokemon = 0;
+
     /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
 
     public NodoMultipleQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
@@ -54,6 +66,24 @@ public class NodoMultipleQuestion extends NodoQuestion {
      * */
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
+
+        /*--Validacion de duplicidad---*/
+        validarObligatorio(this.countLabel,"MULTIPLE_QUESTION", "label", listaErrores);
+
+        if(this.countOptions == 0){
+            validarObligatorio(this.countPokemon,"MULTIPLE_QUESTION", "who_is_that_pokemon()", listaErrores);
+        }else{
+            validarObligatorio(this.countOptions,"MULTIPLE_QUESTION", "options", listaErrores);
+        }
+
+        validarDuplicado(this.countWidth,"MULTIPLE_QUESTION", "width", listaErrores);
+        validarDuplicado(this.countCorrect,"MULTIPLE_QUESTION", "correct", listaErrores);
+        validarDuplicado(this.countPokemon,"MULTIPLE_QUESTION", "who_is_that_pokemon()", listaErrores);
+        validarDuplicado(this.countOptions,"MULTIPLE_QUESTION", "options", listaErrores);
+        validarDuplicado(this.countHeight,"MULTIPLE_QUESTION", "height", listaErrores);
+        validarDuplicado(this.countLabel,"MULTIPLE_QUESTION", "label", listaErrores);
+        validarDuplicado(this.countStyles,"MULTIPLE_QUESTION", "styles", listaErrores);
+
 
         /*--Validacion de config---*/
         if (this.width != null) {
@@ -184,25 +214,35 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
+                    break;
+                case LABEL:
+                    this.label = (NodoLabel) config.getNodoValor();
+                    this.countLabel++;
                     break;
                 case OPTIONS:
                     this.opciones = (NodoOptions) config.getNodoValor();
-
                     if (tieneFuncionPokemon(this.opciones)) {
                         getFuncionPokemon();
+                    } else {
+                        this.countOptions++;
                     }
                     break;
                 case POKEMON:
                     this.funcionPokemon = (NodoFuncionPokemon) config.getNodoValor();
+                    this.countPokemon++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
                 case CORRECT:
                     this.respuestasCorrectas = (List<Nodo>) config.getNodoValor();
+                    this.countCorrect++;
                     break;
             }
         }
@@ -229,6 +269,9 @@ public class NodoMultipleQuestion extends NodoQuestion {
         if (nodo instanceof NodoFuncionPokemon) {
             this.funcionPokemon = nodo;
             this.opciones = null;
+            this.countPokemon++;
+        } else {
+            this.countOptions++;
         }
     }
 
@@ -480,6 +523,15 @@ public class NodoMultipleQuestion extends NodoQuestion {
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
         clon.opciones = (this.opciones != null) ? this.opciones.clonar() : null;
+        clon.label = (this.label != null) ? this.label.clonar() : null;
+
+        clon.countWidth = this.countWidth;
+        clon.countHeight = this.countHeight;
+        clon.countLabel = this.countLabel;
+        clon.countStyles = this.countStyles;
+        clon.countOptions = this.countOptions;
+        clon.countCorrect = this.countCorrect;
+        clon.countPokemon = this.countPokemon;
 
         if (this.funcionPokemon instanceof NodoFuncionPokemon) {
             clon.funcionPokemon = ((NodoFuncionPokemon) this.funcionPokemon).clonar();
@@ -494,8 +546,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
                 if (response instanceof NodoExpresion) {
                     clon.respuestasCorrectas.add(((NodoExpresion) response).clonar());
-                }
-                else if (response instanceof NodoCorrect) {
+                } else if (response instanceof NodoCorrect) {
                     NodoExpresion expClonada = ((NodoCorrect) response).getExpresion().clonar();
                     clon.respuestasCorrectas.add(new NodoCorrect(expClonada, response.getLinea(), response.getColumna()));
                 }

@@ -28,6 +28,13 @@ public class NodoOpenQuestion extends NodoQuestion {
     //Atributos
     private NodoLabel label;
 
+    //Atributos de validacion
+    private int countWidth = 0;
+    private int countHeight = 0;
+    private int countLabel = 0;
+    private int countStyles = 0;
+
+
     /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
 
     public NodoOpenQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
@@ -53,15 +60,19 @@ public class NodoOpenQuestion extends NodoQuestion {
 
                 case WIDTH:
                     this.width = (NodoWidth) config.getNodoValor();
+                    this.countWidth++;
                     break;
                 case HEIGHT:
                     this.height = (NodoHeight) config.getNodoValor();
+                    this.countHeight++;
                     break;
                 case LABEL:
                     this.label = (NodoLabel) config.getNodoValor();
+                    this.countLabel++;
                     break;
                 case STYLES:
                     this.estilos = procesarEstilos((List<NodoEstilos>) config.getNodoValor());
+                    this.countStyles++;
                     break;
             }
 
@@ -77,6 +88,15 @@ public class NodoOpenQuestion extends NodoQuestion {
     @Override
     public TipoVariable validarSemantica(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
+        /*--Validacion de duplicidad---*/
+
+        validarObligatorio(this.countLabel,"OPEN_QUESTION", "label", listaErrores);
+
+        validarDuplicado(this.countWidth,"OPEN_QUESTION", "width", listaErrores);
+        validarDuplicado(this.countHeight,"OPEN_QUESTION", "height", listaErrores);
+        validarDuplicado(this.countLabel,"OPEN_QUESTION", "label", listaErrores);
+        validarDuplicado(this.countStyles,"OPEN_QUESTION", "styles", listaErrores);
+
         /*--Validacion de config---*/
         if (this.width != null) {
             width.validarSemantica(tabla, listaErrores,false);
@@ -90,12 +110,6 @@ public class NodoOpenQuestion extends NodoQuestion {
 
         if(this.label != null){
             this.label.validarSemantica(tabla,listaErrores);
-        }else{
-
-            //Solo es preventivo
-            listaErrores.add(new ErrorAnalisis(id, "Semántico",
-                    "El atributo \"label\" es obligatorio en la pregunta OPEN_QUESTION.", getLinea(), getColumna()));
-
         }
 
         /*--Validacion de comodines--*/
@@ -278,6 +292,11 @@ public class NodoOpenQuestion extends NodoQuestion {
         clon.width = (this.width != null) ? this.width.clonar() : null;
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;
+
+        clon.countWidth = this.countWidth;
+        clon.countHeight = this.countHeight;
+        clon.countLabel = this.countLabel;
+        clon.countStyles = this.countStyles;
 
         return clon;
     }
