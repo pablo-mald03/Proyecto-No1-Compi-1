@@ -123,21 +123,6 @@ public class NodoIf extends Nodo {
         return "";
     }
 
-    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
-    @Override
-    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
-
-        if (this.codigo != null) {
-            for (Nodo nodo : this.codigo) {
-                nodo.ejecutarDraws(tabla, errores);
-            }
-        }
-
-        if (this.nodoElse != null) {
-            this.nodoElse.ejecutarDraws(tabla, errores);
-        }
-    }
-
     /*-----Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)-----*/
     @Override
     public void ejecutarRequests(TablaSimbolos tabla, List<ErrorAnalisis> errores) {

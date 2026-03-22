@@ -39,17 +39,6 @@ public class NodoElements extends Nodo {
         return TipoVariable.VOID;
     }
 
-    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
-    @Override
-    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
-
-        if (this.expresion != null) {
-            for (Nodo n : this.expresion) {
-                n.ejecutarDraws(tabla, errores);
-            }
-        }
-    }
-
     //Metodo que permite ejecutar y retornar el listado de todas las preguntas o elementos que tiene dentro
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

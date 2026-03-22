@@ -99,8 +99,6 @@ fun RenderSection(
     usePosition: Boolean = true
 ) {
 
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${section.javaClass.name ?: "NULL (Default)"}")
-
     Box(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(section, scale) else Modifier)
@@ -145,8 +143,6 @@ fun RenderTable(
     scale: Float,
     usePosition: Boolean = true
 ) {
-
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${table.javaClass.name ?: "NULL (Default)"}")
 
     Box(
         modifier = Modifier
@@ -336,9 +332,6 @@ fun RenderText(text: CompiledText, scale: Float, usePosition: Boolean = true) {
     val contenido = text.texto.toDisplayString()
     val estilos = text.estilosProcesados
 
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${text.javaClass.name ?: "NULL (Default)"}")
-
-
     Text(
         text = contenido,
         modifier = Modifier
@@ -365,9 +358,6 @@ fun RenderOpenQuestion(
     val id = "${question.fila}_${question.columna}"
     val text = viewModel.getAnswer(id) as? String ?: ""
     val estilos = question.estilosProcesados
-
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
-
 
     Column(
         modifier = Modifier
@@ -422,9 +412,6 @@ fun RenderSelectQuestion(
     val id = "${question.fila}_${question.columna}"
     val selectedIndex = viewModel.getAnswer(id) as? Int ?: -1
     val estilos = question.estilosProcesados
-
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
-
 
     Column(
         modifier = Modifier
@@ -491,9 +478,6 @@ fun RenderDropQuestion(
     val opciones = question.opciones.map { it.toDisplayString() }
     val selectedText = if (selectedIndex in opciones.indices) opciones[selectedIndex] else ""
     val estilos = question.estilosProcesados
-
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
-
 
     Column(
         modifier = Modifier
@@ -564,8 +548,6 @@ fun RenderMultipleQuestion(
     val id = "${question.fila}_${question.columna}"
     val selected = (viewModel.getAnswer(id) as? List<Int>)?.toMutableList() ?: mutableListOf()
     val estilos = question.estilosProcesados
-
-    Log.d("TipoLetraCheck", "Recibiendo tipo question: ${question.javaClass.name ?: "NULL (Default)"}")
 
     Column(
         modifier = Modifier

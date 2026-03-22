@@ -66,14 +66,7 @@ public class NodoDraw extends NodoComponente {
         return TipoVariable.SPECIAL;
     }
 
-    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
-    @Override
-    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
-        this.ejecutar(tabla, errores);
-    }
-
     /*METODO EJECUTADO PPARA INYECTAR LOS PARAMETROS A LOS COMODINES QUE ESTAN DENTRO DE LA FUNCION Y GENERAR EL DINAMISMO*/
-
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {
 
@@ -92,7 +85,6 @@ public class NodoDraw extends NodoComponente {
         for (Nodo param : this.parametros) {
             param.validarSemantica(tabla, listaErrores);
         }
-
 
         int comodines = plantilla.contarComodines();
         int totalParametros = this.parametros.size();
@@ -117,6 +109,17 @@ public class NodoDraw extends NodoComponente {
         if (comodines > 0) {
             instanciaClonada.inyectarParametros(this.parametros, listaErrores);
         }
+
+        instanciaClonada.validarSemantica(tabla, listaErrores);
+
+        System.out.println("Evaluando a: " + instanciaClonada.getClass().getName() );
+
+        if (!listaErrores.isEmpty()) {
+            return new OnCompilacionError("Error semantico en parámetros inyectados", getLinea(), getColumna(), true);
+        }
+
+        System.out.println("todavia baja");
+        System.out.println("Comodines post inyeccion:" + instanciaClonada.contarComodines());
 
         return instanciaClonada.ejecutar(tabla, listaErrores);
     }

@@ -247,23 +247,6 @@ public class NodoTable extends NodoComponente implements ValidarDatosForms {
 
     }
 
-    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
-    @Override
-    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
-
-        if (this.filas != null) {
-            for (List<NodoComponente> fila : filas) {
-                if (fila != null) {
-                    for (NodoComponente celda : fila) {
-                        if (celda != null) {
-                            celda.ejecutarDraws(tabla, errores);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /*Metodo que permite retornar todos los componentes que tiene dentro la tabla*/
     @Override
     public Object ejecutar(TablaSimbolos tabla, List<ErrorAnalisis> listaErrores) {

@@ -138,15 +138,6 @@ public class NodoForClasico extends Nodo {
         return componentesAcumulados;
     }
 
-    /*---Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)---*/
-    @Override
-    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
-        if (this.codigo != null) {
-            for (Nodo nodo : this.codigo) {
-                nodo.ejecutarDraws(tabla, errores);
-            }
-        }
-    }
 
     /*-----Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)-----*/
     @Override

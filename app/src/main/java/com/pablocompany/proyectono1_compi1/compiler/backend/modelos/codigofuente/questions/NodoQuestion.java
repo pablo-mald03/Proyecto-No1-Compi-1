@@ -31,6 +31,9 @@ public abstract class NodoQuestion extends NodoComponente {
     //Atributo que representa el nombre de la variable (Puede ser nulleable)
     protected String id;
 
+    /*Variable que permite saber si se esta en tiempo de ejecucion*/
+    protected boolean ejecucion = false;
+
     public NodoQuestion(TipoVariable tipo, String id,NodoWidth width, NodoHeight height,Estilos estilos, int linea, int columna) {
         super(width,height,estilos,linea, columna);
         this.tipoVariable = tipo;
@@ -115,6 +118,11 @@ public abstract class NodoQuestion extends NodoComponente {
                     "El atributo \"" + nombreAtributo + "\" ha sido definido mas de una vez en \""+question+"\".",
                     getLinea(), getColumna()));
         }
+    }
+
+    /*Metodo que permite generar el set para el tiempo de ejecucion y validacion de existencia*/
+    public void setEjecucion(boolean ejecucion) {
+        this.ejecucion = ejecucion;
     }
 
     //Metodo que permite generar una deep copy de las preguntas

@@ -107,8 +107,14 @@ public class NodoFuncionPokemon extends Nodo {
 
         if (lim instanceof OnCompilacionError) return lim;
 
+
         if (off instanceof Number) valOffset = ((Number) off).intValue();
         if (lim instanceof Number) valLimit = ((Number) lim).intValue();
+
+        System.out.println("\n\nejecutando request");
+        System.out.println("param recibido offset: " + valOffset);
+        System.out.println("param recibido limit: " + valLimit);
+
 
         PokeApiService pokeApiService = new PokeApiService();
 

@@ -57,6 +57,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
         this.funcionPokemon = null;
         this.respuestasCorrectas = null;
         this.setConfiguraciones(config);
+        this.ejecucion = false;
     }
 
     //Metodo que permite validar semantica de la pregunta tipo multiple (PATRON EXPERTO)
@@ -166,7 +167,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
         }
 
         /*---Registrar y validar existencia---*/
-        if (id != null) {
+        if (id != null && !this.ejecucion) {
             Simbolo existente = tabla.buscar(id);
             if (existente == null) {
                 Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
@@ -182,6 +183,10 @@ public class NodoMultipleQuestion extends NodoQuestion {
             }
         }
         return TipoVariable.SPECIAL;
+    }
+    /*Metodo que permite generar el set para el tiempo de ejecucion y validacion de existencia*/
+    public void setEjecucion(boolean ejecucion) {
+        this.ejecucion = ejecucion;
     }
 
     /*Metodo que permite ejecutar los requests a la API SI HAY FUNCION POKEMON DECLARADA*/
@@ -547,6 +552,7 @@ public class NodoMultipleQuestion extends NodoQuestion {
 
         NodoMultipleQuestion clon = new NodoMultipleQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
 
+        clon.setEjecucion(true);
         clon.width = (this.width != null) ? this.width.clonar() : null;
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;

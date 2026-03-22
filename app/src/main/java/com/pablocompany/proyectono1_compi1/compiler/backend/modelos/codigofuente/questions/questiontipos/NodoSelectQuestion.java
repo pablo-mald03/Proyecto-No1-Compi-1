@@ -56,6 +56,7 @@ public class NodoSelectQuestion extends NodoQuestion {
     public NodoSelectQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
         this.setConfiguraciones(config);
+        this.ejecucion = false;
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
@@ -235,7 +236,7 @@ public class NodoSelectQuestion extends NodoQuestion {
         }
 
         /*---Registrar y validar existencia---*/
-        if (id != null) {
+        if (id != null && !this.ejecucion) {
             Simbolo existente = tabla.buscar(id);
             if (existente == null) {
                 Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
@@ -253,6 +254,8 @@ public class NodoSelectQuestion extends NodoQuestion {
 
         return TipoVariable.SPECIAL;
     }
+
+
 
     //Metodo que permite validar si tiene comodines la select question
     @Override
@@ -486,6 +489,7 @@ public class NodoSelectQuestion extends NodoQuestion {
     public NodoQuestion clonar() {
         NodoSelectQuestion clon = new NodoSelectQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
 
+        clon.setEjecucion(true);
         clon.width = (this.width != null) ? this.width.clonar() : null;
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;

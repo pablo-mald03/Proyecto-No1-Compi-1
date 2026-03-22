@@ -34,13 +34,12 @@ public class NodoOpenQuestion extends NodoQuestion {
     private int countLabel = 0;
     private int countStyles = 0;
 
-
     /*SI EL ID ES NULO TIENE SIGNIFICADO TAMBIEN*/
 
     public NodoOpenQuestion(TipoVariable tipo, String id, List<AtributoConfig> config, int linea, int columna) {
         super(tipo, id, null, null, null, linea, columna);
         this.setConfiguraciones(config);
-
+        this.ejecucion = false;
     }
 
     //Metodo que permite setear los valores que vienen en la configuracion
@@ -124,7 +123,7 @@ public class NodoOpenQuestion extends NodoQuestion {
             }
         }
 
-        if (id != null) {
+        if (id != null && !this.ejecucion) {
             Simbolo existente = tabla.buscar(id);
             if (existente == null) {
                 Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
@@ -141,6 +140,11 @@ public class NodoOpenQuestion extends NodoQuestion {
         }
 
         return TipoVariable.SPECIAL;
+    }
+
+    /*Metodo que permite generar el set para el tiempo de ejecucion y validacion de existencia*/
+    public void setEjecucion(boolean ejecucion) {
+        this.ejecucion = ejecucion;
     }
 
     //Metodo que permite validar si tiene comodines la open question
@@ -299,11 +303,13 @@ public class NodoOpenQuestion extends NodoQuestion {
     }
 
 
+
     /*Metodo propio que permite clonar a una intancia de clase nodo open question*/
     @Override
     public  NodoQuestion clonar(){
-        NodoOpenQuestion clon = new NodoOpenQuestion(this.tipoVariable, null, new ArrayList<>(), getLinea(), getColumna());
+        NodoOpenQuestion clon = new NodoOpenQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
 
+        clon.setEjecucion(true);
         clon.label = (this.label != null) ? this.label.clonar():null;
         clon.width = (this.width != null) ? this.width.clonar() : null;
         clon.height = (this.height != null) ? this.height.clonar() : null;

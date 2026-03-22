@@ -55,6 +55,7 @@ public class NodoDropQuestion extends NodoQuestion {
         this.funcionPokemon = null;
         this.respuestaCorrecta = null;
         this.setConfiguraciones(config);
+        this.ejecucion = false;
     }
 
     //Metodo que permite validar semantica de la pregunta tipo drop (PATRON EXPERTO)
@@ -147,7 +148,7 @@ public class NodoDropQuestion extends NodoQuestion {
         }
 
         /*---Registrar y validar existencia---*/
-        if (id != null) {
+        if (id != null && !this.ejecucion) {
             Simbolo existente = tabla.buscar(id);
             if (existente == null) {
                 Simbolo simbolo = new Simbolo(id, TipoVariable.SPECIAL, this, getLinea(), getColumna());
@@ -307,6 +308,11 @@ public class NodoDropQuestion extends NodoQuestion {
         }
 
         return contador;
+    }
+
+    /*Metodo que permite generar el set para el tiempo de ejecucion y validacion de existencia*/
+    public void setEjecucion(boolean ejecucion) {
+        this.ejecucion = ejecucion;
     }
 
     /*----APARTADO DE METODOS DELEGADOS A LA CLASE (PATRON EXPERTO)----*/
@@ -499,6 +505,7 @@ public class NodoDropQuestion extends NodoQuestion {
     public NodoQuestion clonar(){
         NodoDropQuestion clon = new NodoDropQuestion(this.tipoVariable, this.id, new ArrayList<>(), getLinea(), getColumna());
 
+        clon.setEjecucion(true);
         clon.width = (this.width != null) ? this.width.clonar() : null;
         clon.height = (this.height != null) ? this.height.clonar() : null;
         clon.estilos = (this.estilos != null) ? this.estilos.clonar() : null;

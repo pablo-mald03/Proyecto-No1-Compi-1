@@ -42,14 +42,6 @@ public class AnalizadorSemantico {
             return "";
         }
 
-        //Metodo que agrega los comodines en su lugar
-        this.agregarComodines(tablaSimbolos);
-
-        if (!this.listadoErroresTotal.isEmpty()) {
-            return "";
-        }
-
-
         /*Metodo de compilacion del codigo*/
         try {
             return codigoIntermedio(tablaSimbolos);
@@ -146,28 +138,6 @@ public class AnalizadorSemantico {
         }
 
         return tablaSimbolos;
-    }
-
-    /*---Metodo delegado para poner los comodines que estaban en la funcion draw----*/
-    private void agregarComodines(TablaSimbolos tablaSimbolos) {
-
-        for (Nodo nodo : astParser) {
-            if (nodo == null) {
-                continue;
-            }
-            nodo.ejecutarDraws(tablaSimbolos, this.listadoErroresTotal);
-        }
-    }
-
-    /*Metodo delegado para ejecutar la segunda pasada que es para mandar los requests a la POKEAPI*/
-    private void ejecutarRequests(TablaSimbolos tablaSimbolos) {
-
-        for (Nodo nodo : astParser) {
-            if (nodo == null) {
-                continue;
-            }
-            nodo.ejecutarRequests(tablaSimbolos, this.listadoErroresTotal);
-        }
     }
 
     //Retorna la lista de errores semanticos

@@ -45,7 +45,6 @@ public class EstilosProcesados {
     }
 
     public TipoLetra getFontFamilly() {
-        System.out.println("Tipo de letra enviada: " + this.fontFamilly);
         return fontFamilly;
     }
 

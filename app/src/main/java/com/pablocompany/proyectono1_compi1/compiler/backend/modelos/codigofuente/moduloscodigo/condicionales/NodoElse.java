@@ -83,16 +83,6 @@ public class NodoElse extends Nodo {
         return componentesGenerados;
     }
 
-    //Metodo que permite ejecutar los draws en las preguntas (PRIMERA PASADA)
-    @Override
-    public void ejecutarDraws(TablaSimbolos tabla, List<ErrorAnalisis> errores) {
-
-        if(this.cuerpo != null){
-            for (Nodo nodo : this.cuerpo) {
-                nodo.ejecutarDraws(tabla, errores);
-            }
-        }
-    }
 
     /*-----Metodo que permite ejecutar los requests hacia la pokeAPI en las preguntas (SEGUNDA PASADA)-----*/
     @Override
