@@ -112,14 +112,10 @@ public class NodoDraw extends NodoComponente {
 
         instanciaClonada.validarSemantica(tabla, listaErrores);
 
-        System.out.println("Evaluando a: " + instanciaClonada.getClass().getName() );
-
         if (!listaErrores.isEmpty()) {
             return new OnCompilacionError("Error semantico en parámetros inyectados", getLinea(), getColumna(), true);
         }
 
-        System.out.println("todavia baja");
-        System.out.println("Comodines post inyeccion:" + instanciaClonada.contarComodines());
 
         return instanciaClonada.ejecutar(tabla, listaErrores);
     }

@@ -31,10 +31,6 @@ public class PokeApiService {
         OkHttpClient client = new OkHttpClient();
         String url = BASE_URL + "pokemon?offset=" + offset + "&limit=" + limit;
 
-        System.out.println("\nurl: " + url);
-        System.out.println("params recibidos offset: " + offset);
-        System.out.println("params recibidos limit: " + limit);
-
 
         Request request = new Request.Builder()
                 .url(url)
