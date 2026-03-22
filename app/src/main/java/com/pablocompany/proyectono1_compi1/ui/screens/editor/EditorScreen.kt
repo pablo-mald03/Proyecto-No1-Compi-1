@@ -1849,6 +1849,64 @@ TABLE [
                         )
                     )
 
+                    // ===== EMOJIS =====
+                    TemplateDropdownButton(
+                        title = "EMOJIS",
+                        options = listOf(
+
+                            "SMILE" to {
+                                onTemplateSelected(
+                                    """
+ @[:smile:]
+                                """.trimIndent()
+                                )
+                                onDismiss()
+                            },
+
+                            "SAD" to {
+                                onTemplateSelected(
+                                    """
+ @[:sad:]
+                                """.trimIndent()
+                                )
+                                onDismiss()
+                            },
+                            "SERIOUS" to {
+                                onTemplateSelected(
+                                    """
+ @[:serious:]
+                                """.trimIndent()
+                                )
+                                onDismiss()
+                            },
+
+                            "HEART" to {
+                                onTemplateSelected(
+                                    """
+ @[:heart:]
+                                """.trimIndent()
+                                )
+                                onDismiss()
+                            },
+                            "STAR" to {
+                                onTemplateSelected(
+                                    """
+ @[:star:]
+                                """.trimIndent()
+                                )
+                                onDismiss()
+                            },
+                            "CAT" to {
+                                onTemplateSelected(
+                                    """
+ @[:cat:]
+                                """.trimIndent()
+                                )
+                                onDismiss()
+                            }
+                        )
+                    )
+
                     // ===== CONFIGURACIONES =====
                     TemplateDropdownButton(
                         title = "CONFIGURACIONES",

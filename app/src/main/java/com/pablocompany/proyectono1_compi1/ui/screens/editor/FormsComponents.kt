@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -184,7 +186,7 @@ fun RenderTable(
 }
 
 /*Funcion auxiliar para poder aplicar estilos a los componentes*/
-fun Modifier.applyStyles(estilos: EstilosProcesados?,scale: Float): Modifier {
+fun Modifier.applyStyles(estilos: EstilosProcesados?, scale: Float): Modifier {
     if (estilos == null) return this
     var modifier = this
 
@@ -272,10 +274,22 @@ fun Modifier.applySize(component: CompiledForm, scale: Float): Modifier {
 
     return this.then(
         when {
+            w == -1f && h == -1f -> Modifier.fillMaxSize()
+
             w > 0 && h > 0 -> Modifier.size((w * scale).dp, (h * scale).dp)
+
+            w == -1f && h > 0 -> Modifier
+                .fillMaxWidth()
+                .height((h * scale).dp)
+            w > 0 && h == -1f -> Modifier
+                .width((w * scale).dp)
+                .fillMaxHeight()
+
+            w == -1f -> Modifier.fillMaxWidth()
+            h == -1f -> Modifier.fillMaxHeight()
             w > 0 -> Modifier.width((w * scale).dp)
             h > 0 -> Modifier.height((h * scale).dp)
-            w == -1f -> Modifier.fillMaxWidth()
+
             else -> Modifier
         }
     )
@@ -338,7 +352,7 @@ fun RenderText(text: CompiledText, scale: Float, usePosition: Boolean = true) {
             .then(if (usePosition) Modifier.applyPosition(text, scale) else Modifier)
             .applySize(text, scale)
             .applyStyles(estilos, scale)
-            .padding(horizontal = (4 * scale).dp),
+            .padding(horizontal = (3 * scale).dp),
         color = estilos?.textColor?.toComposeColor() ?: Color.Black,
         fontSize = calculateFontSize(estilos?.textSize, scale),
         fontFamily = estilos?.fontFamilly.toComposeFont()
@@ -359,17 +373,19 @@ fun RenderOpenQuestion(
     val text = viewModel.getAnswer(id) as? String ?: ""
     val estilos = question.estilosProcesados
 
+    val fontSize = calculateFontSize(estilos?.textSize ?: 14, scale)
+
     Column(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
-            .cardLike(scale,estilos)
+            .cardLike(scale, estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
             color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-            fontSize = calculateFontSize(estilos?.textSize, scale),
+            fontSize = fontSize,
             fontWeight = FontWeight.Medium,
             fontFamily = estilos?.fontFamilly.toComposeFont()
         )
@@ -382,7 +398,7 @@ fun RenderOpenQuestion(
             modifier = Modifier.fillMaxWidth(),
             textStyle = TextStyle(
                 color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-                fontSize = calculateFontSize(14, scale),
+                fontSize = fontSize,
                 fontFamily = estilos?.fontFamilly.toComposeFont()
             ),
             colors = OutlinedTextFieldDefaults.colors(
@@ -418,7 +434,7 @@ fun RenderSelectQuestion(
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
-            .cardLike(scale,estilos)
+            .cardLike(scale, estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
@@ -428,15 +444,14 @@ fun RenderSelectQuestion(
             fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
-        Spacer(modifier = Modifier.height((8 * scale).dp))
-
+        Spacer(modifier = Modifier.height((7 * scale).dp))
 
         question.opciones.forEachIndexed { index, opcion ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = (4 * scale).dp)
+                    .weight(1f)
                     .clickable { viewModel.setAnswer(id, index) }
             ) {
                 RadioButton(
@@ -484,7 +499,7 @@ fun RenderDropQuestion(
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
-            .cardLike(scale,estilos)
+            .cardLike(scale, estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
@@ -493,44 +508,52 @@ fun RenderDropQuestion(
             fontFamily = estilos?.fontFamilly.toComposeFont()
         )
 
-        Spacer(modifier = Modifier.height((8 * scale).dp))
+        Spacer(modifier = Modifier.height((7 * scale).dp))
 
-        ExposedDropdownMenuBox(
-            expanded = expanded.value,
-            onExpandedChange = { expanded.value = !expanded.value }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
         ) {
-            OutlinedTextField(
-                value = selectedText,
-                onValueChange = {},
-                readOnly = true,
-                textStyle = TextStyle(
-                    fontSize = calculateFontSize(14, scale),
-                    fontFamily = estilos?.fontFamilly.toComposeFont()
-                ),
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
-            )
 
-            ExposedDropdownMenu(
+            ExposedDropdownMenuBox(
                 expanded = expanded.value,
-                onDismissRequest = { expanded.value = false }
+                onExpandedChange = { expanded.value = !expanded.value }
             ) {
-                opciones.forEachIndexed { index, opcion ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                opcion,
-                                fontSize = calculateFontSize(14, scale),
-                                fontFamily = estilos?.fontFamilly.toComposeFont(),
-                            )
-                        },
-                        onClick = {
-                            viewModel.setAnswer(id, index)
-                            expanded.value = false
-                        }
-                    )
+                OutlinedTextField(
+                    value = selectedText,
+                    onValueChange = {},
+                    readOnly = true,
+                    textStyle = TextStyle(
+                        fontSize = calculateFontSize(14, scale),
+                        fontFamily = estilos?.fontFamilly.toComposeFont()
+                    ),
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded.value,
+                    onDismissRequest = { expanded.value = false }
+                ) {
+                    opciones.forEachIndexed { index, opcion ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    opcion,
+                                    fontSize = calculateFontSize(14, scale),
+                                    fontFamily = estilos?.fontFamilly.toComposeFont(),
+                                )
+                            },
+                            onClick = {
+                                viewModel.setAnswer(id, index)
+                                expanded.value = false
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -554,7 +577,7 @@ fun RenderMultipleQuestion(
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
-            .cardLike(scale,estilos)
+            .cardLike(scale, estilos)
     ) {
         Text(
             text = question.texto.toDisplayString(),
@@ -569,7 +592,10 @@ fun RenderMultipleQuestion(
             val isChecked = selected.contains(index)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(vertical = (2 * scale).dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(vertical = (2 * scale).dp)
             ) {
                 Checkbox(
                     checked = isChecked,
@@ -579,7 +605,9 @@ fun RenderMultipleQuestion(
                         val indiceRealParaBackend = index
 
                         if (checked) {
-                            if (!newList.contains(indiceRealParaBackend)) newList.add(indiceRealParaBackend)
+                            if (!newList.contains(indiceRealParaBackend)) newList.add(
+                                indiceRealParaBackend
+                            )
                         } else {
                             newList.remove(indiceRealParaBackend)
                         }
@@ -629,7 +657,6 @@ fun calculateFontSize(textSize: Number?, scale: Float): TextUnit {
 
     return (baseSize * scale).sp
 }
-
 
 
 /*Variables de tipos de letra propios de la app*/
