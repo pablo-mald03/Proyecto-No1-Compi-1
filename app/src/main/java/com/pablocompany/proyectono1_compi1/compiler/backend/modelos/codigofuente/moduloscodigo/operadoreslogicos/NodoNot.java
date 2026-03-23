@@ -35,22 +35,17 @@ public class NodoNot extends Nodo {
             return TipoVariable.ERROR;
         }
 
-        if (tipoCondicion == TipoVariable.BOOLEAN_AND || tipoCondicion == TipoVariable.BOOLEAN_OR) {
+        if (tipoCondicion != TipoVariable.BOOLEAN_AND &&
+                tipoCondicion != TipoVariable.BOOLEAN_OR &&
+                tipoCondicion != TipoVariable.NUMBER) {
+
             listaErrores.add(new ErrorAnalisis("NOT", "Semantico",
-                    "No se permite aplicar \"NOT\" directamente sobre operadores AND o OR.",
+                    "El operador NOT solo puede operar sobre condiciones logicas o numericas.",
                     getLinea(), getColumna()));
             return TipoVariable.ERROR;
         }
 
-        if (tipoCondicion != TipoVariable.NUMBER && tipoCondicion != TipoVariable.BOOLEAN_NOT) {
-
-            listaErrores.add(new ErrorAnalisis("NOT", "Semantico",
-                    "El operador NOT solo puede operar sobre condiciones lógicas.",
-                    getLinea(), getColumna()));
-            return TipoVariable.ERROR;
-        }
-
-        return TipoVariable.BOOLEAN_NOT;
+        return tipoCondicion;
     }
 
     //Metodo que permite retornar la condicion logica que se maneja dentro del OR
@@ -73,11 +68,9 @@ public class NodoNot extends Nodo {
         double num = (valor instanceof Number) ? ((Number) valor).doubleValue() : 0.0;
 
         if (num > 0) {
-
-            return 1.0;
-        } else {
-
             return 0.0;
+        } else {
+            return 1.0;
         }
     }
 

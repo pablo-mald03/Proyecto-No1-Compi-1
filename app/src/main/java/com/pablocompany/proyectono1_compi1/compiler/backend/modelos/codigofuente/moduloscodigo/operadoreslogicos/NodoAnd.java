@@ -44,25 +44,17 @@ public class NodoAnd extends Nodo {
             return TipoVariable.ERROR;
         }
 
-        if (tipoA == TipoVariable.BOOLEAN_NOT || tipoB == TipoVariable.BOOLEAN_NOT) {
-            listaErrores.add(new ErrorAnalisis("AND", "Semantico",
-                    "No se permite el uso de \"NOT\" dentro de una operacion AND.",
-                    getLinea(), getColumna()));
-            return TipoVariable.ERROR;
-        }
-
-        if (tipoA != TipoVariable.BOOLEAN_AND && tipoA != TipoVariable.NUMBER &&
-                tipoB != TipoVariable.BOOLEAN_AND && tipoB != TipoVariable.NUMBER) {
+        if ((tipoA != TipoVariable.BOOLEAN_AND && tipoA != TipoVariable.NUMBER) &&
+                (tipoB != TipoVariable.BOOLEAN_AND && tipoB != TipoVariable.NUMBER)) {
 
             listaErrores.add(new ErrorAnalisis("AND", "Semantico",
-                    "El operador AND solo puede operar sobre condiciones lógicas o comparaciones.",
+                    "El operador AND solo puede operar sobre condiciones logicas o comparaciones.",
                     getLinea(), getColumna()));
             return TipoVariable.ERROR;
         }
 
         return TipoVariable.BOOLEAN_AND;
     }
-
     //Metodo que permite retornar la condicion logica que se maneja dentro
     /*
      *

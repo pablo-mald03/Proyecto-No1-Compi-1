@@ -79,12 +79,12 @@ public class AnalizadorSemantico {
             }
         }
 
-        return retornarCodigo(tablaSimbolos,codigoIntermedio);
+        return retornarCodigo(codigoIntermedio);
     }
 
 
     //Metodo delegado para correr el codigo intermedio y retornar el codigo compilado
-    private String retornarCodigo(TablaSimbolos tabla, List<Formulario> codigoIntermedio){
+    private String retornarCodigo(List<Formulario> codigoIntermedio){
 
         Integer [] contadoresReporte  = {0, 0, 0, 0, 0, 0,0};
         /*
@@ -107,6 +107,14 @@ public class AnalizadorSemantico {
 
         for (Formulario formulario : codigoIntermedio){
             formulario.contarComponentes(contadoresReporte);
+        }
+
+
+        if(contadoresReporte[0] == 0 && contadoresReporte[1] == 0 &&
+                contadoresReporte[2] == 0 && contadoresReporte[3] == 0 &&
+                contadoresReporte[4] == 0 && contadoresReporte[5] == 0 &&
+                contadoresReporte[6] == 0){
+            return "";
         }
 
         StringBuilder reporte = new StringBuilder();

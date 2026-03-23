@@ -635,7 +635,11 @@ fun EditorScreen(
                         onFinalizarClick = {
 
                             if (viewModel.codeField.text.isBlank()) {
-                                Toast.makeText(context, "El codigo fuente esta vacío", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "El codigo fuente esta vacío",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 return@ConsoleSection
                             }
 
@@ -670,25 +674,34 @@ fun EditorScreen(
                                     //Cierra el teclado si hay errores
                                     keyboardController?.hide()
                                     focusManager.clearFocus()
-
                                     hayErrores = true
-                                } else {
-                                    hayErrores = false
-                                    showErrorDrawer = false
-
-                                    val codigoFinal = viewModel.codigoGenerado ?: ""
-
-                                    codigoPendiente = codigoFinal
-                                    showSaveFormDialog = true
+                                    return@compilarFormulario
                                 }
+
+
+                                val codigoFinal = viewModel.codigoGenerado ?: ""
+
+                                if (codigoFinal.isBlank()) {
+                                    Toast.makeText(
+                                        context,
+                                        "El compilado generado esta vacio",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@compilarFormulario
+                                }
+
+
+                                hayErrores = false
+                                showErrorDrawer = false
+
+
+
+                                codigoPendiente = codigoFinal
+                                showSaveFormDialog = true
+
                             }
                         },
                         onReemplazarClick = {
-
-                            if (viewModel.codeField.text.isBlank()) {
-                                Toast.makeText(context, "El codigo fuente esta vacío", Toast.LENGTH_SHORT).show()
-                                return@ConsoleSection
-                            }
 
                             if (
                                 sharedFormViewModel.codigoCompilado != null &&
@@ -716,23 +729,36 @@ fun EditorScreen(
                                     focusManager.clearFocus()
                                     hayErrores = true
                                     showErrorDrawer = true
-                                } else {
 
+                                    return@compilarFormulario
+                                }
 
-                                    val nombreFinal =
-                                        if (nombreAutor.isBlank()) "android-app" else nombreAutor
+                                val cuerpoCodigo = viewModel.codigoGenerado ?: ""
 
-                                    val descripcionFinal =
-                                        if (descripcion.isBlank()) "..." else descripcion
+                                if (viewModel.codigoGenerado?.isBlank() == true) {
+                                    estaCompilando = false
+                                    Toast.makeText(
+                                        context,
+                                        "El compilado generado esta vacio",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@compilarFormulario
+                                }
 
-                                    val fechaActual =
-                                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                            .format(Date())
+                                val nombreFinal =
+                                    if (nombreAutor.isBlank()) "android-app" else nombreAutor
 
-                                    val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault())
+                                val descripcionFinal =
+                                    if (descripcion.isBlank()) "..." else descripcion
+
+                                val fechaActual =
+                                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                                         .format(Date())
 
-                                    val header = """
+                                val horaActual = SimpleDateFormat("HH:mm", Locale.getDefault())
+                                    .format(Date())
+
+                                val header = """
 ###
     Author: $nombreFinal
     Fecha: $fechaActual
@@ -741,26 +767,25 @@ fun EditorScreen(
     
 """.trimIndent() + "\n"
 
-                                    val cuerpoCodigo = viewModel.codigoGenerado ?: ""
 
-                                    val codigoFinal = header + cuerpoCodigo
+                                val codigoFinal = header + cuerpoCodigo
 
-                                    scope.launch {
+                                scope.launch {
 
-                                        viewModel.interpretarCodigoCompilado(codigoFinal)
+                                    viewModel.interpretarCodigoCompilado(codigoFinal)
 
-                                        estaCompilando = false
-                                        hayErrores = false
-                                        showErrorDrawer = false
+                                    estaCompilando = false
+                                    hayErrores = false
+                                    showErrorDrawer = false
 
-                                        Toast.makeText(
-                                            context,
-                                            "Vista actualizada",
-                                            Toast.LENGTH_SHORT
-                                        )
-                                            .show()
-                                    }
+                                    Toast.makeText(
+                                        context,
+                                        "Vista actualizada",
+                                        Toast.LENGTH_SHORT
+                                    )
+                                        .show()
                                 }
+
                             }
                         },
                         onAgregarClick = {
