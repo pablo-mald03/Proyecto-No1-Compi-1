@@ -274,7 +274,7 @@ HexColor = "#"[0-9A-Fa-f]{6}
 
     "@[:star:]"                             { return symbol(SymCompiled.EMOJI_STAR, yytext()); }
 
-    ( "@[:star:" {Numero} ":]" | "@[:star-" {Numero} ":]" )     { return symbol(SymCompiled.EMOJI_MULTI_STAR, yytext()); }
+    ( "@[:star:" {Numero} ":]" | "@[:star-" {Numero} ":]" | "@[:star-" {Numero} "." "0"+ ":]")     { return symbol(SymCompiled.EMOJI_MULTI_STAR, yytext()); }
 
     ( "@[:^^:]" | "@[:cat:]" )               { return symbol(SymCompiled.EMOJI_CAT, yytext()); }
 

@@ -30,7 +30,14 @@ public class CompiledEmoji extends CompiledTexto {
         }
         try {
             //ER UTILIZADA SOLO PARA JALAR EL VALOR (NO TIENE NINGUN OTRO CONTEXTO EN TIEMPO DE INTERPRETACION)
-            String numerico = valor.replaceAll("[^0-9]", "");
+            /*
+            * MUY IMPORTANTE DESTACAR QUE SE OPTO POR UNA ER YA QUE POR LA FORMA
+            * EN LA QUE SE RECONOCE EN EL LEXER  SE OPTA POR LA EXPRESION REGULAR
+            * */
+
+            String cadenaEntera = valor.split("\\.")[0];
+
+            String numerico = cadenaEntera.replaceAll("[^0-9]", "");
 
             if (!numerico.isEmpty()) {
                 this.veces = Integer.parseInt(numerico);
