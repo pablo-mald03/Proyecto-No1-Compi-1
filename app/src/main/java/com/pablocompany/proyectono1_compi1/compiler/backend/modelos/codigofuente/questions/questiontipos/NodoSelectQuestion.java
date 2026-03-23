@@ -267,24 +267,20 @@ public class NodoSelectQuestion extends NodoQuestion {
     private int contarComodinesPregunta() {
         int contador = 0;
 
-        if (this.opciones != null) {
-            contador += this.opciones.contarComodines();
-        }
-
-        if (this.respuestaCorrecta != null && this.respuestaCorrecta instanceof NodoCorrect) {
-
-            NodoCorrect expresion = (NodoCorrect) this.respuestaCorrecta;
-            contador += expresion.contarComodines();
-        }
-        if (this.width != null) {
-            contador += this.width.contarComodines();
-        }
         if (this.height != null) {
             contador += this.height.contarComodines();
         }
 
-        if (this.estilos != null) {
-            contador += this.estilos.contarComodines();
+        if (this.width != null) {
+            contador += this.width.contarComodines();
+        }
+
+        if (this.opciones != null) {
+            contador += this.opciones.contarComodines();
+        }
+
+        if (this.label != null) {
+            contador += this.label.contarComodines();
         }
 
         if (this.funcionPokemon != null) {
@@ -295,12 +291,24 @@ public class NodoSelectQuestion extends NodoQuestion {
             }
         }
 
+        if (this.respuestaCorrecta != null && this.respuestaCorrecta instanceof NodoCorrect) {
+
+            NodoCorrect expresion = (NodoCorrect) this.respuestaCorrecta;
+            contador += expresion.contarComodines();
+        }
+
+
+        if (this.estilos != null) {
+            contador += this.estilos.contarComodines();
+        }
+
         return contador;
     }
 
     /*----APARTADO DE METODOS DELEGADOS A LA CLASE (PATRON EXPERTO)----*/
 
     /*Metodo que permite listar los parametros que se van a inyectar dentro de la pregunta*/
+    @Override
     public void inyectarParametros(List<Nodo> parametros, List<ErrorAnalisis> listaErrores) {
 
         List<NodoComodin> comodinesEncontrados = obtenerParametrosComodines();

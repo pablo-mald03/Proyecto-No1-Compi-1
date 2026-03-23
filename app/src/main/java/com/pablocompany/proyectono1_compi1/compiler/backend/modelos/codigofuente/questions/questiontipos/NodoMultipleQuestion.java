@@ -308,6 +308,10 @@ public class NodoMultipleQuestion extends NodoQuestion {
             }
         }
 
+        if (this.label != null) {
+            contador += this.label.contarComodines();
+        }
+
         if (this.width != null) {
             contador += this.width.contarComodines();
         }
