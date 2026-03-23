@@ -625,7 +625,7 @@ lista_propiedades       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIERRE_ETIQ
                         {:
                             RESULT = new CompiledFontFamily(tipo.toString());
                         :}
-                        | MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
+                        | MENOR TEXT SIZE IGUAL valor_numerico:num1 CIERRE_ETIQUETA
                         {:
                             RESULT = new CompiledTextSize(num1);
                         :}
@@ -671,7 +671,7 @@ lista_propiedades_quests       ::= MENOR COLOR_KEY IGUAL valor_color:color1 CIER
                                 {:
                                     RESULT = new CompiledFontFamily(tipo.toString());
                                 :}
-                                | MENOR TEXT SIZE IGUAL valor_numerico:num1 MAYOR
+                                | MENOR TEXT SIZE IGUAL valor_numerico:num1 CIERRE_ETIQUETA
                                 {:
                                     RESULT = new CompiledTextSize(num1);
                                 :}

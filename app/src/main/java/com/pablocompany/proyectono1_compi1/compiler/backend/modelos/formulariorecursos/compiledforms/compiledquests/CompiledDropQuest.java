@@ -27,6 +27,25 @@ public class CompiledDropQuest extends CompiledQuestions {
         this.texto = texto;
     }
 
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public void validarSemantica(List<ErrorAnalisis> listaErrores){
+
+        if(this.width != null && this.height.intValue() < -1 ){
+            this.reportarErrores("<drop>","El atributo \"height\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.width != null && this.width.intValue() < -1 ){
+            this.reportarErrores("<drop>","El atributo \"width\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.respuesta!=null){
+            if(this.respuesta.intValue() < -1 || this.respuesta.intValue() >= this.opciones.size()){
+                this.reportarErrores("<drop>","El valor de la respuesta debe estar dentro de los limites de las opciones o como -1 si no hay respuesta.", listaErrores);
+            }
+        }
+
+    }
+
     /*Metodos getter para obtener los atributos de la clase*/
     public Number getRespuesta() {
         return this.respuesta;

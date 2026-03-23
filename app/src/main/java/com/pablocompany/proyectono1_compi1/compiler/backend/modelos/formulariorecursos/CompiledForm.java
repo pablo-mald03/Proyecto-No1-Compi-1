@@ -86,6 +86,17 @@ public abstract class CompiledForm {
         }
     }
 
+    /*Metodo delegado para poder validar la semantica del interprete*/
+    public void reportarErrores(String componente, String mensaje, List<ErrorAnalisis> listaErrores){
+        listaErrores.add(new ErrorAnalisis(componente, "Semantico", mensaje, getFila(), getColumna()));
+    }
+
+    /*Metodo que permite validar la semantica de los estilos procesados*/
+    public abstract void validarEstilosProcesados(List<ErrorAnalisis> listaErrores);
+
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public abstract void validarSemantica(List<ErrorAnalisis> listaErrores);
+
     //Metodo de maxima jerarquia que permite que cada una de las clases que heredan de esta puedan empaquetar sus estilos o adquieran predeterminados
     protected abstract void empaquetaEstilos();
 

@@ -22,6 +22,20 @@ public class CompiledOpenQuest extends CompiledQuestions {
         this.texto = texto;
     }
 
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public void validarSemantica(List<ErrorAnalisis> listaErrores){
+
+        if(this.height.intValue() < -1 ){
+            this.reportarErrores("<open>","El atributo \"height\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.width.intValue() < -1 ){
+            this.reportarErrores("<open>","El atributo \"width\" no debe ser menor a -1", listaErrores);
+        }
+
+
+    }
+
     /*Metodo getter del texto*/
     public CompiledCadenaTexto getTexto() {
         return this.texto;

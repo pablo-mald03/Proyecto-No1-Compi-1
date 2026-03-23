@@ -101,6 +101,28 @@ public class CompiledTable extends CompiledContenedor {
         }
     }
 
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public void validarSemantica(List<ErrorAnalisis> listaErrores){
+
+        if(this.height.intValue() < -1 ){
+            this.reportarErrores("<table>","El atributo \"height\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.width.intValue() < -1 ){
+            this.reportarErrores("<table>","El atributo \"width\" no debe ser menor a -1", listaErrores);
+        }
+
+        for(List<CompiledForm> fila : this.filas){
+            if (fila != null) {
+                for (CompiledForm form : fila) {
+                    if (form != null) {
+                        form.validarSemantica(listaErrores);
+                    }
+                }
+            }
+        }
+    }
+
     /*Metodo que permite que cad clase empaquete sus estilos*/
     @Override
     public  void delegarEstilos(){
@@ -116,6 +138,51 @@ public class CompiledTable extends CompiledContenedor {
                 }
             }
         }
+    }
+
+    /*Metodo que permite validar los estilos de los contenedores table*/
+    @Override
+    public void validarEstilosProcesados(List<ErrorAnalisis> listaErrores) {
+
+        if(this.estilosProcesados == null){
+            return;
+        }
+
+
+        if(this.estilosProcesados.getBackgroudColor() != null){
+            if(this.estilosProcesados.getBackgroudColor()[0] < 0 || this.estilosProcesados.getBackgroudColor()[0] > 255){
+                this.reportarErrores("<table>", "El atributo \"background color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            }
+        }
+        if(this.estilosProcesados.getTextColor() != null){
+            if(this.estilosProcesados.getTextColor()[0] < 0 || this.estilosProcesados.getTextColor()[0] > 255){
+                this.reportarErrores("<table>", "El atributo \"color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            }
+
+        }
+
+        if(this.estilosProcesados.getTextSize() != null ){
+            if(this.estilosProcesados.getTextSize().intValue() < 0 && this.hayTextSize){
+                this.reportarErrores("<table>", "El atributo \"text size\" no puede ser menor a 0", listaErrores);
+            }
+        }
+
+        if(this.estilosProcesados.getBorder() != null){
+            this.estilosProcesados.getBorder().validarConfiguracion(listaErrores, this.getFila(), this.getColumna());
+        }
+
+
+        //Propagacion
+        for(List<CompiledForm> fila : this.filas){
+            if (fila != null) {
+                for (CompiledForm form : fila) {
+                    if (form != null) {
+                        form.validarEstilosProcesados(listaErrores);
+                    }
+                }
+            }
+        }
+
     }
 }
 

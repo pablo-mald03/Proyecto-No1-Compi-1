@@ -39,10 +39,25 @@ public class GestorInterprete {
             }
         }
 
+        /*Termina de validar la semantica de errores del interprete*/
+        for (CompiledForm form : codigo.getCodigo()) {
+            if (form != null) {
+                form.validarSemantica(this.listaErrores);
+
+            }
+        }
+
         /*Permite que cada clase empaquete su propio estilo*/
         for (CompiledForm form : codigo.getCodigo()) {
             if (form != null) {
                 form.delegarEstilos();
+            }
+        }
+
+        /*Termina de validar la semantica de los estilos empaquetados del interprete*/
+        for (CompiledForm form : codigo.getCodigo()) {
+            if (form != null) {
+                form.validarEstilosProcesados(this.listaErrores);
             }
         }
 

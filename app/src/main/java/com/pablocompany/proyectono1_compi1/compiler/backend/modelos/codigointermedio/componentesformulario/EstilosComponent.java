@@ -107,7 +107,7 @@ public class EstilosComponent {
         if(this.textSize != null){
             estilos.append("        <text size=");
             estilos.append(this.textSize.toString());
-            estilos.append(">");
+            estilos.append("/>");
             estilos.append("\n");
         }
 

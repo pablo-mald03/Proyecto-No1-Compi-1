@@ -17,8 +17,13 @@ import java.util.List;
 //Clase de maxima jerarquia que representa a todas las preguntas que puede tener un formulario
 public abstract class CompiledQuestions extends CompiledForm {
 
+
+    /*Flag que permite marcar cuando esta empaquetado el textsize*/
+    protected boolean hayTextSize;
+
     public CompiledQuestions(Number width, Number height, List<CompiledEstilos> estilos, int fila, int columna) {
         super(width, height, 0, 0, estilos, fila, columna);
+        this.hayTextSize = false;
     }
 
     /*Metodo que permite que cada clase empaquete su propio estilo en quests y textos*/
@@ -58,12 +63,41 @@ public abstract class CompiledQuestions extends CompiledForm {
                 fontFamilly = ((CompiledFontFamily) estilo).getFontFamily();
 
             } else if (estilo instanceof CompiledTextSize) {
-
+                this.hayTextSize = true;
                 textSize = ((CompiledTextSize) estilo).getTextSize();
             }
         }
 
         this.estilosProcesados = new EstilosProcesados(backgroudColor, textColor, fontFamilly, textSize);
+    }
+
+    /*Metodo que permite validar los estilos de las preguntas y elementos*/
+    @Override
+    public void validarEstilosProcesados(List<ErrorAnalisis> listaErrores) {
+
+        if(this.estilosProcesados == null){
+            return;
+        }
+
+        if(this.estilosProcesados.getBackgroudColor() != null){
+            if(this.estilosProcesados.getBackgroudColor()[0] < 0 || this.estilosProcesados.getBackgroudColor()[0] > 255){
+                this.reportarErrores("<question>", "El atributo \"background color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            }
+        }
+
+        if(this.estilosProcesados.getTextColor() != null){
+            if(this.estilosProcesados.getTextColor()[0] < 0 || this.estilosProcesados.getTextColor()[0] > 255){
+                this.reportarErrores("<question>", "El atributo \"color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            }
+        }
+
+        if(this.estilosProcesados.getTextSize() != null){
+            if(this.estilosProcesados.getTextSize().intValue() < 0 && this.hayTextSize){
+
+                this.reportarErrores("<question>", "El atributo \"text size\" no puede ser menor a 0", listaErrores);
+            }
+        }
+
     }
 
 }/*Created by Pablo*/

@@ -118,7 +118,7 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
     "\052\035\055\041\053\047\054\001\002\000\004\031\101" +
     "\001\002\000\010\003\uffcc\032\uffcc\033\uffcc\001\002\000" +
     "\004\005\103\001\002\000\010\004\016\042\020\043\021" +
-    "\001\002\000\004\034\105\001\002\000\010\003\uffc9\032" +
+    "\001\002\000\004\031\105\001\002\000\010\003\uffc9\032" +
     "\uffc9\033\uffc9\001\002\000\010\004\016\042\020\043\021" +
     "\001\002\000\004\006\110\001\002\000\006\044\112\045" +
     "\111\001\002\000\004\006\uffbf\001\002\000\004\006\uffc0" +
@@ -172,7 +172,7 @@ public class ParserCompiled extends java_cup.runtime.lr_parser {
     "\052\035\055\041\053\047\054\001\002\000\004\031\232" +
     "\001\002\000\010\003\uffc4\032\uffc4\033\uffc4\001\002\000" +
     "\004\005\234\001\002\000\010\004\016\042\020\043\021" +
-    "\001\002\000\004\034\236\001\002\000\010\003\uffc1\032" +
+    "\001\002\000\004\031\236\001\002\000\010\003\uffc1\032" +
     "\uffc1\033\uffc1\001\002\000\010\003\uffc5\032\uffc5\033\uffc5" +
     "\001\002\000\004\011\242\001\002\000\010\003\uffc7\032" +
     "\uffc7\033\uffc7\001\002\000\004\034\243\001\002\000\004" +
@@ -1594,7 +1594,7 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 56: // lista_propiedades ::= MENOR TEXT SIZE IGUAL valor_numerico MAYOR 
+          case 56: // lista_propiedades ::= MENOR TEXT SIZE IGUAL valor_numerico CIERRE_ETIQUETA 
             {
               CompiledEstilos RESULT =null;
 		int num1left = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).left;
@@ -1718,7 +1718,7 @@ class CUP$ParserCompiled$actions {
           return CUP$ParserCompiled$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 64: // lista_propiedades_quests ::= MENOR TEXT SIZE IGUAL valor_numerico MAYOR 
+          case 64: // lista_propiedades_quests ::= MENOR TEXT SIZE IGUAL valor_numerico CIERRE_ETIQUETA 
             {
               CompiledEstilos RESULT =null;
 		int num1left = ((java_cup.runtime.Symbol)CUP$ParserCompiled$stack.elementAt(CUP$ParserCompiled$top-1)).left;

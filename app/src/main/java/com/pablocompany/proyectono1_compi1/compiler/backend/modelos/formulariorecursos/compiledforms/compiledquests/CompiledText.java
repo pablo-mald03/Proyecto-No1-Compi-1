@@ -66,6 +66,19 @@ public class CompiledText extends CompiledQuestions {
         validarDuplicado(contadorColor,"<text>", "color", listaErrores);
     }
 
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public void validarSemantica(List<ErrorAnalisis> listaErrores){
+
+        if(this.height.intValue() < -1 ){
+            this.reportarErrores("<text>","El atributo \"height\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.width.intValue() < -1 ){
+            this.reportarErrores("<text>","El atributo \"width\" no debe ser menor a -1", listaErrores);
+        }
+
+    }
+
     /*Metodo que permite que cad clase empaquete sus estilos*/
     @Override
     public  void delegarEstilos(){

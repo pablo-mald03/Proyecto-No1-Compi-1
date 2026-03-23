@@ -39,6 +39,64 @@ public class CompiledSection extends CompiledContenedor {
         this.elementos = elementos;
     }
 
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public void validarSemantica(List<ErrorAnalisis> listaErrores){
+
+        if(this.height.intValue() < -1 ){
+            this.reportarErrores("<section>","El atributo \"height\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.width.intValue() < -1 ){
+            this.reportarErrores("<section>","El atributo \"width\" no debe ser menor a -1", listaErrores);
+        }
+
+        for(CompiledForm form: this.elementos){
+            if(form != null) {
+                form.validarSemantica(listaErrores);
+            }
+        }
+    }
+
+    /*Metodo que permite validar los estilos de los contenedores section*/
+    @Override
+    public void validarEstilosProcesados(List<ErrorAnalisis> listaErrores) {
+
+        if(this.estilosProcesados == null){
+            return;
+        }
+
+
+        if(this.estilosProcesados.getBackgroudColor() != null){
+            if(this.estilosProcesados.getBackgroudColor()[0] < 0 || this.estilosProcesados.getBackgroudColor()[0] > 255){
+                this.reportarErrores("<section>", "El atributo \"background color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            }
+        }
+        if(this.estilosProcesados.getTextColor() != null){
+            if(this.estilosProcesados.getTextColor()[0] < 0 || this.estilosProcesados.getTextColor()[0] > 255){
+                this.reportarErrores("<section>", "El atributo \"color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            }
+
+        }
+
+        if(this.estilosProcesados.getTextSize() != null){
+            if(this.estilosProcesados.getTextSize().intValue() < 0 && this.hayTextSize){
+                this.reportarErrores("<section>", "El atributo \"text size\" no puede ser menor a 0", listaErrores);
+            }
+        }
+
+        if(this.estilosProcesados.getBorder() != null){
+            this.estilosProcesados.getBorder().validarConfiguracion(listaErrores, this.getFila(), this.getColumna());
+        }
+
+
+        //Propagacion
+       for(CompiledForm form: this.elementos){
+           if(form != null) {
+               form.validarEstilosProcesados(listaErrores);
+           }
+       }
+
+    }
 
 
     /*Metodo delegado para poder validar los estilos para cada section*/

@@ -27,6 +27,27 @@ public class CompiledMultipleQuest extends CompiledQuestions {
         this.texto = texto;
     }
 
+    /*Metodo que permite validar la semantica del codigo interpretado*/
+    public void validarSemantica(List<ErrorAnalisis> listaErrores){
+
+        if(this.height.intValue() < -1 ){
+            this.reportarErrores("<multiple>","El atributo \"height\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(this.width.intValue() < -1 ){
+            this.reportarErrores("<multiple>","El atributo \"width\" no debe ser menor a -1", listaErrores);
+        }
+
+        if(!this.respuesta.isEmpty()){
+            for(Number num : this.respuesta){
+                if(num.intValue() < -1 || num.intValue() >= this.opciones.size()){
+                    this.reportarErrores("<multiple>","El valor de la respuesta debe estar dentro de los limites de las opciones o \"vacio\" si no hay respuesta.", listaErrores);
+                }
+            }
+        }
+
+    }
+
     /*Metodos getter para obtener los atributos de la clase*/
     public List<Number> getRespuesta() {
         return this.respuesta;

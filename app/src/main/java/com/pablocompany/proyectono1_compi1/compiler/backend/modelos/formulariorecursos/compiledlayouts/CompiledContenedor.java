@@ -17,9 +17,13 @@ import java.util.List;
 //Clase que representa a toda la jerarquia de layouts. Es decir a estos componentes que almacenan dentro de si mismos mas cosas
 public abstract class CompiledContenedor extends CompiledForm {
 
+    /*Flag que permite indicar si el componente tiene textSize*/
+    protected boolean hayTextSize;
+
     /*Constructor*/
     public CompiledContenedor(Number width, Number height, Number pointX, Number pointY, List<CompiledEstilos> estilos,int fila, int columna) {
         super(width, height, pointX, pointY,estilos,fila,columna);
+        this.hayTextSize = false;
     }
 
     /*Metodo que permite que cada clase empaquete su propio estilo en los contenedores*/
@@ -27,7 +31,6 @@ public abstract class CompiledContenedor extends CompiledForm {
     protected void empaquetaEstilos() {
 
         if (this.estilos == null) {
-
             this.estilosProcesados = new EstilosProcesados( new int[]{255, 255, 255},new int[]{0, 0, 0},null, -1, null);
             return;
         }
@@ -60,7 +63,7 @@ public abstract class CompiledContenedor extends CompiledForm {
                 fontFamilly = ((CompiledFontFamily) estilo).getFontFamily();
 
             } else if (estilo instanceof CompiledTextSize) {
-
+                this.hayTextSize = true;
                 textSize = ((CompiledTextSize) estilo).getTextSize();
             }
             else if (estilo instanceof CompiledBorder) {
