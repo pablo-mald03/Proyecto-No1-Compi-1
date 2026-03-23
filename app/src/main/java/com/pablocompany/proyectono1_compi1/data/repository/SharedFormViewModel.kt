@@ -112,6 +112,23 @@ class SharedFormViewModel : ViewModel() {
         isParsing = false
     }
 
+    /*---Metodo auxiliar que permite limpiar el contenido del formulario si no hay URI (solo modo vista)----*/
+    fun limpiarContenido() {
+
+        interpretJob?.cancel()
+
+        codigoCompilado = null
+        codigoInterpretado = null
+        codigoProcesado = ""
+
+        listaErrores = emptyList()
+
+        isModified = false
+        generadoDesdeEditor = false
+
+        isParsing = false
+    }
+
     //Metodos utilizados para desmarcar cuando se cerro desde el editor o cuando se guardo desde el editor
     fun marcarDesdeEditor() {
         generadoDesdeEditor = true

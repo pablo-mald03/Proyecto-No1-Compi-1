@@ -39,7 +39,7 @@ public class NodoMultiplicacion extends NodoExpresion {
         if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
             listaErrores.add(new ErrorAnalisis(
                     "Multiplicacion", "Semántico",
-                    "La multiplicacion no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() + "\"",
+                    "La multiplicacion no admite operar tipos \"" + tipoIzquierda.getTipo() + "\" con \"" + tipoDerecha.getTipo() + "\"",
                     getLinea(), getColumna()
             ));
         }

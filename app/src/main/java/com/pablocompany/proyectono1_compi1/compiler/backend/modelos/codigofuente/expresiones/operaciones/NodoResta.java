@@ -39,7 +39,7 @@ public class NodoResta extends NodoExpresion {
         if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
             listaErrores.add(new ErrorAnalisis(
                     "Resta", "Semántico",
-                    "La resta no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() + "\"",
+                    "La resta no admite operar tipos \"" + tipoIzquierda.getTipo() + "\" con \"" + tipoDerecha.getTipo() + "\"",
                     getLinea(), getColumna()
             ));
         }

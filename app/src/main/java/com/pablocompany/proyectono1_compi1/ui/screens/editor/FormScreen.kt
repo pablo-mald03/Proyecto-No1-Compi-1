@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Airplay
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -340,27 +341,113 @@ fun FormScreen(
 
                         Spacer(Modifier.height(24.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(20.dp)
-                        ) {
-                            //Boton que permite refrescar los cambios (por si se necesita)
+                        Column {
+
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                //Boton que permite refrescar los cambios (por si se necesita)
+                                Button(
+
+                                    onClick = {
+
+                                        sharedFormViewModel.reanalizar()
+
+                                        if (errores.isNotEmpty()) {
+                                            hayErrores = true
+                                        }
+                                    },
+                                    enabled = interpretado != null && !isParsing,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF04643C),
+                                        contentColor = Color.White,
+
+                                        disabledContainerColor = Color(0xFF96E181).copy(alpha = 0.3f),
+                                        disabledContentColor = Color.White.copy(alpha = 0.5f)
+                                    ),
+
+                                    shape = RoundedCornerShape(14.dp)
+
+                                ) {
+
+                                    Icon(
+                                        imageVector = Icons.Default.Autorenew,
+                                        contentDescription = "Actualizar",
+                                        tint = Color.White
+                                    )
+
+                                    Spacer(Modifier.width(6.dp))
+
+                                    Text(
+                                        "Actualizar",
+                                        color = Color.White
+                                    )
+                                }
+
+                                //Boton que permite navegar a contestar el formulario
+                                Button(
+
+                                    onClick = {
+
+                                        if (interpretado != null) {
+
+                                            answerViewModel.setCodigoProcesado(sharedFormViewModel.codigoProcesado)
+
+                                            navController.navigate("answer")
+
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "No hay formulario interpretado",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    enabled = interpretado != null && !isParsing,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF0D47A1),
+                                        contentColor = Color.White,
+
+                                        disabledContainerColor = Color(0xFF81A5E1).copy(alpha = 0.3f),
+                                        disabledContentColor = Color.White.copy(alpha = 0.5f)
+                                    ),
+
+                                    shape = RoundedCornerShape(14.dp)
+
+                                ) {
+
+                                    Icon(
+                                        imageVector = Icons.Default.PlayArrow,
+                                        contentDescription = "Contestar",
+                                        tint = Color.White
+                                    )
+
+                                    Spacer(Modifier.width(6.dp))
+
+                                    Text(
+                                        "Contestar",
+                                        color = Color.White
+                                    )
+                                }
+                            }
+
                             Button(
 
                                 onClick = {
-
-                                    sharedFormViewModel.reanalizar()
-
-                                    if (errores.isNotEmpty()) {
-                                        hayErrores = true
-                                    }
+                                    sharedFormViewModel.limpiarContenido()
                                 },
-                                enabled = interpretado != null && !isParsing,
+                                modifier = Modifier.fillMaxWidth(),
+                                enabled = sharedFormViewModel.codigoProcesado.isNotBlank() && !isParsing && sharedFormViewModel.currentFileUri == null,
+
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF04643C),
+                                    containerColor = Color(0xFF6D1B1B),
                                     contentColor = Color.White,
 
-                                    disabledContainerColor = Color(0xFF96E181).copy(alpha = 0.3f),
+                                    disabledContainerColor = Color(0xFFE57373).copy(alpha = 0.3f),
                                     disabledContentColor = Color.White.copy(alpha = 0.5f)
                                 ),
 
@@ -369,70 +456,20 @@ fun FormScreen(
                             ) {
 
                                 Icon(
-                                    imageVector = Icons.Default.Autorenew,
-                                    contentDescription = "Actualizar",
+                                    imageVector = Icons.Default.AutoFixHigh,
+                                    contentDescription = "Limpiar",
                                     tint = Color.White
                                 )
 
                                 Spacer(Modifier.width(6.dp))
 
-                                Text(
-                                    "Actualizar",
-                                    color = Color.White
-                                )
+                                Text("Limpiar")
                             }
 
-                            //Boton que permite navegar a contestar el formulario
-                            Button(
-
-                                onClick = {
-
-                                    if (interpretado != null) {
-
-                                        answerViewModel.setCodigoProcesado(sharedFormViewModel.codigoProcesado)
-
-                                        navController.navigate("answer")
-
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            "No hay formulario interpretado",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-
-                                },
-                                modifier = Modifier.weight(1f),
-                                enabled = interpretado != null && !isParsing,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF0D47A1),
-                                    contentColor = Color.White,
-
-                                    disabledContainerColor = Color(0xFF81A5E1).copy(alpha = 0.3f),
-                                    disabledContentColor = Color.White.copy(alpha = 0.5f)
-                                ),
-
-                                shape = RoundedCornerShape(14.dp)
-
-                            ) {
-
-                                Icon(
-                                    imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = "Contestar",
-                                    tint = Color.White
-                                )
-
-                                Spacer(Modifier.width(6.dp))
-
-                                Text(
-                                    "Contestar",
-                                    color = Color.White
-                                )
-                            }
                         }
                     }
                 }
-            ) {innerPadding ->
+            ) { innerPadding ->
 
                 /* ---------------- Pantalla principal ---------------- */
 

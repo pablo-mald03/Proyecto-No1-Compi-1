@@ -39,7 +39,7 @@ public class NodoDivision extends NodoExpresion {
         if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
             listaErrores.add(new ErrorAnalisis(
                     "Division", "Semántico",
-                    "La división no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() + "\"",
+                    "La división no admite operar tipos \"" + tipoIzquierda.getTipo() + "\" con \"" + tipoDerecha.getTipo() + "\"",
                     getLinea(), getColumna()
             ));
         }

@@ -39,7 +39,7 @@ public class  NodoPotencia extends NodoExpresion {
         if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
             listaErrores.add(new ErrorAnalisis(
                     "Potencia", "Semántico",
-                    "La potencia no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() + "\"",
+                    "La potencia no admite operar tipos \"" + tipoIzquierda.getTipo() + "\" con \"" + tipoDerecha.getTipo() + "\"",
                     getLinea(), getColumna()
             ));
         }

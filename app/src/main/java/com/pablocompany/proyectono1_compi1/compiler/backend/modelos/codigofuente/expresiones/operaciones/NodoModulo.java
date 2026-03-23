@@ -38,7 +38,7 @@ public class NodoModulo extends NodoExpresion {
         if (tipoIzquierda != TipoVariable.ERROR && tipoDerecha != TipoVariable.ERROR) {
             listaErrores.add(new ErrorAnalisis(
                     "Modulo", "Semántico",
-                    "El modulo no admite tipos \"" + tipoIzquierda.getTipo() + "\" y \"" + tipoDerecha.getTipo() +"\"",
+                    "El modulo no admite operar tipos \"" + tipoIzquierda.getTipo() + "\" con \"" + tipoDerecha.getTipo() +"\"",
                     getLinea(), getColumna()
             ));
         }
