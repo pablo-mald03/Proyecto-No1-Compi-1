@@ -290,6 +290,11 @@ non terminal List<AtributoConfig> cuerpo_text;
 non terminal Nodo condicional;
 non terminal Nodo bloque_else;
 non terminal Nodo condicion;
+non terminal Nodo termino_logico;
+non terminal Nodo factor_logico;
+non terminal Nodo primal_logico;
+non terminal Nodo comparacion_logica;
+
 
 //---*--No terminales de la generacion del ciclo for---*---
 non terminal Nodo ciclo_for;
@@ -503,21 +508,84 @@ instruccion_bloque         ::= ID:id IGUALACION expresion:expresion
 
 
 /*Created by Pablo*/
+
+
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE CONDICIONES-----*/
 
-condicion       ::= condicion:condA AND:and condicion:condB
+/*Regla que representa la maxima precedencia que se tiene con AND*/
+
+condicion       ::= condicion:condA OR:or termino_logico:condB
+                {:
+                    RESULT = new NodoOr(condA, condB, orleft, orright);
+                :}
+                | termino_logico:t
+                {:
+                    RESULT = t;
+                :}
+                ;
+
+
+/*------Produccion de derivacion para el AND-----*/
+
+termino_logico      ::= termino_logico:condA AND:and factor_logico:condB
                     {:
-                        RESULT = new NodoAnd(condA, condB,andleft, andright);
+                        RESULT = new NodoAnd(condA, condB, andleft, andright);
                     :}
-                    | condicion:condA OR:or condicion:condB
+                    | factor_logico:f
                     {:
-                        RESULT = new NodoOr(condA, condB,orleft, orright);
+                        RESULT = f;
                     :}
-                    | NOT:not condicion:condA
+                    ;
+
+/*---Produccion que le da la prioridad al NOT---*/
+
+factor_logico       ::= NOT:not factor_logico:condA
                     {:
                         RESULT = new NodoNot(condA, notleft, notright);
                     :}
-                    | PARENT_APERTURA condicion:condA PARENT_CIERRE
+                    | comparacion_logica:comp
+                    {:
+                        RESULT = comp;
+                    :}
+                    ;
+
+
+/*----PRODUCCION QUE GENERA LA DERIVACION PARA LAS CONDICIONES LOGICAS CON COMPARACION----*/
+
+comparacion_logica          ::= primal_logico:condicionA DIFERENTE primal_logico:condicionB
+                            {:
+                                RESULT = new NodoDiferente(condicionA, condicionB, condicionAleft, condicionAright);
+                            :}
+                            | primal_logico:condicionA IGUALDAD primal_logico:condicionB
+                            {:
+                                RESULT = new NodoIgualdad(condicionA, condicionB, condicionAleft, condicionAright);
+                            :}
+                            | primal_logico:condicionA MAYOR primal_logico:condicionB
+                            {:
+                                RESULT = new NodoMayor(condicionA, condicionB, condicionAleft, condicionAright);
+                            :}
+                            | primal_logico:condicionA MENOR primal_logico:condicionB
+                            {:
+                                RESULT = new NodoMenor(condicionA, condicionB, condicionAleft, condicionAright);
+                            :}
+                            | primal_logico:condicionA MAYOR_IGUAL primal_logico:condicionB
+                            {:
+                                RESULT = new NodoMayorIgual(condicionA, condicionB, condicionAleft, condicionAright);
+                            :}
+                            | primal_logico:condicionA MENOR_IGUAL primal_logico:condicionB
+                            {:
+                                RESULT = new NodoMenorIgual(condicionA, condicionB, condicionAleft, condicionAright);
+                            :}
+                            | primal_logico:p
+                            {:
+                                RESULT = p;
+                            :}
+                            ;
+
+
+
+/*---produccion que generar la ultima derivacion para las condiciones---*/
+primal_logico       ::= PARENT_APERTURA condicion:condA PARENT_CIERRE
                     {:
                         RESULT = condA;
                     :}
@@ -546,6 +614,8 @@ condicion       ::= condicion:condA AND:and condicion:condB
                         RESULT = new NodoMenorIgual(expA, expB, expAleft, expAright);
                     :}
                     ;
+
+/*Created by Pablo*/
 
 
 /*-----REGLAS DE PRODUCCION PARA DECLARACION DE TABLAS DE FORMULARIOS-----*/

@@ -45,6 +45,13 @@ public class NodoOr extends Nodo {
             return TipoVariable.ERROR;
         }
 
+        if (tipoA == TipoVariable.BOOLEAN_NOT || tipoB == TipoVariable.BOOLEAN_NOT) {
+            listaErrores.add(new ErrorAnalisis("OR", "Semantico",
+                    "No se permite aplicar el operador OR sobre un \"NOT\" directamente.",
+                    getLinea(), getColumna()));
+            return TipoVariable.ERROR;
+        }
+
         if ((tipoA != TipoVariable.BOOLEAN_OR && tipoA != TipoVariable.NUMBER) ||
                 (tipoB != TipoVariable.BOOLEAN_OR && tipoB != TipoVariable.NUMBER)) {
             listaErrores.add(new ErrorAnalisis("OR", "Semantico",

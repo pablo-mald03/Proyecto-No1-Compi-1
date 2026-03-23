@@ -9,6 +9,7 @@ public enum TipoVariable {
     COMODIN("?"),
     BOOLEAN_AND("AND"),
     BOOLEAN_OR("OR"),
+    BOOLEAN_NOT("NOT"),
     VOID("void"),
     COLOR("color"),
     POKEMON("pokemon"),
