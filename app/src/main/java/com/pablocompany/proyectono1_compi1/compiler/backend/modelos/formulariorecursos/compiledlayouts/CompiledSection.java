@@ -65,17 +65,29 @@ public class CompiledSection extends CompiledContenedor {
             return;
         }
 
-
         if(this.estilosProcesados.getBackgroudColor() != null){
-            if(this.estilosProcesados.getBackgroudColor()[0] < 0 || this.estilosProcesados.getBackgroudColor()[0] > 255){
-                this.reportarErrores("<section>", "El atributo \"background color\" no puede ser menor a 0 o mayor a 255", listaErrores);
+            int[] colores = this.estilosProcesados.getBackgroudColor();
+            for (int i = 0; i < Math.min(colores.length, 3); i++) {
+                if (colores[i] < 0) {
+                    this.reportarErrores("<section>",
+                            "Los componentes del \"background color\" no deben ser menores a cero (Encontrado: " + colores[i] + ")",
+                            listaErrores);
+                    break;
+                }
             }
         }
-        if(this.estilosProcesados.getTextColor() != null){
-            if(this.estilosProcesados.getTextColor()[0] < 0 || this.estilosProcesados.getTextColor()[0] > 255){
-                this.reportarErrores("<section>", "El atributo \"color\" no puede ser menor a 0 o mayor a 255", listaErrores);
-            }
 
+
+        if(this.estilosProcesados.getTextColor() != null){
+            int[] colores = this.estilosProcesados.getTextColor();
+            for (int i = 0; i < Math.min(colores.length, 3); i++) {
+                if (colores[i] < 0) {
+                    this.reportarErrores("<section>",
+                            "Los componentes del \"color\" no deben ser menores a cero (Encontrado: " + colores[i] + ")",
+                            listaErrores);
+                    break;
+                }
+            }
         }
 
         if(this.estilosProcesados.getTextSize() != null){

@@ -218,6 +218,7 @@ fun Modifier.applyStyles(estilos: EstilosProcesados?, scale: Float): Modifier {
                             cornerRadius = CornerRadius(roundedRadius, roundedRadius)
                         )
                     }
+
                     TipoBorde.DOUBLE -> {
                         drawRoundRect(
                             color = colorBorde,
@@ -243,6 +244,7 @@ fun Modifier.applyStyles(estilos: EstilosProcesados?, scale: Float): Modifier {
                             )
                         )
                     }
+
                     else -> {
                         drawRoundRect(
                             color = colorBorde,
@@ -259,12 +261,13 @@ fun Modifier.applyStyles(estilos: EstilosProcesados?, scale: Float): Modifier {
 
 /*Funcion que permite transformar un color array en un Color de Compose*/
 fun IntArray.toComposeColor(): Color {
-    return Color(
-        red = this[0] / 255f,
-        green = this[1] / 255f,
-        blue = this[2] / 255f,
-        alpha = (if (this.size > 3) this[3] else 255) / 255f
-    )
+
+    val r = (this.getOrNull(0) ?: 0).coerceIn(0, 255) / 255f
+    val g = (this.getOrNull(1) ?: 0).coerceIn(0, 255) / 255f
+    val b = (this.getOrNull(2) ?: 0).coerceIn(0, 255) / 255f
+    val a = (if (this.size > 3) this[3] else 255) / 255f
+
+    return Color(red = r, green = g, blue = b, alpha = a)
 }
 
 /*Funcion que permite aplicar un tamanio a un componente*/
@@ -281,6 +284,7 @@ fun Modifier.applySize(component: CompiledForm, scale: Float): Modifier {
             w == -1f && h > 0 -> Modifier
                 .fillMaxWidth()
                 .height((h * scale).dp)
+
             w > 0 && h == -1f -> Modifier
                 .width((w * scale).dp)
                 .fillMaxHeight()

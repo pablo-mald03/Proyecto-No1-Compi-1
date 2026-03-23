@@ -111,7 +111,7 @@ public class EstilosComponent {
             estilos.append("\n");
         }
 
-        estilos.append("\n\n    </style>");
+        estilos.append("\n    </style>");
 
         return estilos.toString();
     }
@@ -132,7 +132,7 @@ public class EstilosComponent {
             estilos.append("\n        <font family=").append(this.fontFamily).append("/>");
         }
         if (this.textSize != null) {
-            estilos.append("\n        <text size=").append(this.textSize).append(">");
+            estilos.append("\n        <text size=").append(this.textSize).append("/>\n");
         }
 
         return estilos.toString();

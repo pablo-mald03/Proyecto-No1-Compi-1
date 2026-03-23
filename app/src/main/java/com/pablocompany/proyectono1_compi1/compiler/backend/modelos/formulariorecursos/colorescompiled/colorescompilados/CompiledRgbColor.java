@@ -21,8 +21,8 @@ public class CompiledRgbColor extends CompiledColor {
 
         return new int[]{
                 (red).intValue(),
-                (blue).intValue(),
-                (green).intValue()
+                (green).intValue(),
+                (blue).intValue()
         };
 
     }

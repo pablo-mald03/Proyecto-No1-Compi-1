@@ -1,5 +1,7 @@
 package com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.tipocolores;
 
+import android.annotation.SuppressLint;
+
 import com.pablocompany.proyectono1_compi1.compiler.backend.exceptions.OnCompilacionError;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.colores.NodoColor;
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.codigofuente.expresiones.NodoExpresion;
@@ -76,10 +78,10 @@ public class NodoRgbColor extends NodoColor{
             return err;
         }
 
-        return String.format("(%s, %s, %s)",
-                valorRed,
-                valorGreen,
-                valorBlue);
+        return String.format(java.util.Locale.US, "(%d, %d, %d)",
+                ((Number) valorRed).intValue(),
+                ((Number) valorGreen).intValue(),
+                ((Number) valorBlue).intValue());
 
     }
 

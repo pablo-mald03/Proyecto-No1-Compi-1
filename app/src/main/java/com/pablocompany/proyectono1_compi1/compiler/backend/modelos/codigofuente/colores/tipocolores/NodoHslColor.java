@@ -126,11 +126,10 @@ public class NodoHslColor extends NodoColor {
         }
 
 
-        return String.format("<%s, %s, %s>",
-                valorRed,
-                valorGreen,
-                valorBlue);
-
+        return String.format(java.util.Locale.US, "<%d, %d, %d>",
+                ((Number) valorRed).intValue(),
+                ((Number) valorGreen).intValue(),
+                ((Number) valorBlue).intValue());
     }
 
     //Metodo que permite clonar el color
