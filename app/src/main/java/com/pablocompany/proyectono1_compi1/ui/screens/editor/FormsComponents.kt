@@ -18,18 +18,30 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.SmsFailed
+import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -69,7 +81,12 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariore
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.estiloscompiled.EstilosProcesados
 import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
 import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextDecoration
 import com.pablocompany.proyectono1_compi1.R
+import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.CompiledQuestions
+import com.pablocompany.proyectono1_compi1.data.clases.EvaluacionQuestion
+import com.pablocompany.proyectono1_compi1.data.clases.ReporteFormulario
 
 /*Clase composable utilizada para poder recrear los elementos en la UI*/
 
@@ -78,16 +95,23 @@ fun RenderComponent(
     component: CompiledForm,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluationMap: Map<String, EvaluacionQuestion>? = null
 ) {
+
+    val id = if (component is CompiledQuestions) "${component.fila}_${component.columna}" else ""
+    val miEvaluacion = evaluationMap?.get(id)
+
+
     when (component) {
-        is CompiledSection -> RenderSection(component, viewModel, scale, usePosition)
-        is CompiledTable -> RenderTable(component, viewModel, scale, usePosition)
+        is CompiledSection -> RenderSection(component, viewModel, scale, usePosition,evaluationMap)
+        is CompiledTable -> RenderTable(component, viewModel, scale, usePosition,evaluationMap)
+
         is CompiledText -> RenderText(component, scale, usePosition)
-        is CompiledOpenQuest -> RenderOpenQuestion(component, viewModel, scale, usePosition)
-        is CompiledSelectQuest -> RenderSelectQuestion(component, viewModel, scale, usePosition)
-        is CompiledDropQuest -> RenderDropQuestion(component, viewModel, scale, usePosition)
-        is CompiledMultipleQuest -> RenderMultipleQuestion(component, viewModel, scale, usePosition)
+        is CompiledOpenQuest -> RenderOpenQuestion(component, viewModel, scale, usePosition,miEvaluacion)
+        is CompiledSelectQuest -> RenderSelectQuestion(component, viewModel, scale, usePosition,miEvaluacion)
+        is CompiledDropQuest -> RenderDropQuestion(component, viewModel, scale, usePosition,miEvaluacion)
+        is CompiledMultipleQuest -> RenderMultipleQuestion(component, viewModel, scale, usePosition,miEvaluacion)
     }
 }
 
@@ -98,7 +122,8 @@ fun RenderSection(
     section: CompiledSection,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluationMap: Map<String, EvaluacionQuestion>? = null
 ) {
 
     Box(
@@ -118,7 +143,7 @@ fun RenderSection(
                         if (child.height?.toInt() == -1) Modifier.weight(1f) else Modifier
 
                     Box(modifier = weightModifier.fillMaxWidth()) {
-                        RenderComponent(child, viewModel, scale, usePosition = false)
+                        RenderComponent(child, viewModel, scale, usePosition = false, evaluationMap = evaluationMap)
                     }
                 }
             }
@@ -129,7 +154,7 @@ fun RenderSection(
                         if (child.width?.toInt() == -1) Modifier.weight(1f) else Modifier
 
                     Box(modifier = weightModifier.fillMaxHeight()) {
-                        RenderComponent(child, viewModel, scale, usePosition = false)
+                        RenderComponent(child, viewModel, scale, usePosition = false, evaluationMap = evaluationMap)
                     }
                 }
             }
@@ -143,7 +168,8 @@ fun RenderTable(
     table: CompiledTable,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluationMap: Map<String, EvaluacionQuestion>? = null
 ) {
 
     Box(
@@ -170,7 +196,7 @@ fun RenderTable(
                                 .applySize(cell, scale)
                                 .applyStyles(cell.estilosProcesados, scale)
                         ) {
-                            RenderComponent(cell, viewModel, scale, usePosition = false)
+                            RenderComponent(cell, viewModel, scale, usePosition = false, evaluationMap = evaluationMap)
                         }
                     }
 
@@ -371,7 +397,8 @@ fun RenderOpenQuestion(
     question: CompiledOpenQuest,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluation: EvaluacionQuestion? = null
 ) {
     val id = "${question.fila}_${question.columna}"
     val text = viewModel.getAnswer(id) as? String ?: ""
@@ -379,20 +406,51 @@ fun RenderOpenQuestion(
 
     val fontSize = calculateFontSize(estilos?.textSize ?: 14, scale)
 
+    val statusColor = when {
+        evaluation == null -> estilos?.textColor?.toComposeColor() ?: Color.Black
+        evaluation.esCorrecta -> Color(0xFF4CAF50)
+        else -> Color(0xFFF44336)
+    }
+
     Column(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
+            .then(
+                if (evaluation != null) Modifier.border(
+                    1.dp,
+                    statusColor.copy(alpha = 0.3f),
+                    RoundedCornerShape(8.dp)
+                )
+                else Modifier
+            )
             .cardLike(scale, estilos)
     ) {
-        Text(
-            text = question.texto.toDisplayString(),
-            color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-            fontSize = fontSize,
-            fontWeight = FontWeight.Medium,
-            fontFamily = estilos?.fontFamilly.toComposeFont()
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+
+            Text(
+                text = question.texto.toDisplayString(),
+                color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                fontSize = fontSize,
+                fontWeight = FontWeight.Medium,
+                fontFamily = estilos?.fontFamilly.toComposeFont(),
+                modifier = Modifier.weight(1f)
+            )
+
+            if (evaluation != null) {
+                Icon(
+                    imageVector = if (evaluation.esCorrecta) Icons.Default.TaskAlt else Icons.Default.SmsFailed,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size((18 * scale).dp)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height((8 * scale).dp))
 
@@ -400,22 +458,37 @@ fun RenderOpenQuestion(
             value = text,
             onValueChange = { viewModel.setAnswer(id, it) },
             modifier = Modifier.fillMaxWidth(),
+            readOnly = evaluation != null,
+            enabled = evaluation == null,
             textStyle = TextStyle(
-                color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                color = if (evaluation != null) statusColor else (estilos?.textColor?.toComposeColor()
+                    ?: Color.Black),
                 fontSize = fontSize,
                 fontFamily = estilos?.fontFamilly.toComposeFont()
             ),
+            placeholder = {
+                if (evaluation == null) {
+                    Text("Escribe tu respuesta aquí...", fontSize = fontSize)
+                }
+            },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = estilos?.textColor?.toComposeColor() ?: Color.Black,
-                unfocusedTextColor = estilos?.textColor?.toComposeColor() ?: Color.Black,
-                focusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(
-                    alpha = 0.7f
-                ),
-                unfocusedBorderColor = (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(
-                    alpha = 0.4f
-                )
+                focusedBorderColor = statusColor,
+                unfocusedBorderColor = statusColor.copy(alpha = 0.5f),
+                disabledBorderColor = statusColor.copy(alpha = 0.6f),
+                disabledTextColor = if (text.isEmpty()) Color.Gray else statusColor,
+                disabledContainerColor = if (evaluation != null) statusColor.copy(alpha = 0.05f) else Color.Transparent
             )
         )
+
+        if (evaluation != null) {
+            Text(
+                text = if (evaluation.esCorrecta) "Informacion guardada correctamente" else "Este campo es requerido",
+                color = statusColor.copy(alpha = 0.8f),
+                fontSize = fontSize,
+                fontStyle = FontStyle.Italic,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
     }
 }
 
@@ -427,45 +500,91 @@ fun RenderSelectQuestion(
     question: CompiledSelectQuest,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluation: EvaluacionQuestion? = null
 ) {
     val id = "${question.fila}_${question.columna}"
     val selectedIndex = viewModel.getAnswer(id) as? Int ?: -1
     val estilos = question.estilosProcesados
+
+    val statusColor = when {
+        evaluation == null -> estilos?.textColor?.toComposeColor() ?: Color.Black
+        evaluation.esCorrecta -> Color(0xFF4CAF50)
+        else -> Color(0xFFF44336)
+    }
+
+    val correctIndex = evaluation?.respuestaCorrecta?.toString()?.toDoubleOrNull()?.toInt() ?: -1
 
     Column(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
+            .then(
+                if (evaluation != null) Modifier.border(1.dp, statusColor.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                else Modifier
+            )
             .cardLike(scale, estilos)
     ) {
-        Text(
-            text = question.texto.toDisplayString(),
-            color = estilos?.textColor?.toComposeColor() ?: Color.Black,
-            fontSize = calculateFontSize(estilos?.textSize, scale),
-            fontWeight = FontWeight.Bold,
-            fontFamily = estilos?.fontFamilly.toComposeFont()
-        )
 
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = question.texto.toDisplayString(),
+                color = estilos?.textColor?.toComposeColor() ?: Color.Black,
+                fontSize = calculateFontSize(estilos?.textSize, scale),
+                fontWeight = FontWeight.Bold,
+                fontFamily = estilos?.fontFamilly.toComposeFont(),
+                modifier = Modifier.weight(1f)
+            )
+
+            if (evaluation != null) {
+                Icon(
+                    imageVector = if (evaluation.esCorrecta) Icons.Default.CheckCircle else Icons.Default.Cancel,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size((18 * scale).dp)
+                )
+            }
+        }
         Spacer(modifier = Modifier.height((7 * scale).dp))
 
         question.opciones.forEachIndexed { index, opcion ->
+
+            val isOptionSelected = selectedIndex == index
+            val isOptionCorrect = correctIndex == index
+
+            val optionColor = when {
+                evaluation == null -> estilos?.textColor?.toComposeColor() ?: Color.Black
+                isOptionCorrect -> Color(0xFF4CAF50)
+                isOptionSelected && !isOptionCorrect -> Color(0xFFF44336)
+                else -> (estilos?.textColor?.toComposeColor() ?: Color.Black).copy(alpha = 0.5f)
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .clickable { viewModel.setAnswer(id, index) }
+                    .then(
+                        if (evaluation != null && isOptionCorrect)
+                            Modifier.background(Color(0xFF4CAF50).copy(alpha = 0.1f), RoundedCornerShape(4.dp))
+                        else Modifier
+                    )
             ) {
                 RadioButton(
                     selected = selectedIndex == index,
-                    onClick = { viewModel.setAnswer(id, index) },
+                    onClick = { if (evaluation == null) viewModel.setAnswer(id, index) },
                     modifier = Modifier.scale(scale),
-
+                    enabled = evaluation == null,
                     colors = RadioButtonDefaults.colors(
-                        selectedColor = Color(0xFF6200EE),
-                        unselectedColor = Color.Gray
+                        selectedColor = if (evaluation != null) optionColor else Color(0xFF6200EE),
+                        unselectedColor = if (evaluation != null && isOptionCorrect) Color(0xFF4CAF50) else Color.Gray,
+                        disabledSelectedColor = optionColor,
+                        disabledUnselectedColor = if (isOptionCorrect) Color(0xFF4CAF50).copy(alpha = 0.5f) else Color.LightGray
                     )
                 )
 
@@ -474,7 +593,8 @@ fun RenderSelectQuestion(
                     fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
                     color = estilos?.textColor?.toComposeColor() ?: Color.Black,
                     modifier = Modifier.padding(start = (8 * scale).dp),
-                    fontFamily = estilos?.fontFamilly.toComposeFont()
+                    fontFamily = estilos?.fontFamilly.toComposeFont(),
+                    fontWeight = if (isOptionCorrect || isOptionSelected) FontWeight.Medium else FontWeight.Normal
                 )
             }
         }
@@ -489,7 +609,8 @@ fun RenderDropQuestion(
     question: CompiledDropQuest,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluation: EvaluacionQuestion? = null
 ) {
     val id = "${question.fila}_${question.columna}"
     val selectedIndex = viewModel.getAnswer(id) as? Int ?: -1
@@ -498,19 +619,49 @@ fun RenderDropQuestion(
     val selectedText = if (selectedIndex in opciones.indices) opciones[selectedIndex] else ""
     val estilos = question.estilosProcesados
 
+    val statusColor = when {
+        evaluation == null -> estilos?.textColor?.toComposeColor() ?: Color.White
+        evaluation.esCorrecta -> Color(0xFF4CAF50)
+        else -> Color(0xFFF44336)
+    }
+
     Column(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
+            .then(
+                if (evaluation != null) Modifier.border(
+                    1.dp,
+                    statusColor.copy(alpha = 0.5f),
+                    RoundedCornerShape(8.dp)
+                )
+                else Modifier
+            )
             .cardLike(scale, estilos)
     ) {
-        Text(
-            text = question.texto.toDisplayString(),
-            color = estilos?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = calculateFontSize(estilos?.textSize, scale),
-            fontFamily = estilos?.fontFamilly.toComposeFont()
-        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = question.texto.toDisplayString(),
+                color = estilos?.textColor?.toComposeColor() ?: Color.White,
+                fontSize = calculateFontSize(estilos?.textSize, scale),
+                fontFamily = estilos?.fontFamilly.toComposeFont()
+            )
+
+            if (evaluation != null) {
+                Icon(
+                    imageVector = if (evaluation.esCorrecta) Icons.Default.CheckCircle else Icons.Default.Cancel,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier
+                        .size((20 * scale).dp)
+                        .padding(start = 4.dp)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height((7 * scale).dp))
 
@@ -522,16 +673,19 @@ fun RenderDropQuestion(
         ) {
 
             ExposedDropdownMenuBox(
-                expanded = expanded.value,
-                onExpandedChange = { expanded.value = !expanded.value }
+                expanded = if (evaluation == null) expanded.value else false,
+                onExpandedChange = {
+                    if (evaluation == null) expanded.value = !expanded.value
+                }
             ) {
                 OutlinedTextField(
                     value = selectedText,
                     onValueChange = {},
                     readOnly = true,
                     textStyle = TextStyle(
-                        fontSize = calculateFontSize(14, scale),
-                        fontFamily = estilos?.fontFamilly.toComposeFont()
+                        fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
+                        fontFamily = estilos?.fontFamilly.toComposeFont(),
+                        color = if (evaluation != null) statusColor else Color.Unspecified
                     ),
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded.value) },
                     modifier = Modifier
@@ -539,26 +693,44 @@ fun RenderDropQuestion(
                         .fillMaxWidth()
                 )
 
-                ExposedDropdownMenu(
-                    expanded = expanded.value,
-                    onDismissRequest = { expanded.value = false }
-                ) {
-                    opciones.forEachIndexed { index, opcion ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(
-                                    opcion,
-                                    fontSize = calculateFontSize(14, scale),
-                                    fontFamily = estilos?.fontFamilly.toComposeFont(),
-                                )
-                            },
-                            onClick = {
-                                viewModel.setAnswer(id, index)
-                                expanded.value = false
-                            }
-                        )
+                if (evaluation == null) {
+                    ExposedDropdownMenu(
+                        expanded = expanded.value,
+                        onDismissRequest = { expanded.value = false }
+                    ) {
+                        opciones.forEachIndexed { index, opcion ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        opcion,
+                                        fontSize = calculateFontSize(
+                                            estilos?.textSize ?: 12,
+                                            scale
+                                        ),
+                                        fontFamily = estilos?.fontFamilly.toComposeFont(),
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.setAnswer(id, index)
+                                    expanded.value = false
+                                }
+                            )
+                        }
                     }
                 }
+            }
+        }
+
+        if (evaluation != null && !evaluation.esCorrecta && !evaluation.esInformativa) {
+            val correctIdx = evaluation.respuestaCorrecta as? Int ?: -1
+            if (correctIdx in opciones.indices) {
+                Text(
+                    text = "Respuesta correcta: ${opciones[correctIdx]}",
+                    color = Color(0xFFBBDEFB),
+                    fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
+                    modifier = Modifier.padding(top = 4.dp),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -570,30 +742,71 @@ fun RenderMultipleQuestion(
     question: CompiledMultipleQuest,
     viewModel: FormViewModel,
     scale: Float,
-    usePosition: Boolean = true
+    usePosition: Boolean = true,
+    evaluation: EvaluacionQuestion? = null
 ) {
     val id = "${question.fila}_${question.columna}"
-    val selected = (viewModel.getAnswer(id) as? List<Int>)?.toMutableList() ?: mutableListOf()
+    val selected = (viewModel.getAnswer(id) as? List<*>)
+        ?.mapNotNull { it.toString().toDoubleOrNull()?.toInt() } ?: emptyList()
+
     val estilos = question.estilosProcesados
+
+    val statusColor = when {
+        evaluation == null -> estilos?.textColor?.toComposeColor() ?: Color.White
+        evaluation.esCorrecta -> Color(0xFF4CAF50)
+        else -> Color(0xFFF44336)
+    }
+
+    val respuestasCorrectas = (evaluation?.respuestaCorrecta as? List<*>)
+        ?.mapNotNull { it.toString().toDoubleOrNull()?.toInt() } ?: emptyList()
 
     Column(
         modifier = Modifier
             .then(if (usePosition) Modifier.applyPosition(question, scale) else Modifier)
             .applySize(question, scale)
             .applyStyles(estilos, scale)
+            .then(
+                if (evaluation != null) Modifier.border(
+                    1.dp,
+                    statusColor.copy(alpha = 0.4f),
+                    RoundedCornerShape(8.dp)
+                )
+                else Modifier
+            )
             .cardLike(scale, estilos)
     ) {
-        Text(
-            text = question.texto.toDisplayString(),
-            color = estilos?.textColor?.toComposeColor() ?: Color.White,
-            fontSize = calculateFontSize(estilos?.textSize, scale),
-            fontFamily = estilos?.fontFamilly.toComposeFont()
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = question.texto.toDisplayString(),
+                color = statusColor,
+                fontSize = calculateFontSize(estilos?.textSize ?: 14, scale),
+                fontFamily = estilos?.fontFamilly.toComposeFont(),
+                modifier = Modifier.weight(1f)
+            )
+            if (evaluation != null) {
+                Icon(
+                    imageVector = if (evaluation.esCorrecta) Icons.Default.CheckCircle else Icons.Default.Cancel,
+                    contentDescription = null,
+                    tint = statusColor,
+                    modifier = Modifier.size((20 * scale).dp)
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height((7 * scale).dp))
 
         question.opciones.forEachIndexed { index, opcion ->
             val isChecked = selected.contains(index)
+            val isOptionCorrect = respuestasCorrectas.contains(index)
+
+            val optionContentColor = when {
+                evaluation == null -> estilos?.textColor?.toComposeColor() ?: Color.White
+                isOptionCorrect && isChecked -> Color(0xFF4CAF50)
+                isOptionCorrect && !isChecked -> Color(0xFF2196F3)
+                !isOptionCorrect && isChecked -> Color(0xFFF44336)
+                else -> (estilos?.textColor?.toComposeColor() ?: Color.White).copy(alpha = 0.6f)
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -604,30 +817,47 @@ fun RenderMultipleQuestion(
                 Checkbox(
                     checked = isChecked,
                     onCheckedChange = { checked ->
-                        val newList = selected.toMutableList()
-
-                        val indiceRealParaBackend = index
-
-                        if (checked) {
-                            if (!newList.contains(indiceRealParaBackend)) newList.add(
-                                indiceRealParaBackend
-                            )
-                        } else {
-                            newList.remove(indiceRealParaBackend)
+                        if (evaluation == null) {
+                            val newList = selected.toMutableList()
+                            if (checked) {
+                                if (!newList.contains(index)) newList.add(index)
+                            } else {
+                                newList.remove(index)
+                            }
+                            viewModel.setAnswer(id, newList)
                         }
-
-                        viewModel.setAnswer(id, newList)
                     },
-                    modifier = Modifier.scale(scale)
+                    modifier = Modifier.scale(scale),
+                    enabled = evaluation == null,
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = if (evaluation != null) optionContentColor else MaterialTheme.colorScheme.primary,
+                        uncheckedColor = if (evaluation != null && isOptionCorrect) Color(0xFF2196F3) else MaterialTheme.colorScheme.onSurface,
+                        disabledCheckedColor = optionContentColor,
+                        disabledUncheckedColor = if (isOptionCorrect) Color(0xFF2196F3).copy(alpha = 0.5f) else Color.Gray
+                    )
                 )
                 Text(
                     text = opcion.toDisplayString(),
-                    color = estilos?.textColor?.toComposeColor() ?: Color.White,
-                    fontSize = calculateFontSize(estilos?.textSize ?: 12, scale),
-                    fontFamily = estilos?.fontFamilly.toComposeFont()
+                    color = optionContentColor,
+                    fontSize = calculateFontSize(estilos?.textSize ?: 14, scale),
+                    fontFamily = estilos?.fontFamilly.toComposeFont(),
+                    style = if (evaluation != null && isOptionCorrect && !isChecked)
+                        TextStyle(textDecoration = TextDecoration.Underline)
+                    else TextStyle.Default
                 )
             }
         }
+
+        if (evaluation != null && evaluation.esInformativa) {
+            Text(
+                text = "Recopilacion de información",
+                color = Color.Gray,
+                fontSize = calculateFontSize(estilos?.textSize ?: 14, scale),
+                fontStyle = FontStyle.Italic,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
     }
 }
 
@@ -677,10 +907,4 @@ fun TipoLetra?.toComposeFont(): FontFamily {
         TipoLetra.CURSIVE -> FontFamily.Cursive
         else -> MontserratDefault
     }
-}
-
-// Mapeo de TipoBorde
-
-fun TipoBorde?.toStrokeCap(): StrokeCap {
-    return StrokeCap.Round
 }

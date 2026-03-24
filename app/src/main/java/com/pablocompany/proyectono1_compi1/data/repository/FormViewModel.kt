@@ -9,6 +9,9 @@ import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariore
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledforms.compiledquests.CompiledSelectQuest
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.CompiledSection
 import com.pablocompany.proyectono1_compi1.compiler.backend.modelos.formulariorecursos.compiledlayouts.CompiledTable
+import com.pablocompany.proyectono1_compi1.data.clases.EvaluacionQuestion
+import com.pablocompany.proyectono1_compi1.data.clases.ReporteFormulario
+import com.pablocompany.proyectono1_compi1.ui.screens.editor.toDisplayString
 
 /*ViewModel que representa a las respuestas del formulario  (FUNCIONAMIENTO BASICO CON HASHMAP)*/
 class FormViewModel : ViewModel() {
@@ -38,90 +41,91 @@ class FormViewModel : ViewModel() {
 
 
     /*Metodo utilizado para poder calificar las respuestas obtenidas en el resultado*/
-    fun caluclarPuntaje(componentes: List<Any>): Pair<Int, Int> {
-        var aciertos = 0
-        var totalPreguntas = 0
+    fun calcularReporteDetallado(
+        componentes: List<Any>,
+        respuestasUsuario: Map<String, Any>
+    ): ReporteFormulario {
+        val evaluacionMap = mutableMapOf<String, EvaluacionQuestion>()
 
-        // Función interna recursiva para no repetir código
-        fun procesarRecursivo(lista: List<Any>) {
+        fun procesar(lista: List<Any>) {
             lista.forEach { comp ->
                 when (comp) {
-                    is CompiledTable -> {
-                        val todosLosElementos = comp.elementos?.flatten() ?: emptyList()
-                        procesarRecursivo(todosLosElementos)
+                    is CompiledTable -> procesar(comp.elementos?.flatten() ?: emptyList())
+                    is CompiledSection -> procesar(comp.elementos ?: emptyList())
+
+                    is CompiledSelectQuest, is CompiledDropQuest -> {
+                        // Extraemos datos según el tipo
+                        val fila = if (comp is CompiledSelectQuest) comp.fila else (comp as CompiledDropQuest).fila
+                        val col = if (comp is CompiledSelectQuest) comp.columna else (comp as CompiledDropQuest).columna
+                        val texto = if (comp is CompiledSelectQuest) comp.texto.toDisplayString() else (comp as CompiledDropQuest).texto.toDisplayString()
+                        val resCorrectaRaw = if (comp is CompiledSelectQuest) comp.respuesta else (comp as CompiledDropQuest).respuesta
+
+                        val id = "${fila}_${col}"
+                        val evaluacion = evaluarSimple(fila, col, texto, resCorrectaRaw, respuestasUsuario)
+
+                        // Guardamos en el mapa usando el ID como llave
+                        evaluacionMap[id] = evaluacion
                     }
-                    is CompiledSection -> {
-                        procesarRecursivo(comp.elementos ?: emptyList())
-                    }
-                    is CompiledMultipleQuest -> {
-                        totalPreguntas++
-                        val id = "${comp.fila}_${comp.columna}"
 
-                        val respuestaUsuario = (_answers[id] as? List<*>)
-                            ?.mapNotNull { it?.toString()?.toDoubleOrNull()?.toInt() }
-                            ?.sorted() ?: emptyList()
-
-                        val respuestaCorrecta = (comp.respuesta as? List<*>)
-                            ?.mapNotNull { it?.toString()?.toDoubleOrNull()?.toInt() }
-                            ?.sorted() ?: emptyList()
-
-                        if (respuestaUsuario.isNotEmpty() && respuestaUsuario == respuestaCorrecta) {
-                            aciertos++
-                        }
-                    }
-                    is CompiledDropQuest -> {
-                        totalPreguntas++
-                        val id = "${comp.fila}_${comp.columna}"
-
-                        val respuestaUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
-
-                        val respuestaCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
-
-                        if (respuestaUsuario != null && respuestaUsuario == respuestaCorrecta) {
-                            aciertos++
-                        }
-                    }
-                    is CompiledSelectQuest -> {
-                        totalPreguntas++
-                        val id = "${comp.fila}_${comp.columna}"
-
-                        val respuestaUsuario = _answers[id]?.toString()?.toDoubleOrNull()?.toInt()
-                        val respuestaCorrecta = comp.respuesta?.toString()?.toDoubleOrNull()?.toInt()
-
-                        if (respuestaUsuario != null && respuestaUsuario == respuestaCorrecta) {
-                            aciertos++
-                        }
-                    }
                     is CompiledOpenQuest -> {
-
-                        totalPreguntas++
                         val id = "${comp.fila}_${comp.columna}"
+                        val res = respuestasUsuario[id]?.toString() ?: ""
+                        val esBien = res.trim().isNotEmpty()
+                        evaluacionMap[id] = EvaluacionQuestion(
+                            id = id,
+                            titulo = comp.texto.toDisplayString(),
+                            respuestaUsuario = res,
+                            respuestaCorrecta = "Abierta",
+                            esCorrecta = esBien,
+                            esInformativa = true
+                        )
+                    }
 
-                        val respuestaTexto = _answers[id] as? String ?: ""
+                    is CompiledMultipleQuest -> {
+                        val id = "${comp.fila}_${comp.columna}"
+                        val resU = (respuestasUsuario[id] as? List<*>)?.mapNotNull { it.toString().toDoubleOrNull()?.toInt() }?.sorted() ?: emptyList()
+                        val resC = (comp.respuesta as? List<*>)?.mapNotNull { it.toString().toDoubleOrNull()?.toInt() }?.sorted() ?: emptyList()
 
-                        if (respuestaTexto.trim().isNotEmpty()) {
-                            aciertos++
-                        }
+                        val esInformativa = resC.isEmpty()
+                        val esCorrecta = if (esInformativa) resU.isNotEmpty() else resU == resC
+
+                        evaluacionMap[id] = EvaluacionQuestion(id, "Pregunta Múltiple", resU, resC, esCorrecta, esInformativa)
                     }
                 }
             }
         }
 
-        procesarRecursivo(componentes)
+        procesar(componentes)
 
-        return Pair(aciertos, totalPreguntas)
+        val aciertos = evaluacionMap.values.count { it.esCorrecta }
+        val total = evaluacionMap.size
+
+        return ReporteFormulario(
+            detalles = evaluacionMap,
+            aciertos = aciertos,
+            total = total,
+            porcentaje = if(total > 0) (aciertos.toFloat() / total * 100) else 0f
+        )
     }
 
-    /*Metodo que permite validar si la respuesta esta correcta*/
-    fun isValid(id: String): Boolean {
-        val value = answers[id] as? String
-        return !value.isNullOrBlank()
+    /*Funcion auxiliar que permite validar si la respuesta es correcta simple*/
+    private fun evaluarSimple(fila: Int, col: Int, titulo: String, respuestaC: Any?, respuestasU: Map<String, Any>):  EvaluacionQuestion {
+        val id = "${fila}_${col}"
+        val respuestaUnitaria = respuestasU[id]?.toString()?.toDoubleOrNull()?.toInt()
+        val respuestaCorrecta = respuestaC?.toString()?.toDoubleOrNull()?.toInt() ?: -1
+
+        val esInformativa = respuestaC == -1
+        val esCorrecta = if (esInformativa) respuestaUnitaria != null else respuestaUnitaria == respuestaCorrecta
+
+        return EvaluacionQuestion(id, titulo, respuestaUnitaria, respuestaCorrecta, esCorrecta, esInformativa)
     }
 
     /*Funcion que permite limpiar el hash*/
     fun clear() {
         _answers.clear()
     }
+
+    fun getAllAnswers(): Map<String, Any> = _answers.toMap()
 
 
 }

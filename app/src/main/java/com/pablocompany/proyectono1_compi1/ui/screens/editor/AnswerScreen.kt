@@ -30,12 +30,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Airplay
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
@@ -49,6 +52,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -62,12 +66,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.pablocompany.proyectono1_compi1.data.clases.ReporteFormulario
 import com.pablocompany.proyectono1_compi1.data.repository.AnswerViewModel
 import com.pablocompany.proyectono1_compi1.data.repository.FormViewModel
 
@@ -98,6 +105,9 @@ fun AnswerScreen(
 
     /*Viewmodel de respuestas*/
     val viewModel: FormViewModel = viewModel()
+
+    /*Estados mutables para poder reconocer las respuestas*/
+    var reporte by remember { mutableStateOf<ReporteFormulario?>(null) }
 
     LaunchedEffect(errores) {
         if (errores.isNotEmpty()) {
@@ -271,7 +281,8 @@ fun AnswerScreen(
                                     component = componente,
                                     viewModel = viewModel,
                                     scale = scale,
-                                    usePosition = false
+                                    usePosition = false,
+                                    evaluationMap = reporte?.detalles
                                 )
                             }
                         }
@@ -284,6 +295,13 @@ fun AnswerScreen(
                         ) {
                             Button(
                                 onClick = {
+                                    val nuevoReporte = viewModel.calcularReporteDetallado(
+                                        componentes = interpretado?.codigo ?: emptyList(),
+                                        respuestasUsuario = viewModel.getAllAnswers()
+                                    )
+
+                                    reporte = nuevoReporte
+
                                     showDialog = true
                                 },
                                 modifier = Modifier.weight(1f),
@@ -491,72 +509,81 @@ fun AnswerScreen(
 
         /* ===== RESULTADO DEL FORMULARIO QUE PERMITE CALIFICAR LAS RESPUESTAS===== */
 
-        if (showDialog) {
-            val resultado = remember(showDialog) {
-                viewModel.caluclarPuntaje(interpretado?.codigo ?: emptyList())
-            }
-
+        if (showDialog && reporte != null) {
             AlertDialog(
                 onDismissRequest = { showDialog = false },
-                containerColor = Color(0xFF1E1E1E),
+                properties = DialogProperties(usePlatformDefaultWidth = false),
+                modifier = Modifier.fillMaxWidth(0.85f),
+                containerColor = Color(0xFF1A1A1A),
+                shape = RoundedCornerShape(24.dp),
                 title = {
-                    Text(
-                        text = if (resultado.second > 0) "Resultado de Evaluacion" else "Formulario Enviado",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                text = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        if (resultado.second > 0) {
-                            val porcentaje =
-                                (resultado.first.toFloat() / resultado.second * 100).toInt()
+                        Text(
+                            text = if (reporte!!.total > 0) "Resultado de Evaluación" else "Formulario Enviado",
+                            color = Color.White,
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        // --- M3: Adiós Divider, hola HorizontalDivider ---
+                        HorizontalDivider(
+                            modifier = Modifier.padding(top = 12.dp),
+                            thickness = 1.dp,
+                            color = Color.White.copy(alpha = 0.1f)
+                        )
+                    }
+                },
+                text = {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+                    ) {
+                        if (reporte!!.total > 0) {
+                            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(120.dp)) {
+                                CircularProgressIndicator(
+                                    progress = { reporte!!.porcentaje / 100f },
+                                    modifier = Modifier.fillMaxSize(),
+                                    color = if (reporte!!.porcentaje >= 61) Color(0xFF4CAF50) else Color(0xFFF44336),
+                                    strokeWidth = 8.dp,
+                                    trackColor = Color.White.copy(alpha = 0.1f),
+                                    strokeCap = StrokeCap.Round
+                                )
+                                Text(
+                                    text = "${reporte!!.porcentaje.toInt()}%",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
+
+                            Spacer(Modifier.height(20.dp))
 
                             Text(
-                                text = "$porcentaje / 100",
-                                style = MaterialTheme.typography.displayMedium,
-                                color = if (porcentaje >= 61) Color(0xFF4CAF50) else Color(
-                                    0xFFF44336
-                                ),
-                                fontWeight = FontWeight.Black
-                            )
-
-                            Spacer(Modifier.height(8.dp))
-
-                            Text(
-                                text = "Aciertos: ${resultado.first} de ${resultado.second}",
+                                text = "Aciertos: ${reporte!!.aciertos} de ${reporte!!.total}",
+                                style = MaterialTheme.typography.bodyLarge,
                                 color = Color.LightGray
                             )
-                        } else {
-                            Icon(
-                                Icons.Default.CheckCircle,
-                                contentDescription = null,
-                                tint = Color(0xFF4CAF50),
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Spacer(Modifier.height(16.dp))
+
                             Text(
-                                "Tu respuesta ha sido procesada con exito.",
-                                color = Color(0xFFCCCCCC),
-                                textAlign = TextAlign.Center
+                                text = if(reporte!!.porcentaje >= 61) "¡Excelente trabajo!" else "Revisa tus errores abajo.",
+                                color = if(reporte!!.porcentaje >= 61) Color(0xFF81C784) else Color(0xFFE57373),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(top = 8.dp)
                             )
+                        } else {
+                            Icon(Icons.Default.CloudDone, null, tint = Color(0xFF4CAF50), modifier = Modifier.size(64.dp))
+                            Text("¡Informacion enviada con exito!", color = Color.White, modifier = Modifier.padding(top = 16.dp))
                         }
                     }
                 },
                 confirmButton = {
-                    Button(
-                        onClick = {
-                            showDialog = false
-
-                            //viewModel.clear()
-                            // answerViewModel.limpiarResultado()
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D47A1))
+                    TextButton(
+                        onClick = { showDialog = false },
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                     ) {
-                        Text("Aceptar", color = Color.White)
+                        Text("Cerrar y Revisar", fontWeight = FontWeight.ExtraBold, color = Color(0xFF64B5F6))
                     }
                 }
             )
