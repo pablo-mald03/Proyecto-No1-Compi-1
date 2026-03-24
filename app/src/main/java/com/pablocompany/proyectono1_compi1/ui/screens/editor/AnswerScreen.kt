@@ -289,44 +289,85 @@ fun AnswerScreen(
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val nuevoReporte = viewModel.calcularReporteDetallado(
+                                            componentes = interpretado?.codigo ?: emptyList(),
+                                            respuestasUsuario = viewModel.getAllAnswers()
+                                        )
+
+                                        reporte = nuevoReporte
+
+                                        showDialog = true
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(
+                                            0xFF04643C
+                                        )
+                                    ),
+                                    shape = RoundedCornerShape(14.dp)
+                                ) {
+                                    Text(
+                                        "Enviar",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+
+                                Button(
+                                    onClick = { showCloseDialog = true },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(
+                                            0xFF09066E
+                                        )
+                                    ),
+                                    shape = RoundedCornerShape(14.dp)
+                                ) {
+                                    Text(
+                                        "Cerrar",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+
+
                             Button(
                                 onClick = {
-                                    val nuevoReporte = viewModel.calcularReporteDetallado(
-                                        componentes = interpretado?.codigo ?: emptyList(),
-                                        respuestasUsuario = viewModel.getAllAnswers()
-                                    )
 
-                                    reporte = nuevoReporte
-
-                                    showDialog = true
+                                    reporte = null
+                                    viewModel.clear()
                                 },
-                                modifier = Modifier.weight(1f),
+                                modifier = Modifier.fillMaxWidth(),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Color(
-                                        0xFF04643C
+                                        0xFF015443
                                     )
                                 ),
                                 shape = RoundedCornerShape(14.dp)
+
                             ) {
-                                Text("Enviar", color = Color.White, fontWeight = FontWeight.Bold)
+                                Text(
+                                    "Reintentar",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
 
-                            Button(
-                                onClick = { showCloseDialog = true },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFF09066E
-                                    )
-                                ),
-                                shape = RoundedCornerShape(14.dp)
-                            ) {
-                                Text("Cerrar", color = Color.White, fontWeight = FontWeight.Bold)
-                            }
+
                         }
                         Spacer(modifier = Modifier.height(80.dp))
                     }
@@ -538,14 +579,21 @@ fun AnswerScreen(
                 text = {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
                     ) {
                         if (reporte!!.total > 0) {
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(120.dp)) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(120.dp)
+                            ) {
                                 CircularProgressIndicator(
                                     progress = { reporte!!.porcentaje / 100f },
                                     modifier = Modifier.fillMaxSize(),
-                                    color = if (reporte!!.porcentaje >= 61) Color(0xFF4CAF50) else Color(0xFFF44336),
+                                    color = if (reporte!!.porcentaje >= 61) Color(0xFF4CAF50) else Color(
+                                        0xFFF44336
+                                    ),
                                     strokeWidth = 8.dp,
                                     trackColor = Color.White.copy(alpha = 0.1f),
                                     strokeCap = StrokeCap.Round
@@ -567,23 +615,40 @@ fun AnswerScreen(
                             )
 
                             Text(
-                                text = if(reporte!!.porcentaje >= 61) "¡Excelente trabajo!" else "Revisa tus errores abajo.",
-                                color = if(reporte!!.porcentaje >= 61) Color(0xFF81C784) else Color(0xFFE57373),
+                                text = if (reporte!!.porcentaje >= 61) "¡Excelente trabajo!" else "Revisa tus errores abajo.",
+                                color = if (reporte!!.porcentaje >= 61) Color(0xFF81C784) else Color(
+                                    0xFFE57373
+                                ),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(top = 8.dp)
                             )
                         } else {
-                            Icon(Icons.Default.CloudDone, null, tint = Color(0xFF4CAF50), modifier = Modifier.size(64.dp))
-                            Text("¡Informacion enviada con exito!", color = Color.White, modifier = Modifier.padding(top = 16.dp))
+                            Icon(
+                                Icons.Default.CloudDone,
+                                null,
+                                tint = Color(0xFF4CAF50),
+                                modifier = Modifier.size(64.dp)
+                            )
+                            Text(
+                                "¡Informacion enviada con exito!",
+                                color = Color.White,
+                                modifier = Modifier.padding(top = 16.dp)
+                            )
                         }
                     }
                 },
                 confirmButton = {
                     TextButton(
                         onClick = { showDialog = false },
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
                     ) {
-                        Text("Cerrar y Revisar", fontWeight = FontWeight.ExtraBold, color = Color(0xFF64B5F6))
+                        Text(
+                            "Cerrar y Revisar",
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color(0xFF64B5F6)
+                        )
                     }
                 }
             )
